@@ -1,3 +1,3 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-class ModelCreate extends Claero_ModelCreate { }
+class ModelCreate extends cl4_ModelCreate { }
