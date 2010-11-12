@@ -270,6 +270,7 @@ class cl4_ORM extends Kohana_ORM {
 			} // foreach
 		} // if
 
+		// look for table column options inside $options
 		$table_column_options = Arr::get($options, 'table_columns', array());
 
 		foreach ($this->_table_columns as $column_name => $meta_data) {
@@ -285,6 +286,7 @@ class cl4_ORM extends Kohana_ORM {
 				}
 			} // if
 
+			// get the options passed in for this column
 			$this_table_column_options = Arr::get($table_column_options, $column_name, array());
 
 			// merge the defaults for the field type or just general defaults with the meta data in _table_columns
@@ -480,11 +482,15 @@ class cl4_ORM extends Kohana_ORM {
 					// determine the field type class name
 					$field_type_class_name = ORM_FieldType::get_field_type_class_name($column_info['field_type']);
 
-					if ($this->_mode != 'view' && in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
-						$field_html_name = $this->get_field_html_name($column_name);
+					$field_html_name = $this->get_field_html_name($column_name);
 
+					// determine the value of the field based on the default value
+					$pk = $this->pk();
+					$field_value = ($this->_options['load_defaults'] && $this->_mode == 'add' && empty($pk) ? $column_info['field_options']['default_value'] : $this->$column_name);
+
+					if ($this->_mode != 'view' && in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 						// hidden (or other fields) are a special case because they don't get a column or row in a table and they will not be displayed
-						$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $this->$column_name, $field_attributes, $column_info['field_options'], $this);
+						$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 
 					} else {
 						// get the field label when it's set and not NULL
@@ -492,8 +498,6 @@ class cl4_ORM extends Kohana_ORM {
 						if ($column_info['field_type'] == 'password_confirm') {
 							$field_label .= HEOL . (isset($this->_labels[$column_name]) && $this->_labels[$column_name] !== NULL ? $this->_labels[$column_name] : $column_name) . ' Confirm';
 						}
-
-						$field_html_name = $this->get_field_html_name($column_name);
 
 						// set default name, might be overidden below
 						$name_html = Form::label($field_html_name, $field_label, $label_attributes);
@@ -512,10 +516,6 @@ class cl4_ORM extends Kohana_ORM {
 
 							$field_html = call_user_func($field_type_class_name . '::view_html', $this->$column_name, $column_name, $this, $view_html_options, $source);
 						} else {
-							// determine the value of the field based on the default value
-							$pk = $this->pk();
-							$field_value = ($this->_options['load_defaults'] && $this->_mode == 'add' && empty($pk) ? $column_info['field_options']['default_value'] : $this->$column_name);
-
 							$field_html = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 						}
 
