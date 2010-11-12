@@ -512,7 +512,11 @@ class cl4_ORM extends Kohana_ORM {
 
 							$field_html = call_user_func($field_type_class_name . '::view_html', $this->$column_name, $column_name, $this, $view_html_options, $source);
 						} else {
-							$field_html = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $this->$column_name, $field_attributes, $column_info['field_options'], $this);
+							// determine the value of the field based on the default value
+							$pk = $this->pk();
+							$field_value = ($this->_options['load_defaults'] && $this->_mode == 'add' && empty($pk) ? $column_info['field_options']['default_value'] : $this->$column_name);
+
+							$field_html = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 						}
 
 						// add the field label and data in the object

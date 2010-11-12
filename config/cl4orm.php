@@ -103,7 +103,8 @@ return array(
 			),
 		),
 	),
-	// Claero_ORM class default options
+
+	// cl4_ORM class default options
 	'default_options' => array(
 		'request_action_name' => 'c_user_action',
 		'request_object_name' => 'c_object_name',
@@ -298,7 +299,7 @@ return array(
 		'display_no_rows' => TRUE,
 		'add_numrows_dropdown' => FALSE,
 
-		'load_defaults' => TRUE, // this overrides all the table & column specific settings, unless sent in as an option specifically for the table or column
+		'load_defaults' => TRUE, // if set to true, then the defaults field value (default_value) specified in the model for the field will be used; otherwise, it will be ignored so (likely) NULL will be used
 		'generate_row_id' => FALSE, // if true, the a row ID will be added to each row
 		'row_id_prefix' => '', // when generate_row_id is true, then this will be used as the prefix to the row id
 		// these fields will be added to the hidden fields array when generating the form and will not be included in the _field_html array and therefore will not get a row in an edit form

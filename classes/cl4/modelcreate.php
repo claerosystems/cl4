@@ -54,7 +54,7 @@ class cl4_ModelCreate {
 		$model_code .= TAB . 'protected $_primary_key = \'' . 'id' . '\'; // default: id' . EOL;
 		// todo: guess at a smart primary value
 		$model_code .= TAB . 'protected $_primary_val = \'' . 'name' . '\'; // default: name (column used as primary value)' . EOL;
-		$model_code .= TAB . 'public $_table_name_display = \'' . Claero::underscores_to_words($table_name) . '\'; // cl4-specific' . EOL;
+		$model_code .= TAB . 'public $_table_name_display = \'' . cl4::underscores_to_words($table_name) . '\'; // cl4-specific' . EOL;
 
 		// add the column labels
 		$model_code .= EOL;
