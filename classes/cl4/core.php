@@ -171,10 +171,10 @@ class cl4_Core extends Kohana_Core {
 	 * Also applies Security::xss_clean()
 	 * If the value is NULL and $type is NULL then NULL will be returned
 	 *
-	 * @param 		string		the key of the paramter
-	 * @param		mixed		the default value
-	 * @param      string      used for type casting, can be 'int' or 'string' right now
-	 * @return  	mixed		the value of the parameter, or $default, or null
+	 * @param  string  the key of the paramter
+	 * @param  mixed  the default value
+	 * @param  string  used for type casting, can be 'int', 'string' or 'array'
+	 * @return  mixed  the value of the parameter, or $default, or null
 	 */
 	public static function get_param($key, $default = NULL, $type = NULL) {
 		// look in POST
@@ -193,26 +193,8 @@ class cl4_Core extends Kohana_Core {
 		// check for GET; only look for it if the value was not set in POST or the Route (Request)
 		if (empty($value)) $value = Arr::get($_GET, $key, $default);
 
-		// only do xss_clean when the value is not NULL (likely the default)
-		if ($value !== NULL) {
-			// do some cleaning, this will likely change in the future because xss_clean may be deprecated
-			$cleaned_value = Security::xss_clean($value);
-		} else {
-			$cleaned_value = $value;
-		}
-
-		// cast the type if one is specified
-		switch($type) {
-			case 'int':
-				$cleaned_value = (int) $cleaned_value;
-				break;
-			case 'string':
-				$cleaned_value = (string) $cleaned_value;
-				break;
-		} // switch
-
-		return $cleaned_value;
-	} // function
+		return cl4::clean_param($value, $type);
+	} // function get_param
 
 	/**
 	* Returns the value from the POST or GET based on the array keys, if it exists
@@ -221,7 +203,7 @@ class cl4_Core extends Kohana_Core {
 	*
 	* @param  array  $array_keys array keys to the location in the request
 	* @param  mixed  the default value if nothing is found
-	* @param  string  used for type casting, can be 'int' or 'string' right now
+	* @param  string  used for type casting, can be 'int', 'string' or 'array'
 	* @return  mixed  the value of the parameter, or $default, or null
 	*/
 	public static function get_param_array($array_keys, $default = NULL, $type = NULL) {
@@ -232,8 +214,21 @@ class cl4_Core extends Kohana_Core {
 		$value = Arr::path($_POST, $path);
 		if (empty($value)) Arr::path($_GET, $path, $default);
 
-		// only do xss_clean when the value is not NULL (likely the default)
-		if ($value !== NULL) {
+		return cl4::clean_param($value, $type);
+	} // function get_param_array
+
+	/**
+	* Cleans the value using xss_clean and optionally casts it to a certain type
+	* Security::xss_clean() will only be applied on string and array values (other values don't need to be cleaned)
+	*
+	* @param  mixed  $value  the value to be cleaned
+	* @param  string  $type  used for type casting, can be 'int', 'string' or 'array'
+	* @return  mixed  the cleaned value
+	*/
+	public static function clean_param($value, $type = NULL) {
+		// only do xss_clean when the value is a string or an array
+		// other types, such as bools, NULL or integers don't need to be cleaned
+		if (is_string($value) || is_array($value)) {
 			// do some cleaning, this will likely change in the future because xss_clean may be deprecated
 			$cleaned_value = Security::xss_clean($value);
 		} else {
@@ -245,13 +240,15 @@ class cl4_Core extends Kohana_Core {
 			case 'int':
 				$cleaned_value = (int) $cleaned_value;
 				break;
+			case 'array' :
+				if ( ! is_array($cleaned_value)) $cleaned_value = (array) $cleaned_value;
 			case 'string':
 				$cleaned_value = (string) $cleaned_value;
 				break;
 		} // switch
 
 		return $cleaned_value;
-	} // function get_param_array
+	} // function clean_param
 
 	/**
 	* WARNING: right now this just returns the table names as an array of table_name => table_name
