@@ -172,9 +172,9 @@ class cl4_Core extends Kohana_Core {
 	 * If the value is NULL and $type is NULL then NULL will be returned
 	 *
 	 * @param 		string		the key of the paramter
-	 * @param		string		the default value
+	 * @param		mixed		the default value
 	 * @param      string      used for type casting, can be 'int' or 'string' right now
-	 * @return  	string		the value of the parameter, or $default, or null
+	 * @return  	mixed		the value of the parameter, or $default, or null
 	 */
 	public static function get_param($key, $default = NULL, $type = NULL) {
 		// look in POST
@@ -214,26 +214,44 @@ class cl4_Core extends Kohana_Core {
 		return $cleaned_value;
 	} // function
 
-    /**
-	* Returns the key from the $_FILES array using Arr::path() with the location specified in $array_keys
-	* $key will be added as the second key
+	/**
+	* Returns the value from the POST or GET based on the array keys, if it exists
+	* Also applies Security::xss_clean()
+	* If the value is NULL and $type is NULL then NULL will be returned
 	*
-	* @param array $array_keys array keys to the location in the $_FILES array
-	* @param string $key The key you want to retrieve from the $_FILES array, such as: name, tmp_name, mime_type, etc
-	* @return mixed
+	* @param  array  $array_keys array keys to the location in the request
+	* @param  mixed  the default value if nothing is found
+	* @param  string  used for type casting, can be 'int' or 'string' right now
+	* @return  mixed  the value of the parameter, or $default, or null
 	*/
 	public static function get_param_array($array_keys, $default = NULL, $type = NULL) {
-		// add the first key of the passed array plus the key we are looking for to the path
-		$path = $array_keys[0] . '.' . $key;
+		// determine the path to the file
+		$path = implode('.', $array_keys);
 
-		$total_keys = count($array_keys) - 1;
+		// look in post and if it's not there, look in get
+		$value = Arr::path($_POST, $path);
+		if (empty($value)) Arr::path($_GET, $path, $default);
 
-		for ($i = 1; $i <= $total_keys; $i ++) {
-			$path .= '.' . $array_keys[$i];
+		// only do xss_clean when the value is not NULL (likely the default)
+		if ($value !== NULL) {
+			// do some cleaning, this will likely change in the future because xss_clean may be deprecated
+			$cleaned_value = Security::xss_clean($value);
+		} else {
+			$cleaned_value = $value;
 		}
 
-		return Arr::path($_FILES, $path);
-	} // function
+		// cast the type if one is specified
+		switch($type) {
+			case 'int':
+				$cleaned_value = (int) $cleaned_value;
+				break;
+			case 'string':
+				$cleaned_value = (string) $cleaned_value;
+				break;
+		} // switch
+
+		return $cleaned_value;
+	} // function get_param_array
 
 	/**
 	* WARNING: right now this just returns the table names as an array of table_name => table_name
