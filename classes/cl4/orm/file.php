@@ -47,9 +47,15 @@ class cl4_ORM_File extends ORM_FieldType {
 				} // if
 
 				// remove the existing filename and original file name column data
-				$orm_model->$column_name = NULL;
+				if ($options['is_nullable']) {
+					$no_value = NULL;
+				} else {
+					$no_value = '';
+				}
+
+				$orm_model->$column_name = $no_value;
 				if ( ! empty($file_options['original_filename_column'])) {
-					$orm_model->$file_options['original_filename_column'] = NULL;
+					$orm_model->$file_options['original_filename_column'] = $no_value;
 				}
 
 			} catch (Exception $e) {

@@ -183,6 +183,8 @@ class cl4_ModelCreate {
 				$meta_data['field_type'] = 'text';
 			}
 
+			$meta_data['is_nullable'] = $column_data['is_nullable'];
+
 			// now that we know the field type, lets merge in some defaults
 			$default_meta_data = Kohana::config('cl4orm.default_meta_data');
 

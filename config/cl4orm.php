@@ -17,6 +17,13 @@ return array(
 		'search_flag' => FALSE,    // displays this field in the search mode (search form)
 		'view_flag' => FALSE,      // displays this field in the view mode
 		'display_order' => 0,      // the order in which to display the columns
+		/**
+		* determines if the field can be set to NULL; TRUE means that it can be set to NULL; FALSE means that it can't
+		* this is used most often in situations where the field is not received in the post because the field wasn't display although still editable
+		* ORM_FieldType or sub class will check if the field is nullable before trying to set it to NULL
+		* defaults to true because that's the default functionality of Kohana (to allow for NULL values)
+		*/
+		'is_nullable' => TRUE,
 		'field_attributes' => array(),// attributes to be passed to the Form class as field attributes
 		// options to be passed to the Form class method and ORM_FieldType (or sub class); may also contain sub array of file_options
 		'field_options' => array(

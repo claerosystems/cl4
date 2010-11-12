@@ -30,7 +30,9 @@ class cl4_ORM_Phone extends ORM_FieldType {
 				// no phone or partial phone received so we can't do anything as we don't know how to format it
 				$orm_model->$column_name = '';
 			}
-		} else {
+
+		// only set the value if it's not NULL or is nullable
+		} else if ($value !== NULL || $options['is_nullable']) {
 			$orm_model->$column_name = $value;
 		} // if
 	} // function

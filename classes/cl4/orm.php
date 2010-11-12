@@ -383,6 +383,7 @@ class cl4_ORM extends Kohana_ORM {
 	protected function get_save_options($column_name = NULL) {
 		$options = array(
 			'field_name_prefix' => $this->_options['field_name_prefix'],
+			'is_nullable' => $this->_table_columns[$column_name]['is_nullable'],
 		);
 
 		if ( ! empty($column_name)) {
@@ -1211,18 +1212,8 @@ class cl4_ORM extends Kohana_ORM {
 				if ($column_name != $this->_primary_key && ($column_meta['edit_flag'] || in_array($column_name, $this->_ignored_columns))) {
 					$save_options = $this->get_save_options($column_name);
 
-					// do extra processing based on field type
-					if (array_key_exists($column_name, $post)) {
-						if (isset($column_meta['field_type'])) {
-							// this will set the value using the passed ORM model
-							call_user_func(ORM_FieldType::get_field_type_class_name($column_meta['field_type']) . '::save', $post, $column_name, $save_options, $this);
-						} // if
-
-					// deal with the fields that are not in the post array, like checkboxes and files
-					} else {
-						// this will set the value using the passed ORM model
-						call_user_func(ORM_FieldType::get_field_type_class_name($column_meta['field_type']) . '::save', $post, $column_name, $save_options, $this);
-					} // if
+					// this will set the value in the passed ORM model
+					call_user_func(ORM_FieldType::get_field_type_class_name($column_meta['field_type']) . '::save', $post, $column_name, $save_options, $this);
 				} // if
 			} // foreach
 		} catch (Exception $e) {

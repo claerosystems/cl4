@@ -19,7 +19,9 @@ class cl4_ORM_Select extends ORM_FieldType {
 	public static function save($post, $column_name, array $options = array(), ORM $orm_model = NULL) {
 		$value = Arr::get($post, $column_name);
 
-		$orm_model->$column_name = ($value == 'none' || $value == 'all' || $value == '' ? 0 : $value);
+		if ($value !== NULL || $options['is_nullable']) {
+			$orm_model->$column_name = ($value == 'none' || $value == 'all' || $value == '' ? 0 : $value);
+		}
 	}
 
 	public static function search($column_name, $html_name, $selected, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {

@@ -25,14 +25,21 @@ class cl4_ORM_FieldType {
 	}
 
 	/**
-	* Received the request value and returns the value that should be passed to the ORM through save_values() for use in it's __set() function
-	* This can also return an array. If it's an array, the key will be used as the column name and the value, the value of the column.
+	* Receives the request array ($post) and sets the value within the model ($orm_model)
+	* This is made for specifically dealing with POST or GET values, and may have strange affects if using it to set values otherwise
+	* If the value is_nullable (according the options), then if the key is not present in $post, the value will be set to NULL.
+	* If the value is not in $post and the field is not nullable, then it will not be set at all.
 	*/
 	public static function save($post, $column_name, array $options = array(), ORM $orm_model = NULL) {
 		$options += array(
 			'default_value' => NULL,
 		);
-		$orm_model->$column_name = Arr::get($post, $column_name, $options['default_value']);
+
+		$value = Arr::get($post, $column_name, $options['default_value']);
+
+		if ($value !== NULL || $options['is_nullable']) {
+			$orm_model->$column_name = $value;
+		}
 	}
 
 	/**

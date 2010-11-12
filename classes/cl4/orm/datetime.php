@@ -15,8 +15,10 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 			$value['sec']	= array_key_exists('sec', $value) 	? $value['sec'] 	: 0;
 
 			$orm_model->$column_name = sprintf('%s %0.2d:%0.2d:%0.2d', $value['date'], $value['hour'], $value['min'], $value['sec']);
-		} else {
+		} else if ( ! is_array($value)) {
 			$orm_model->$column_name = $value;
+		} else if ($options['is_nullable']) {
+			$orm_model->$column_name = NULL;
 		} // if
 	} // function
 
