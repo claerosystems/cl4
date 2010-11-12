@@ -486,7 +486,7 @@ class cl4_ORM extends Kohana_ORM {
 
 					// determine the value of the field based on the default value
 					$pk = $this->pk();
-					$field_value = ($this->_options['load_defaults'] && $this->_mode == 'add' && empty($pk) ? $column_info['field_options']['default_value'] : $this->$column_name);
+					$field_value = ($this->_options['load_defaults'] && $this->_mode == 'add' && empty($pk) && empty($this->$column_name) ? $column_info['field_options']['default_value'] : $this->$column_name);
 
 					if ($this->_mode != 'view' && in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 						// hidden (or other fields) are a special case because they don't get a column or row in a table and they will not be displayed
@@ -635,7 +635,7 @@ class cl4_ORM extends Kohana_ORM {
 	 */
 	public function get_form(array $options = array()) {
 		// set options if passed
-		if (count($options) > 0) $this->set_options($options);
+		if ( ! empty($options)) $this->set_options($options);
 
 		$this->_form_buttons = array();
 		$target_route = $this->_options['target_route'];
@@ -734,7 +734,7 @@ class cl4_ORM extends Kohana_ORM {
 	 */
 	public function get_view(array $options = array()) {
 		// set options if passed
-		if (count($options) > 0) $this->set_options($options);
+		if ( ! empty($options)) $this->set_options($options);
 
 		// generate the form field html (this also gets the default data)
 		$this->prepare_form();
@@ -774,20 +774,18 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* get a table with data from the specified model
-	* todo: merge this with get_editable_list() ?
-	* todo: or implement all the latest functions in get_editable_list() that apply to this method as well
+	* @todo: move to MultiORM
+	* @todo: merge this with get_editable_list() ?
+	* @todo: or implement all the latest functions in get_editable_list() that apply to this method as well
 	*
 	* @param array $options
 	*/
 	public function get_list($options = array()) {
-		$this->set_options($options);
+		if ( ! empty($options)) $this->set_options($options);
 
 		$table_data = array();
 		$table_heading = array();
 		$returnHtml = '';
-
-		// set options if passed
-		if (count($options) > 0) $this->set_options($options);
 
 		// apply any mandatory search strings
 		$this->add_search_filter();
@@ -822,8 +820,7 @@ class cl4_ORM extends Kohana_ORM {
 			$returnHtml .= HTMLTable::factory($table_options)->get_html();
 
 		} catch (Exception $e) {
-
-			$returnHtml = kohana::debug($e);
+			throw $e;
 		}
 
 		return $returnHtml;
