@@ -82,7 +82,7 @@ class cl4_Form extends Kohana_Form {
 				$sql_source_options = Arr::overwrite($options, array('enable_parent' => FALSE)); // this is because there isn't support for parent relationships in radios (in the code below)
 				$source = Form::get_sql_source($source, $sql_source_options);
 			} catch (Exception $e) {
-				Kohana::exception_handler($e);
+				throw $e;
 			}
 		} else if (is_string($source)) {
 			throw new Kohana_Exception('cl4_Form::radios_sql() received a string, but it\'s not a select: :source', array(':source' => $source));
@@ -190,7 +190,7 @@ class cl4_Form extends Kohana_Form {
 			try {
 				$source = Form::get_sql_source($source, $options);
 			} catch (Exception $e) {
-				Kohana::exception_handler($e);
+				throw $e;
 			}
 		} else if (is_string($source)) {
 			throw new Kohana_Exception('cl4_Form::checkboxes_sql() received a string, but it\'s not a select: :source', array(':source' => $source));
@@ -491,19 +491,35 @@ class cl4_Form extends Kohana_Form {
 		return $html;
 	} // function date_drop
 
+	public static function select_model($name, ORM $source_model = NULL, $selected = NULL, array $attributes = NULL, array $options = array()) {
+		$default_options = array(
+			'source_value' => Form::$default_source_value,
+			'source_label' => Form::$default_source_label,
+		);
+		$options += $default_options;
+
+		try {
+			$source = $source_model->find_all()->as_array($options['source_value'], $options['source_label']);
+		} catch (Exception $e) {
+			throw $e;
+		}
+
+		return Form::select($name, $source, $selected, $attributes, $options);
+	} // function select_model
+
 	public static function select_sql($name, $source = NULL, $selected = NULL, array $attributes = NULL, array $options = array()) {
 		if (is_string($source) && stripos($source, 'select') !== false) {
 			try {
 				$source = Form::get_sql_source($source, $options);
 			} catch (Exception $e) {
-				Kohana::exception_handler($e);
+				throw $e;
 			}
 		} else if (is_string($source)) {
-			throw new Kohana_Exception('cl4_Form::select() received a string, but it\'s not a select: :source', array(':source' => $source));
+			throw new Kohana_Exception('cl4_Form::select() received a string, but it\'s not a SQL SELECT: :source', array(':source' => $source));
 		}
 
 		return Form::select($name, $source, $selected, $attributes, $options);
-	} // function
+	} // function select_sql
 
 	/**
 	* this function prepares the options and then calls the parent function to generate the select
