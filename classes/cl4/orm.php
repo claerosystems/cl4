@@ -129,14 +129,14 @@ class cl4_ORM extends Kohana_ORM {
 			// Ignore any rows that have expired
 			if (Database::SELECT == $type) {
 				$this->_db_builder->and_where_open()
-					  ->where($this->_expires_column['column'], ">", DB::expr("NOW()"))
-					  ->or_where($this->_expires_column['column'], "=", $this->_expires_column['default'])
-					  ->and_where_close();
-			}
-		}
+					->where($this->_expires_column['column'], '>', DB::expr("NOW()"))
+					->or_where($this->_expires_column['column'], '=', $this->_expires_column['default'])
+					->and_where_close();
+			} // if
+		} // if
 
 		return $this;
-	} // function
+	} // function _build
 
 	/**
 	 * Creates and returns a new model.
