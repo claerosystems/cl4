@@ -337,18 +337,12 @@ class cl4_ORM extends Kohana_ORM {
 	* todo: add html flag or non-html flag to class and use it?
 	* todo: not sure if we should return a string if not loaded, maybe throw an exception (this will return null or can be caught)
 	*
-	* @param mixed $colun_name
+	* @param  mixed  $colun_name
+	* @return  mixed  the value of the field after being passed through ORM_FieldType::view()
 	*/
-	public function get_value($column_name = '') {
-		$value = NULL;
-
-		if ($this->loaded()) {
-			$field_type = $this->_table_columns[$column_name]['field_type'];
-			$value = call_user_func(ORM_FieldType::get_field_type_class_name($field_type) . '::view', $this->$column_name, $column_name, $this);
-		} else {
-			// no data loaded yet
-			$value = '[' . __('no model loaded') . ']';
-		} // if
+	public function get_value($column_name) {
+		$field_type = $this->_table_columns[$column_name]['field_type'];
+		$value = call_user_func(ORM_FieldType::get_field_type_class_name($field_type) . '::view', $this->$column_name, $column_name, $this);
 
 		return $value;
 	} // function
