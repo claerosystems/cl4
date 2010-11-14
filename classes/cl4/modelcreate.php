@@ -140,6 +140,8 @@ class cl4_ModelCreate {
 			}
 			if ($last_field_part == '_id') {
 				$meta_data['field_type'] = 'select';
+				$meta_data['field_options']['source']['source'] = 'model';
+				$meta_data['field_options']['source']['data'] = substr($column_name, 0, strpos($column_name, '_'));;
 			}
 			if ($column_data['data_type'] == 'datetime' || $column_data['data_type'] == 'timestamp') {
 				$meta_data['field_type'] = 'datetime';
@@ -208,6 +210,7 @@ class cl4_ModelCreate {
 
 			// merge everything together
 			$meta_data = Arr::merge($default_meta_data, $default_meta_data_field_type, $meta_data);
+			$default_meta_data = Arr::merge($default_meta_data, $default_meta_data_field_type);
 
 			// now set some other stuff based on the field type (mostly attributes)
 			if ($meta_data['field_type'] == 'text') {
@@ -254,24 +257,37 @@ class cl4_ModelCreate {
 
 				// filter out optional fields for now, just include required
 				if ( ! array_key_exists($key, $default_meta_data) || $data !== $default_meta_data[$key] || in_array($key, array('field_type', 'display_order'))) {
-					if ($key == 'source_data') {
-						// don't need to escape data because none of the automatically generated SQL above includes quotes
-						$model_code .= TAB . TAB . TAB . '\'' . $key . '\' => "' . $data . '",' . EOL;
-					} else {
-						$model_code .= TAB . TAB . TAB . "'" . $key . "' => ";
-						if (is_array($data)) {
-							$model_code .= 'array(' . EOL;
-							foreach ($data as $sub_key => $sub_data) {
-								if ( ! array_key_exists($sub_key, $default_meta_data[$key]) || $sub_data !== $default_meta_data[$key][$sub_key]) {
-									$model_code .= TAB . TAB . TAB . TAB . "'" . $sub_key . "' => " . ModelCreate::return_code_value($sub_data) . ',' . EOL;
+					$model_code .= TAB . TAB . TAB . "'" . $key . "' => ";
+					if (is_array($data)) {
+
+						$model_code .= 'array(' . EOL;
+						foreach ($data as $sub_key => $sub_data) {
+							if ( ! array_key_exists($sub_key, $default_meta_data[$key]) || $sub_data !== $default_meta_data[$key][$sub_key]) {
+								$model_code .= TAB . TAB . TAB . TAB . "'" . $sub_key . "' => ";
+								if (is_array($sub_data)) {
+
+									$model_code .= 'array(' . EOL;
+									foreach ($sub_data as $_sub_key => $_sub_data) {
+										if ( ! isset($default_meta_data[$key][$sub_key]) || ! array_key_exists($_sub_key, $default_meta_data[$key][$sub_key]) || $_sub_data !== $default_meta_data[$key][$sub_key][$_sub_key]
+											// special case: add the source key to the source array so it's obvious what's being used
+											|| ($key == 'field_options' && $sub_key == 'source' && $_sub_key == 'source')) {
+											$model_code .= TAB . TAB . TAB . TAB . TAB . "'" . $_sub_key . "' => " . ModelCreate::return_code_value($_sub_data) . ',' . EOL;
+										}
+									} // foreach
+									$model_code .= TAB . TAB . TAB . TAB . ')';
+
+								} else {
+									$model_code .= ModelCreate::return_code_value($sub_data);
 								}
-							}
-							$model_code .= TAB . TAB . TAB . ')';
-						} else {
-							$model_code .= ModelCreate::return_code_value($data);
-						}
-						$model_code .= ',' . EOL;
+								$model_code .= ',' . EOL;
+							} // if
+						} // foreach
+						$model_code .= TAB . TAB . TAB . ')';
+
+					} else {
+						$model_code .= ModelCreate::return_code_value($data);
 					}
+					$model_code .= ',' . EOL;
 				} // if
 			} // foreach
 
