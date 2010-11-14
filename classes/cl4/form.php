@@ -584,9 +584,9 @@ class cl4_Form extends Kohana_Form {
 		} // if
 		// if there are any additional values, add them as well
 		if (is_array($options['add_values'])) {
-			foreach ($options['add_values'] as $value => $name) {
+			foreach ($options['add_values'] as $value => $option) {
 				// $name could be an array allowing the addition of optgroup's
-				$add_values[$value] = $name;
+				$add_values[$value] = $option;
 			}
 		} // if
 		// determine if there are any new values
@@ -631,7 +631,11 @@ class cl4_Form extends Kohana_Form {
 		$options += $default_options;
 
 		$html .= parent::password($name, $value, $attributes);
-		$this_attributes = Arr::overwrite($attributes, array('id' => $attributes['id'] . $options['confirm_id_append']));
+		if (array_key_exists('id', $attributes)) {
+			$this_attributes = Arr::overwrite($attributes, array('id' => $attributes['id'] . $options['confirm_id_append']));
+		} else {
+			$this_attributes = $attributes;
+		}
 		$this_attributes = Form::increment_tabindex($this_attributes);
 		$html .= ($options['2_lines'] ? HEOL : '') . parent::password($name . $options['confirm_name_append'], $value, $this_attributes);
 
