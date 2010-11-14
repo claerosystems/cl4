@@ -122,7 +122,15 @@ class cl4_ModelCreate {
 		// now create the column meta data lines
 		$display_order = 10;
 		foreach ($columns as $column_name => $column_data) {
+			// now that we know the field type, lets merge in some defaults
+			// global field type defaults
 			$meta_data = Kohana::config('cl4orm.default_meta_data');
+
+			// model create defaults
+			$model_create_defaults = (array) Kohana::config('cl4modelcreate.default_meta_data');
+
+			// merge the global model create and global defaults
+			$meta_data = Arr::merge($meta_data, $model_create_defaults);
 
 			// try to detect the field type
 			$last_field_part = substr($column_name, strrpos($column_name, '_'));
@@ -157,8 +165,10 @@ class cl4_ModelCreate {
 			switch ($column_name) {
 				case 'id' :
 					$meta_data['field_type'] = 'hidden';
+					$meta_data['edit_flag'] = TRUE;
 					$meta_data['list_flag'] = FALSE;
 					$meta_data['search_flag'] = FALSE;
+					$meta_data['view_flag'] = FALSE;
 					break;
 
 				case 'password' :
@@ -185,16 +195,19 @@ class cl4_ModelCreate {
 
 			$meta_data['is_nullable'] = $column_data['is_nullable'];
 
+			// get the model create defaults for the field type and then merge with the current values
+			$model_create_detaults_field_type = (array) Kohana::config('cl4modelcreate.default_meta_data_field_type.' . $meta_data['field_type']);
+			$meta_data = Arr::merge($model_create_detaults_field_type, $meta_data);
+
 			// now that we know the field type, lets merge in some defaults
+			// global field type defaults
 			$default_meta_data = Kohana::config('cl4orm.default_meta_data');
 
-			$default_meta_data_field_type = Kohana::config('cl4orm.default_meta_data_field_type');
-			if ( ! is_array($default_meta_data_field_type)) $default_meta_data_field_type = (array) $default_meta_data_field_type;
+			// get the defaults for the field type
+			$default_meta_data_field_type = (array) Kohana::config('cl4orm.default_meta_data_field_type.' . $meta_data['field_type']);
 
-			if ( ! empty($default_meta_data_field_type[$meta_data['field_type']])) {
-				$default_meta_data = Arr::merge($default_meta_data, $default_meta_data_field_type[$meta_data['field_type']]);
-			}
-			$meta_data = Arr::merge($default_meta_data, $meta_data);
+			// merge everything together
+			$meta_data = Arr::merge($default_meta_data, $default_meta_data_field_type, $meta_data);
 
 			// now set some other stuff based on the field type (mostly attributes)
 			if ($meta_data['field_type'] == 'text') {
@@ -206,7 +219,7 @@ class cl4_ModelCreate {
 					$meta_data['field_attributes']['maxlength'] = 'unknown';
 				}
 
-				if ($default_meta_data['field_attributes']['size'] > $meta_data['field_attributes']['maxlength']) {
+				if (isset($meta_data['field_attributes']['size']) && $meta_data['field_attributes']['size'] > $meta_data['field_attributes']['maxlength']) {
 					$meta_data['field_attributes']['size'] = $meta_data['field_attributes']['maxlength'];
 				}
 
@@ -240,7 +253,7 @@ class cl4_ModelCreate {
 				if ($key == 'display_order') $data = $display_order;
 
 				// filter out optional fields for now, just include required
-				if ($data !== $default_meta_data[$key] || in_array($key, array('field_type', 'display_order'))) {
+				if ( ! array_key_exists($key, $default_meta_data) || $data !== $default_meta_data[$key] || in_array($key, array('field_type', 'display_order'))) {
 					if ($key == 'source_data') {
 						// don't need to escape data because none of the automatically generated SQL above includes quotes
 						$model_code .= TAB . TAB . TAB . '\'' . $key . '\' => "' . $data . '",' . EOL;
@@ -249,7 +262,7 @@ class cl4_ModelCreate {
 						if (is_array($data)) {
 							$model_code .= 'array(' . EOL;
 							foreach ($data as $sub_key => $sub_data) {
-								if ($sub_data !== $default_meta_data[$key][$sub_key]) {
+								if ( ! array_key_exists($sub_key, $default_meta_data[$key]) || $sub_data !== $default_meta_data[$key][$sub_key]) {
 									$model_code .= TAB . TAB . TAB . TAB . "'" . $sub_key . "' => " . ModelCreate::return_code_value($sub_data) . ',' . EOL;
 								}
 							}
