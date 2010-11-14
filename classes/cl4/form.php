@@ -107,6 +107,7 @@ class cl4_Form extends Kohana_Form {
 	 * @param array  $attributes Attributes to apply to the radio inputs.
 	 * @param array  $options    Options to modify the creation of our inputs.
 	 *        orientation => the way that radio buttons and checkboxes are laid out, allowed: horizontal, vertical, table, table_vertical (puts text above the <input> separated by a <br />) (default: horizontal)
+	 *        radio_attributes => an array where the keys are the radio values and the values are arrays of attributes to be added to the radios
 	 *
 	 * @return string
 	 */
@@ -125,6 +126,7 @@ class cl4_Form extends Kohana_Form {
 			'table_attributes' => array(
 				'class' => 'radio_table',
 			),
+			'radio_attributes' => array(),
 		);
 		if (isset($options['table_attributes'])) $options['table_attributes'] += $default_options['table_attributes'];
 		$options += $default_options;
@@ -141,7 +143,7 @@ class cl4_Form extends Kohana_Form {
 				default :
 					$view_name = 'horizontal';
 					break;
-			}
+			} // switch
 			$options['view'] = 'cl4/form/radios_' . $view_name;
 		} // if
 
@@ -150,7 +152,6 @@ class cl4_Form extends Kohana_Form {
 			$attributes['id'] = uniqid();
 		}
 
-		$col = 1;
 		$fields = array();
 		foreach ($source as $radio_key => $radio_value) {
 			if ($options['escape_label']) {
@@ -164,6 +165,10 @@ class cl4_Form extends Kohana_Form {
 
 			// make an attribute for this radio based on the current id plus the value of the radio
 			$this_attributes = Arr::overwrite($attributes, array('id' => $attributes['id'] . '-' . $radio_key));
+
+			if (isset($options['radio_attributes'][$radio_key])) {
+				$this_attributes = Arr::merge($this_attributes, $options['radio_attributes'][$radio_key]);
+			}
 
 			$fields[] = array(
 				'radio' => Form::radio($name, $radio_key, $checked, $this_attributes),
