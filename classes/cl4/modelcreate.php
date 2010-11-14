@@ -180,6 +180,13 @@ class cl4_ModelCreate {
 					$meta_data['search_flag'] = FALSE;
 					break;
 
+				case 'expiry_date' :
+					$meta_data['edit_flag'] = FALSE;
+					$meta_data['list_flag'] = FALSE;
+					$meta_data['view_flag'] = FALSE;
+					$meta_data['search_flag'] = FALSE;
+					break;
+
 				case 'date_created' :
 				case 'date_modified' :
 				case 'created_by' :
