@@ -77,7 +77,10 @@ class cl4_Form extends Kohana_Form {
 		if ( ! empty($modulation_attributes['id'])) $modulation_attributes['id'] .= '-modulation';
 		$fields['am_pm'] = Form::radios($name . '[modulation]', array('am' => 'AM', 'pm' => 'PM'), $modulation, $modulation_attributes);
 
-		return View::factory($options['view'], array('fields' => $fields));
+		return View::factory($options['view'], array(
+			'fields' => $fields,
+			'options' => $options,
+		));
 	} // function datetime
 
 	public static function radios_sql($name, $source, $selected = NULL, array $attributes = NULL, array $options = array()) {
@@ -95,8 +98,6 @@ class cl4_Form extends Kohana_Form {
 		return Form::radios($name, $source, $selected, $attributes, $options);
 	} // function
 
-	// orientation => the way that radio buttons and checkboxes are laid out, allowed: horizontal, vertical, table, table_vertical (for radios only, puts text above the <input> separated by a <br />) (default: horizontal)
-
 	/**
 	 * Creates radio buttons for a form.
 	 *
@@ -105,6 +106,7 @@ class cl4_Form extends Kohana_Form {
 	 * @param mixed  $selected   The selected input.
 	 * @param array  $attributes Attributes to apply to the radio inputs.
 	 * @param array  $options    Options to modify the creation of our inputs.
+	 *        orientation => the way that radio buttons and checkboxes are laid out, allowed: horizontal, vertical, table, table_vertical (puts text above the <input> separated by a <br />) (default: horizontal)
 	 *
 	 * @return string
 	 */
@@ -113,6 +115,7 @@ class cl4_Form extends Kohana_Form {
 
 		$default_options = array(
 			'orientation' => 'horizontal',
+			'view' => NULL,
 			'replace_spaces' => TRUE,
 			'table_tag' => true,
 			'columns' => 2,
@@ -126,31 +129,30 @@ class cl4_Form extends Kohana_Form {
 		if (isset($options['table_attributes'])) $options['table_attributes'] += $default_options['table_attributes'];
 		$options += $default_options;
 
+		// if the view is empty, set to radios_[orientation] if the orientation is included in our list of orientations (for security)
+		if (empty($options['view'])) {
+			switch ($options['orientation']) {
+				case 'horizontal' :
+				case 'table' :
+				case 'table_vertical' :
+				case 'vertical' :
+					$view_name = $options['orientation'];
+					break;
+				default :
+					$view_name = 'horizontal';
+					break;
+			}
+			$options['view'] = 'cl4/form/radios_' . $view_name;
+		} // if
+
 		if (empty($attributes['id'])) {
 			// since we have no ID, but we need one for the labels, so just use a unique id
 			$attributes['id'] = uniqid();
 		}
 
-		if (($options['orientation'] == 'table' || $options['orientation'] == 'table_vertical') && $options['table_tag']) {
-			$html .= '<table' . HTML::attributes($options['table_attributes']) . '>';
-		}
-
 		$col = 1;
+		$fields = array();
 		foreach ($source as $radio_key => $radio_value) {
-			switch ($options['orientation']) {
-				case 'horizontal' :
-					if ($col != 1) $html .= '&nbsp;&nbsp;&nbsp;';
-					break;
-				case 'table' :
-				case 'table_vertical' :
-					if ($col == 1) $html .= EOL . '<tr>';
-					$html .= '<td>';
-					break;
-				default :
-					if ($col != 1) $html .= HEOL;
-					break;
-			} // switch orientation
-
 			if ($options['escape_label']) {
 				$radio_value = HTML::chars($radio_value);
 			}
@@ -163,30 +165,17 @@ class cl4_Form extends Kohana_Form {
 			// make an attribute for this radio based on the current id plus the value of the radio
 			$this_attributes = Arr::overwrite($attributes, array('id' => $attributes['id'] . '-' . $radio_key));
 
-			if ($options['orientation'] != 'table_vertical') {
-				$html .= '<label for="' . HTML::chars($this_attributes['id']) . '">' . Form::radio($name, $radio_key, $checked, $this_attributes) . '&nbsp;' . $radio_value . '</label>';
-			} else {
-				$html .= '<label for="' . HTML::chars($this_attributes['id']) . '">' . $radio_value . '<br>' . Form::radio($name, $radio_key, $checked, $this_attributes) . '</label>';
-			}
-
-			if ($options['orientation'] == 'table' || $options['orientation'] == 'table_vertical') {
-				$html .= '</td>' . EOL;
-				if ($col == $options['columns']) {
-					$html .= '</tr>' . EOL;
-					$col = 1;
-				} else {
-					++ $col;
-				}
-			} else {
-				++ $col;
-			}
+			$fields[] = array(
+				'radio' => Form::radio($name, $radio_key, $checked, $this_attributes),
+				'label' => $radio_value,
+				'label_tag' => '<label' . HTML::attributes(array('for' => $this_attributes['id'])) . '>',
+			);
 		} // foreach
 
-		if (($options['orientation'] == 'table' || $options['orientation'] == 'table_vertical') && $options['table_tag']) {
-			$html .= '</table>';
-		}
-
-		return $html;
+		return View::factory($options['view'], array(
+			'fields' => $fields,
+			'options' => $options,
+		));
 	} // function radios
 
 	public static function checkboxes_sql($name, $source, array $checked = NULL, array $attributes = NULL, array $options = array()) {
@@ -325,7 +314,7 @@ class cl4_Form extends Kohana_Form {
 			}
 		}
 
-		$html .= EOL . Form::checkbox($name, $checked, $checked, $attributes) . '<label for="' . HTML::chars($attributes['id']) . '">' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label>';
+		$html .= EOL . Form::checkbox($name, $checked, $checked, $attributes) . '<label' . HTML::attributes(array('for' => $attributes['id'])) . '>' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label>';
 
 		return $html;
 	} // function
@@ -347,7 +336,7 @@ class cl4_Form extends Kohana_Form {
 
 		if ($col == 1) $html .= '<tr>';
 
-		$html .= '<td>' . Form::checkbox($name, $checked, $checked, $attributes) . '<label for="' . HTML::chars($attributes['id']) . '">' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label></td>' . EOL;
+		$html .= '<td>' . Form::checkbox($name, $checked, $checked, $attributes) . '<label' . HTML::attributes(array('for' => $attributes['id'])) . '>' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label></td>' . EOL;
 
 		++ $col;
 
