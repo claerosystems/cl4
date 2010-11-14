@@ -88,7 +88,7 @@ class cl4_Message {
 			$file = '';
 		}
 
-		return View::factory('cl4/cl4_message_validate')
+		return View::factory('cl4/message/validate_errors')
 			->set('messages', $validate->errors($file));
 	} // function
 
@@ -137,7 +137,7 @@ class cl4_Message {
 	public static function display() {
 		$messages = Message::get();
 
-		$message_view = View::factory('cl4/cl4_message')
+		$message_view = View::factory('cl4/message/display')
 			->set('messages', $messages)
 			->set('level_to_class', Message::$level_to_class);
 
