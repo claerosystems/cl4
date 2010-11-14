@@ -220,7 +220,7 @@ class cl4_ORM extends Kohana_ORM {
 		$default_options = Kohana::config('cl4orm.default_options');
 
 		// merge the defaults with the passed options (add defaults where values are missing)
-		$this->_options = Arr::merge($default_options, $options);
+		$this->_options = Arr::merge($default_options, $this->_options, $options);
 
 		if (empty($this->_options['form_id'])) {
 			$this->_options['form_id'] = substr(md5(time()), 0, 8) . '_' . $this->_object_name . '_form';
