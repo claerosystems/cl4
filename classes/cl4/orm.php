@@ -148,8 +148,6 @@ class cl4_ORM extends Kohana_ORM {
 	 * @return  ORM
 	 */
 	public static function factory($model_name, $id = NULL, $options = array()) {
-		$model = NULL;
-
 		// a try/catch will not work if the model does not exist because PHP throws a FATAL error
 		// therefore, we at least look for the model first
 		$class_name = 'Model_' . ucfirst($model_name);
@@ -160,13 +158,11 @@ class cl4_ORM extends Kohana_ORM {
 			// now try to create the model
 			try {
 				// instantiate the model
-				$model = new $class_name($id, $options);
+				return new $class_name($id, $options);
 			} catch (Exception $e) {
 				throw $e;
 			}
 		} // if
-
-		return $model;
 	} // function
 
 	/**
@@ -185,6 +181,20 @@ class cl4_ORM extends Kohana_ORM {
 
 		parent::_initialize();
 	} // function
+
+	/**
+	 * Allows serialization of only the object data and state, to prevent
+	 * "stale" objects being unserialized, which also requires less memory.
+	 *
+	 * The same as Kohana::__sleep() but we also include the _options array
+	 *
+	 * @return  array
+	 */
+	public function __sleep()
+	{
+		// Store only information about the object
+		return array('_object_name', '_object', '_changed', '_loaded', '_saved', '_sorting', '_options', '_table_columns');
+	}
 
 	/**
 	 * Prepares the model database connection and loads the object.
@@ -214,6 +224,7 @@ class cl4_ORM extends Kohana_ORM {
 	 *
 	 * @param  string  $formName   name of form or table to prepare/create
 	 * @param  array   $options    array of options for object
+	 * @return ORM
 	*/
 	public function set_options(array $options = array()) {
 		// get the default options from the config file
@@ -237,6 +248,8 @@ class cl4_ORM extends Kohana_ORM {
 		} // if
 
 		$this->_mode = $this->_options['mode'];
+
+		return $this;
 	} // function
 
 	/**
@@ -394,10 +407,11 @@ class cl4_ORM extends Kohana_ORM {
 	 * This can be run multiple times and it will overwrite the pervious data every time either for all fields or a specific field
 	 *
 	 * @param   array     $column_name     Can be a string or an array of column names
+	 * @param  array  $options  Options, the same as what can be passed into the object; sets the options within the object
 	 *
 	 * @return  void
 	 */
-	public function prepare_form($column_name = NULL) {
+	public function prepare_form($column_name = NULL, array $options = array()) {
 		// reset the form field html, hidden, and buttons
 		$this->_field_html = array();
 		$this->_form_fields_hidden = array();
@@ -1233,9 +1247,10 @@ class cl4_ORM extends Kohana_ORM {
 			// check for has_many relationships and associated changes (adds / deletes)
 			// todo: should we add some of this to check() ?
 			foreach ($this->_has_many as $foreign_object => $relation_data) {
-				$through_table = $relation_data['through'];
-				if (empty($through_table)) continue; // can't process this table because the through table is not set
+				// can't process this table because the through table is not set
+				if (empty($relation_data['through'])) continue;
 
+				$through_table = $relation_data['through'];
 				$source_model = ! empty($relation_data['source_model']) ? $relation_data['source_model'] : NULL; // todo: should not need 'source_model' since we have the relationship via the model
 
 				// get the current associated record ids
