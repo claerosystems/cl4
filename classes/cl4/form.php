@@ -21,8 +21,12 @@ class cl4_Form extends Kohana_Form {
 	 * @param   array   html attributes
 	 * @return  string
 	 */
-	public static function datetime($name, $value = FALSE, array $attributes = NULL) {
+	public static function datetime($name, $value = FALSE, array $attributes = NULL, array $options = array()) {
 		$html = '';
+
+		$options += array(
+			'view' => 'cl4/form/datetime',
+		);
 
 		$fields = array();
 
@@ -73,7 +77,7 @@ class cl4_Form extends Kohana_Form {
 		if ( ! empty($modulation_attributes['id'])) $modulation_attributes['id'] .= '-modulation';
 		$fields['am_pm'] = Form::radios($name . '[modulation]', array('am' => 'AM', 'pm' => 'PM'), $modulation, $modulation_attributes);
 
-		return View::factory('cl4/form/fields/datetime', array('fields' => $fields));
+		return View::factory($options['view'], array('fields' => $fields));
 	} // function datetime
 
 	public static function radios_sql($name, $source, $selected = NULL, array $attributes = NULL, array $options = array()) {
