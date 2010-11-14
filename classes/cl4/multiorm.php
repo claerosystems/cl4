@@ -656,7 +656,9 @@ class cl4_MultiORM {
 
 				foreach ($table_records as $num => $record_data) {
 					try {
-						$model = ORM::factory($this->_model_name, NULL, $this->_options)->set_record_number($num)->save_values($record_data)->save();
+						$model = ORM::factory($this->_model_name, NULL, $this->_options)->set_record_number($num)
+							->save_values($record_data)
+							->save();
 					} catch (Exception $e) {
 						throw $e;
 					}
