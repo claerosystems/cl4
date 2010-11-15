@@ -260,7 +260,13 @@ class cl4_ModelCreate {
 			// add the cl4 meta data
 			$model_code .= TAB . TAB . '\'' . $column_name . '\' => array(' . EOL;
 			foreach ($meta_data as $key => $data) {
-				if ($key == 'display_order') $data = $display_order;
+				if ($key == 'display_order') {
+					if ($data !== FALSE) {
+						$data = $display_order;
+					} else {
+						break;
+					} // if
+				} // if
 
 				// filter out optional fields for now, just include required
 				if ( ! array_key_exists($key, $default_meta_data) || $data !== $default_meta_data[$key] || in_array($key, array('field_type', 'display_order'))) {
