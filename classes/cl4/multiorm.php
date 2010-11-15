@@ -165,7 +165,7 @@ class cl4_MultiORM {
 			$default_search[Kohana::config('cl4orm.default_options.request_search_type_name')] = 'where';
 			$default_search[Kohana::config('cl4orm.default_options.request_search_like_name')] = 'exact';
 			$this->set_search($default_search, TRUE);
-			Message::add('default search applied: ' . kohana::debug($default_search) ,Message::$debug);
+			Message::add('default search applied: ' . json_encode($this->_model->_default_search_filter) ,Message::$debug);
 			//echo kohana::debug($this->_model);
 		} // if
 
