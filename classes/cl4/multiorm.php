@@ -69,6 +69,12 @@ class cl4_MultiORM {
 	protected $_num_rows = NULL;
 
 	/**
+	* An array of column name => value to prepend to the search query (from model definition)
+	* @var array
+	*/
+	protected $_default_search_filter = array();
+
+	/**
 	* Returns an instance of ORMMultiple
 	*
 	* @chainable
@@ -150,6 +156,18 @@ class cl4_MultiORM {
 		$list_options = $this->_options['editable_list_options'];
 
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
+
+		// apply any default search filters defined in the model
+		//Message::add('test');
+		//echo kohana::debug($this->_model);
+		if ( ! empty($this->_model->_default_search_filter)) {
+			$default_search = $this->_model->_default_search_filter;
+			$default_search[Kohana::config('cl4orm.default_options.request_search_type_name')] = 'where';
+			$default_search[Kohana::config('cl4orm.default_options.request_search_like_name')] = 'exact';
+			$this->set_search($default_search, TRUE);
+			Message::add('default search applied: ' . kohana::debug($default_search) ,Message::$debug);
+			//echo kohana::debug($this->_model);
+		} // if
 
 		// check to see if the column set to sort by is in _table_columns
 		// if it's not, it will use the default sorting specified in _sorting
@@ -483,8 +501,8 @@ class cl4_MultiORM {
 	* @param mixed $post
 	* @return ORMMultiple
 	*/
-	public function set_search($post = NULL) {
-		$this->_model->set_search($post);
+	public function set_search($post = NULL, $skip_search_flag = FALSE) {
+		$this->_model->set_search($post, $skip_search_flag);
 
 		return $this;
 	} // function

@@ -1465,7 +1465,7 @@ class cl4_ORM extends Kohana_ORM {
 	* @param  array  $post  the post values
 	* @return  ORM
 	*/
-	public function set_search($post = NULL) {
+	public function set_search($post = NULL, $skip_search_flag = FALSE) {
 		// grab the values from the POST if the values have not been passed
 		if ($post === NULL) {
 			$post = $_POST;
@@ -1489,7 +1489,7 @@ class cl4_ORM extends Kohana_ORM {
 		$post = $this->get_table_records_from_post($post);
 
 		foreach ($post as $column_name => $value) {
-			if (isset($this->_table_columns[$column_name]) && $this->_table_columns[$column_name]['search_flag']) {
+			if (isset($this->_table_columns[$column_name]) && ($skip_search_flag || $this->_table_columns[$column_name]['search_flag'])) {
 				$methods = call_user_func(ORM_FieldType::get_field_type_class_name($this->_table_columns[$column_name]['field_type']) . '::search_prepare', $column_name, $value, $search_options);
 
 				// now loop through the methods passed in and add them to _db_pending (they will get added to the query in _build())
