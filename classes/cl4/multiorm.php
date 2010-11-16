@@ -140,8 +140,6 @@ class cl4_MultiORM {
 			} catch (Exception $e) {
 				throw $e;
 			}
-		} else {
-			$this->_db = Database::instance();
 		} // if
 
 		$this->_mode = $this->_options['mode'];
