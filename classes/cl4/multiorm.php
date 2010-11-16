@@ -174,6 +174,11 @@ class cl4_MultiORM {
 			Message::add('default search applied: ' . json_encode($this->_model->_default_search_filter) ,Message::$debug);
 		} // if
 
+		// set the search in the model
+		if ( ! empty($this->_search)) {
+			$this->_model->set_search($this->_search);
+		}
+
 		// check to see if the column set to sort by is in _table_columns
 		// if it's not, it will use the default sorting specified in _sorting
 		// if nothing is specified in _sorting, Kohana_ORM will use the primary key (likely ID)
@@ -184,12 +189,8 @@ class cl4_MultiORM {
 		// set the limit, offset (page_offset is the page #, to get the offset multiply by rows on page) and then load the records
 		$offset = $this->_options['page_offset'];
 		if ($offset > 0) {
-			// subtract 1 because the first page_offset really by 0, but instead is 1
+			// subtract 1 because the first page_offset really by 0, but is passed as 1
 			--$offset;
-		}
-
-		if ( ! empty($this->_search)) {
-			$this->_model->set_search($this->_search);
 		}
 
 		// find all the records to be displayed on this page

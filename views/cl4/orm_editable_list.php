@@ -23,7 +23,7 @@
 	<?php echo $nav_html; ?>
 
 	<?php if ($options['display_no_rows'] && $items_on_page == 0) { // check to see if there are no rows ?>
-	<div class="cl4_no_rows">0 rows found</div>
+	<div class="cl4_no_rows">0 items found</div>
 	<?php } else { // if ?>
 	<div class="<?php echo HTML::chars($object_name); ?>_editable_list">
 	<?php echo $data_table; ?>

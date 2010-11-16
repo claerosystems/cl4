@@ -64,7 +64,7 @@ class cl4_Pagination extends Kohana_Pagination {
             $this->items_on_page = $this->current_last_item - $this->current_first_item;
 
             // if we have more than 0 records on the page or we only have 1 item, then add 1 to the items on page because of the count starting at 0
-			if ($this->items_on_page > 0 || ($this->current_last_item == $this->current_first_item && $this->items_on_page == 0)) {
+			if ($this->items_on_page > 0 || ($this->current_last_item == $this->current_first_item && $this->items_on_page == 0 && $this->current_last_item != 0)) {
 				++$this->items_on_page; // add 1
 			}
 		} // if
