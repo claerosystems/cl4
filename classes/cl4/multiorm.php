@@ -75,12 +75,19 @@ class cl4_MultiORM {
 	protected $_default_search_filter = array();
 
 	/**
-	* Returns an instance of ORMMultiple
+	* The current search as the post from the search form
+	* Passed into ORM::set_search(); set through MultiORM::set_search()
+	* @var array
+	*/
+	protected $_search = NULL;
+
+	/**
+	* Returns an instance of MultiORM
 	*
 	* @chainable
 	* @param string $model_name
 	* @param array $options
-	* @return ORMMultiple
+	* @return MultiORM
 	*/
 	public static function factory($model_name, array $options = array()) {
 		return new MultiORM($model_name, $options);
@@ -143,7 +150,7 @@ class cl4_MultiORM {
 	/**
 	* Generates an HTML record list with edit, delete, view and add similar links for the given object including add/edit/del, pagination, etc.
 	*
-	* @param mixed $options
+	* @param  array  $options
 	* @return View
 	*/
 	public function get_editable_list($options = array()) {
@@ -158,15 +165,13 @@ class cl4_MultiORM {
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
 
 		// apply any default search filters defined in the model
-		//Message::add('test');
-		//echo kohana::debug($this->_model);
 		if ( ! empty($this->_model->_default_search_filter)) {
 			$default_search = $this->_model->_default_search_filter;
 			$default_search[Kohana::config('cl4orm.default_options.request_search_type_name')] = 'where';
 			$default_search[Kohana::config('cl4orm.default_options.request_search_like_name')] = 'exact';
 			$this->set_search($default_search, TRUE);
+
 			Message::add('default search applied: ' . json_encode($this->_model->_default_search_filter) ,Message::$debug);
-			//echo kohana::debug($this->_model);
 		} // if
 
 		// check to see if the column set to sort by is in _table_columns
@@ -182,9 +187,25 @@ class cl4_MultiORM {
 			// subtract 1 because the first page_offset really by 0, but instead is 1
 			--$offset;
 		}
-		$this->_records = $this->_model->limit($this->_options['page_max_rows'])->offset($offset * $this->_options['page_max_rows'])->find_all();
 
-		$this->_num_rows = count($this->_records);
+		if ( ! empty($this->_search)) {
+			$this->_model->set_search($this->_search);
+		}
+
+		// find all the records to be displayed on this page
+		$this->_records = $this->_model
+			->limit($this->_options['page_max_rows'])
+			->offset($offset * $this->_options['page_max_rows'])
+			->find_all();
+
+		// set_search must be run again because find_all() clears the previous query
+		if ( ! empty($this->_search)) {
+			$this->_model->set_search($this->_search);
+		}
+
+		// count the records in the find_all query
+		// skip the limit and offset
+		$this->_num_rows = $this->_model->count_all();
 
 		// create the pagination object
 		$pagination = Pagination::factory(array(
@@ -496,13 +517,15 @@ class cl4_MultiORM {
 	} // function get_editable_list
 
 	/**
-	* Sets the search within the model
+	* Sets the search within this object
+	* The search is used with get_ediable_list()
 	*
+	* @chainable
 	* @param mixed $post
-	* @return ORMMultiple
+	* @return MultiORM
 	*/
-	public function set_search($post = NULL, $skip_search_flag = FALSE) {
-		$this->_model->set_search($post, $skip_search_flag);
+	public function set_search($post, $skip_search_flag = FALSE) {
+		$this->_search = $post;
 
 		return $this;
 	} // function
@@ -657,7 +680,7 @@ class cl4_MultiORM {
 	*
 	* @chainable
 	* @param mixed $post
-	* @return ORMMultiple
+	* @return MultiORM
 	*/
 	public function save_edit_multiple($post = NULL) {
 		if ($post === NULL) {
