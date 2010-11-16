@@ -134,7 +134,6 @@ return array(
 		'textarea_max_cols' => 150,
 		'textarea_max_rows' => 50,
 
-		'db_group' => NULL, // the database instance name to be used as a default, if null, default is used
 		// form options used when generating forms
 		// todo: figure out how to specify that a select should have 'none' or 'select one' for selects
 		'get_form_view_file' => 'cl4/orm_form_table', // the default view to use when displaying the edit or search form
