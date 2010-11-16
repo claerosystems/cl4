@@ -682,7 +682,6 @@ class cl4_ORM extends Kohana_ORM {
 				'class' => 'cl4_button_link',
 				'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'edit', 'id' => $this->pk())),
 			));
-
 		}
 		if ($this->_options['display_cancel']) {
 			$this->_form_buttons[] = Form::input('cl4_cancel', __('Cancel'), array(
@@ -1136,20 +1135,6 @@ class cl4_ORM extends Kohana_ORM {
 		} // foreach
 
 		return NULL;
-	} // function
-
-	/**
-	* put your comment there...
-	*
-	* @return Validate
-	*/
-	public function check() {
-		if (parent::check()) {
-			return TRUE;
-		} else {
-			// there were validation errors so return the validation object
-			return $this->_validate;
-		}
 	} // function
 
 	/**
