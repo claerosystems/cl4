@@ -1475,11 +1475,11 @@ class cl4_ORM extends Kohana_ORM {
 		// if the values are not there or aren't one of the options then use the default (partial security)
 		$search_type = strtolower(Arr::get($post, $this->_options['request_search_type_name']));
 		if ( ! in_array($search_type, array('where', 'or_where'))) {
-			$search_type = $this->_options['require_search_type_default'];
+			$search_type = $this->_options['request_search_type_default'];
 		}
 		$search_like = strtolower(Arr::get($post, $this->_options['request_search_like_name']));
 		if ( ! in_array($search_like, array('beginning', 'exact', 'full_text'))) {
-			$search_like = $this->_options['request_search_link_default'];
+			$search_like = $this->_options['request_search_like_default'];
 		}
 		$search_options = array(
 			'search_type' => $search_type,
