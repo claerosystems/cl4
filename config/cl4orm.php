@@ -113,9 +113,8 @@ return array(
 
 	// cl4_ORM class default options
 	'default_options' => array(
-		'request_action_name' => 'c_user_action',
-		'request_object_name' => 'c_object_name',
-		'request_record_name' => 'cl4',
+		'db_group' => NULL, // the database instance name to be used as a default, if null, default is used
+
 		'request_search_type_name' => 'c_search_type',
 		'request_search_type_default' => 'where',
 		'request_search_like_name' => 'c_like_type',
@@ -124,10 +123,6 @@ return array(
 		'request_current_search' => 'c_current_search',
 
 		'target_route' => Route::name(Request::instance()->route), // used to generate all links, should have model, action, id parameters; defaults to the current route
-		'new_action_default' => 'index',
-		'new_action_search' => 'perform_search',
-		'new_action_edit' => 'save',
-		'new_action_add' => 'save',
 
 		'text_field_max_size' => 100,
 		'text_field_max_length' => 7000,
