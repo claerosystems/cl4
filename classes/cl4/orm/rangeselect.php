@@ -13,7 +13,11 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 	}
 
 	public static function save($post, $column_name, array $options = array(), ORM $orm_model = NULL) {
+		$range = ORM_RangeSelect::get_range($options);
+
 		$value = Arr::get($post, $column_name);
+
+		$value = in_array($value, $range) ? $value : NULL;
 
 		if ($value !== NULL || $options['is_nullable']) {
 			$orm_model->$column_name = ($value == 'none' || $value == 'all' || $value == '' ? 0 : $value);
@@ -21,8 +25,6 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 	}
 
 	public static function search($column_name, $html_name, $selected, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
-		$source = $orm_model->get_source_data($column_name);
-
 		if (empty($selected)) {
 			$selected = array('all');
 		}
@@ -54,14 +56,7 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 	} // function
 
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-		$default_options = array(
-			'start' => 1,
-			'end' => 10,
-			'increment' => 1,
-		);
-		$options += array_merge($default_options, $options);
-
-		$range = range($options['start'], $options['end'], $options['increment']);
+		$range = ORM_RangeSelect::get_range($options);
 
 		$found_value = in_array($value, $range) ? $value : NULL;
 
@@ -77,5 +72,16 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 			// the value is not set (0 or NULL likely)
 			return '<span class="cl4_not_set">' . __('not set') . '</span>';
 		}
+	}
+
+	protected static function get_range($options) {
+		$default_options = array(
+			'start' => 1,
+			'end' => 10,
+			'increment' => 1,
+		);
+		$options += array_merge($default_options, $options);
+
+		return range($options['start'], $options['end'], $options['increment']);
 	}
 } // class
