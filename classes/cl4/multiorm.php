@@ -69,12 +69,6 @@ class cl4_MultiORM {
 	protected $_num_rows = NULL;
 
 	/**
-	* An array of column name => value to prepend to the search query (from model definition)
-	* @var array
-	*/
-	protected $_default_search_filter = array();
-
-	/**
 	* The current search as the post from the search form
 	* Passed into ORM::set_search(); set through MultiORM::set_search()
 	* @var array
@@ -161,16 +155,6 @@ class cl4_MultiORM {
 		$list_options = $this->_options['editable_list_options'];
 
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
-
-		// apply any default search filters defined in the model
-		if ( ! empty($this->_model->_default_search_filter)) {
-			$default_search = $this->_model->_default_search_filter;
-			$default_search[Kohana::config('cl4orm.default_options.request_search_type_name')] = 'where';
-			$default_search[Kohana::config('cl4orm.default_options.request_search_like_name')] = 'exact';
-			$this->set_search($default_search, TRUE);
-
-			Message::add('default search applied: ' . json_encode($this->_model->_default_search_filter) ,Message::$debug);
-		} // if
 
 		// set the search in the model
 		if ( ! empty($this->_search)) {
