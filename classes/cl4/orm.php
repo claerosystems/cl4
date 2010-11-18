@@ -78,12 +78,6 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_expires_column = array();
 
 	/**
-	* An array of values to put in _db_pending when running get_list() or get_editable_list()
-	* @var array
-	*/
-	protected $_search_filter = array();
-
-	/**
 	 * @var boolean $_include_expired If true, includes expired rows in select queries.
 	 */
 	protected $_include_expired = false;
@@ -237,16 +231,6 @@ class cl4_ORM extends Kohana_ORM {
 			$this->_options['form_id'] = substr(md5(time()), 0, 8) . '_' . $this->_object_name . '_form';
 		} // if
 		$this->_form_id = $this->_options['form_id'];
-
-		// set the default database if passed (will override the model database group)
-		if ( ! empty($this->_options['db_group'])) {
-			try {
-				$this->_db = Database::instance($this->_options['db_group']);
-			} catch (Exception $e) {
-				throw $e;
-			}
-		} // if
-
 		$this->_mode = $this->_options['mode'];
 
 		return $this;
