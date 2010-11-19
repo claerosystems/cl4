@@ -111,6 +111,7 @@ class cl4_MultiORM {
 	 *
 	 * @param  string  $formName   name of form or table to prepare/create
 	 * @param  array   $options    array of options for object
+	 * @return  MultiORM
 	*/
 	public function set_options(array $options = array()) {
 		// get the default options from the config file
@@ -126,17 +127,27 @@ class cl4_MultiORM {
 			$this->_options['form_id'] = substr(md5(time()), 0, 8) . '_' . $this->_object_name . '_form';
 		} // if
 		$this->_form_id = $this->_options['form_id'];
+		$this->_mode = $this->_options['mode'];
 
-		// set the default database if passed (will override the model database group)
-		if ( ! empty($this->_options['db_group'])) {
+		// set the default database
+		// if _db is a string and not empty then use it as the db instance name
+		if (is_string($this->_db) && ! empty($this->_db)) {
+			try {
+				$this->_db = Database::instance($this->_db);
+			} catch (Exception $e) {
+				throw $e;
+			}
+		// if the database instance has not been set, use the value in the options as the db instance name
+		// by default, _options['db_group'] will be NULL, therefore Database::instance() will get the default db instance
+		} else if (empty($this->_db)) {
 			try {
 				$this->_db = Database::instance($this->_options['db_group']);
 			} catch (Exception $e) {
 				throw $e;
 			}
-		} // if
+		}
 
-		$this->_mode = $this->_options['mode'];
+		return $this;
 	} // function
 
 	/**
