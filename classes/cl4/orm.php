@@ -1417,7 +1417,7 @@ class cl4_ORM extends Kohana_ORM {
 	*/
 	protected function merge_override_properties() {
 		if ( ! empty($this->_override_properties)) {
-			$allowed_override_properties = array('_db', '_table_name', '_table_columns', '_belongs_to', '_rules', '_has_many', '_has_one', '_labels', '_sorting');
+			$allowed_override_properties = array('_db', '_table_name', '_table_columns', '_belongs_to', '_rules', '_callbacks', '_has_many', '_has_one', '_labels', '_sorting');
 
 			foreach ($allowed_override_properties as $property) {
 				if ( ! empty($this->_override_properties[$property])) {
@@ -1425,6 +1425,7 @@ class cl4_ORM extends Kohana_ORM {
 						case '_table_columns' :
 						case '_belongs_to' :
 						case '_rules' :
+						case '_callbacks' :
 						case '_has_many' :
 						case '_has_one' :
 							// replace each key in the array with the array in _override_properties
