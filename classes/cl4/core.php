@@ -4,7 +4,7 @@ class cl4_Core extends Kohana_Core {
     /**
 	 * @var boolean If FirePHP has been detected as an available module.
 	 */
-	public static $is_firephp = NULL;
+	public static $is_firephp;
 
 	/**
 	* Sets the exception handler to the customized cl4 version

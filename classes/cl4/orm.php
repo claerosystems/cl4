@@ -14,7 +14,7 @@ class cl4_ORM extends Kohana_ORM {
 	*
 	* @var database instance
 	*/
-	protected $_db = NULL;
+	protected $_db;
 
 	/**
 	* this is the array of options
@@ -26,7 +26,7 @@ class cl4_ORM extends Kohana_ORM {
 	* This is the current mode for the model: add, edit, search, view
 	* @var string
 	*/
-	protected $_mode = NULL;
+	protected $_mode;
 
 	/**
 	* this holds the HTML for each of the form fields in the object
@@ -45,7 +45,7 @@ class cl4_ORM extends Kohana_ORM {
 	* this holds the HTML form id field for the current form
 	* @todo: this doesn't seem to be used; it's set but never used
 	*/
-	public $_form_id = NULL;
+	public $_form_id;
 
 	/**
 	*	this holds the hidden fields
@@ -86,7 +86,7 @@ class cl4_ORM extends Kohana_ORM {
 	* The table name to display
 	* @var 	string
 	*/
-	public $_table_name_display = NULL;
+	public $_table_name_display;
 
 	/**
 	* An array of values that should be merged with the properties

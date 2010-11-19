@@ -8,32 +8,32 @@ class cl4_MultiORM {
 	* this will hold the current database instance to be used for database actions
 	* @var database instance
 	*/
-	protected $_db = NULL;
+	protected $_db;
 
     /**
 	* This is the current mode for the model: add, edit, search, view
 	* @var string
 	*/
-	protected $_mode = NULL;
+	protected $_mode;
 
 	/**
 	* The current models name (the class name without Model_)
 	* @var string
 	*/
-	protected $_model_name = NULL;
+	protected $_model_name;
 
     /**
 	* The model we are currently working with
 	* Populated within _construct()
 	* @var ORM
 	*/
-	protected $_model = NULL;
+	protected $_model;
 
 	/**
 	* The object name from the model
 	* @var string
 	*/
-	protected $_object_name = NULL;
+	protected $_object_name;
 
 	/**
 	* this is the array of options
@@ -60,20 +60,20 @@ class cl4_MultiORM {
 	* After load_records() is called, this will be populated with the results of find_all() likely an array of objects
 	* @var  array
 	*/
-	protected $_records = NULL;
+	protected $_records;
 
 	/**
 	* The number of rows being display or edited
 	* @var int
 	*/
-	protected $_num_rows = NULL;
+	protected $_num_rows;
 
 	/**
 	* The current search as the post from the search form
 	* Passed into ORM::set_search(); set through MultiORM::set_search()
 	* @var array
 	*/
-	protected $_search = NULL;
+	protected $_search;
 
 	/**
 	* Returns an instance of MultiORM
