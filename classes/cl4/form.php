@@ -800,6 +800,24 @@ class cl4_Form extends Kohana_Form {
 		return Form::select($name, $source, $value, $attributes);
 	} // function
 
+	/**
+	* Creates a textarea that could be used to either input HTML directly or add a WYSIWYG
+	* This method does nothing special except run Form::textarea()
+	* The special part comes in display in ORM_HTML::view_html()
+	* Otherwise, this will function exactly like a textarea
+	*
+	* @param   string   textarea name
+	* @param   string   textarea body
+	* @param   array    html attributes
+	* @param   boolean  encode existing HTML characters
+	* @return  string
+	* @uses    HTML::attributes
+	* @uses    HTML::chars
+	*/
+	public static function html($name, $body = '', array $attributes = NULL, $double_encode = TRUE) {
+		return Form::textarea($name, $body, $attributes, $double_encode);
+	}
+
 	private static function get_sql_source($source, array $options = array()) {
 		$default_options = array(
 			'db_instance' => NULL,
