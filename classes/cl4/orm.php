@@ -348,6 +348,20 @@ class cl4_ORM extends Kohana_ORM {
 	} // function
 
 	/**
+	* Sets the current mode of the model
+	* Options are add, edit, search, view
+	*
+	* @chainable
+	* @param string $mode
+	* @return ORM
+	*/
+	public function set_mode($mode) {
+		$this->_mode = $mode;
+
+		return $this;
+	} // function set_mode
+
+	/**
 	* get a formatted value of a model column
 	* todo: add html flag or non-html flag to class and use it?
 	* todo: not sure if we should return a string if not loaded, maybe throw an exception (this will return null or can be caught)
