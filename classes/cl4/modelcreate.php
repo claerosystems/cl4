@@ -96,8 +96,7 @@ class cl4_ModelCreate {
 		// add validation rules placeholder
 		$model_code .= EOL;
 		$model_code .= TAB . '// validation rules'. EOL;
-		$model_code .= TAB . '//protected $_rules = array(' . EOL;
-		$model_code .= TAB . '//);' . EOL;
+		$model_code .= TAB . '//protected $_rules = array();' . EOL;
 
 		// Add trim filter
 		$model_code .= EOL;
@@ -337,8 +336,7 @@ class cl4_ModelCreate {
 
 		// ignored fields
 		$model_code .= TAB . '// fields mentioned here can be accessed like properties, but will not be referenced in write operations' . EOL;
-		$model_code .= TAB . '//protected $_ignored_columns = array(' . EOL;
-		$model_code .= TAB . '//);' . EOL;
+		$model_code .= TAB . '//protected $_ignored_columns = array();' . EOL . EOL;
 
 		// Add expires column
 		$model_code .= TAB . '/**' . EOL;
