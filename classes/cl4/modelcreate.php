@@ -97,6 +97,7 @@ class cl4_ModelCreate {
 		$model_code .= EOL;
 		$model_code .= TAB . '// validation rules'. EOL;
 		$model_code .= TAB . '//protected $_rules = array();' . EOL;
+		$model_code .= TAB . '//protected $_callbacks = array();' . EOL;
 
 		// Add trim filter
 		$model_code .= EOL;
