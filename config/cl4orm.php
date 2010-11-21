@@ -298,7 +298,7 @@ return array(
 		'hide_top_row_buttons' => FALSE,
 		'nav_right' => FALSE,
 		'display_no_rows' => TRUE,
-		'add_numrows_dropdown' => FALSE,
+		'add_num_rows_dropdown' => FALSE,
 
 		'load_defaults' => TRUE, // if set to true, then the defaults field value (default_value) specified in the model for the field will be used; otherwise, it will be ignored so (likely) NULL will be used
 		'generate_row_id' => FALSE, // if true, the a row ID will be added to each row
