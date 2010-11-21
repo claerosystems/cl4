@@ -172,8 +172,6 @@ return array(
 			),
 		),
 		'text_area_br' => FALSE,
-		// todo: 'include_fields' => array(),
-		// todo: 'exclude_fields' => null,
 		'hidden' => array(), // extra hidden fields to add to the form, done for admin
 
 		// formatting for views
