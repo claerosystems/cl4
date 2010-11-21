@@ -174,7 +174,7 @@ return array(
 		'text_area_br' => FALSE,
 		// todo: 'include_fields' => array(),
 		// todo: 'exclude_fields' => null,
-		'hidden' => array(), // todo: extra hidden fields to add to the form, done for admin
+		'hidden' => array(), // extra hidden fields to add to the form, done for admin
 
 		// formatting for views
 		'nbsp' => FALSE, // replace spaces with &nbsp; in the data to avoid wrapping in view_html()
@@ -297,7 +297,7 @@ return array(
 		'button_class' => 'cl4_list_button', // a class to assign to all buttons generated in get_editable_list()
 		'hide_top_row_buttons' => FALSE,
 		'nav_right' => FALSE,
-		'display_no_rows' => TRUE,
+		'display_no_rows' => TRUE, // if set to TRUE, then a message will be displayed when retrieving and editable list that doesn't have any rows
 		'add_num_rows_dropdown' => FALSE,
 
 		'load_defaults' => TRUE, // if set to true, then the defaults field value (default_value) specified in the model for the field will be used; otherwise, it will be ignored so (likely) NULL will be used
