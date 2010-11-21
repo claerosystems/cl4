@@ -147,7 +147,7 @@ class cl4_ORM extends Kohana_ORM {
 		$class_name = 'Model_' . ucfirst($model_name);
 		if ( ! class_exists($class_name)) {
 			// the model does not appear to exist
-			throw new Kohana_Exception('The requested model was not found.', NULL, 3001);
+			throw new Kohana_Exception('The requested model was not found: :model_name:', array(':model_name:' => $model_name), 3001);
 		} else {
 			// now try to create the model
 			try {
