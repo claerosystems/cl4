@@ -48,9 +48,6 @@ class cl4_HTMLTable {
 	*/
 	protected $col_span = array();
 
-	// array of attributes that are appended to (like class) vs overwritten (like id)
-	protected $attribute_to_append_to = array('class',);
-
 	/**
 	*   Prepares the table
 	*
@@ -107,8 +104,29 @@ class cl4_HTMLTable {
 			'eol' => $this->eol,
 			'heol' => $this->heol,
 			'tab' => $this->tab,
+
+			'is_email' => FALSE,
+			'email_options' => array(
+				'table_attributes' => array(
+					'style' => 'font-size:12px;',
+					'cellspacing' => 2,
+					'cellpadding' => 2,
+				),
+				'tr_even_attributes' => array(
+					'style' => 'background-color:#e4e4e4;',
+				),
+				'tr_odd_attributes' => array(
+					'style' => 'background-color:#f1f1f1;',
+				),
+			),
 		);
+		// merge the sub arrays first as the += will mess with the sub arrays
 		if (isset($options['table_attributes'])) $options['table_attributes'] += $default_options['table_attributes'];
+		if (isset($options['email_options'])) {
+			if (isset($options['email_options']['table_attributes'])) $options['email_options']['table_attributes'] += $default_options['email_options']['table_attributes'];
+			if (isset($options['email_options']['tr_even_attributes'])) $options['email_options']['tr_even_attributes'] += $default_options['email_options']['tr_even_attributes'];
+			if (isset($options['email_options']['tr_odd_attributes'])) $options['email_options']['tr_odd_attributes'] += $default_options['email_options']['tr_odd_attributes'];
+		}
 		$options += $default_options;
 		$this->options = $options;
 
@@ -116,6 +134,12 @@ class cl4_HTMLTable {
 		$this->heol = $this->options['heol'];
 		$this->tab = $this->options['tab'];
 
+		// if this is an email, merge the default table attributes with the email option table attributes
+		if ($this->options['is_email']) {
+			$this->options['table_attributes'] = Arr::merge($this->options['table_attributes'], $this->options['email_options']['table_attributes']);
+		}
+
+		// set the tr attributes within the object
 		foreach ($this->options['tr_attributes'] as $row_number => $attribute) {
 			$this->set_attribute($row_number, false, $attribute);
 		}
@@ -155,18 +179,10 @@ class cl4_HTMLTable {
 	public function set_attribute($row_number, $column_number, $attribute, $attribute_value) {
 		if ($column_number !== FALSE) {
 			// must be cell attribute
-			if ( ! empty($this->td_attribute[$row_number][$column_number]) && in_array($attribute, $this->attribute_to_append_to)) {
-				$this->td_attribute[$row_number][$column_number][$attribute] .= ' ' . $attribute_value;
-			} else {
-				$this->td_attribute[$row_number][$column_number][$attribute] = $attribute_value;
-			}
+			$this->td_attribute[$row_number][$column_number] = HTML::merge_attributes($this->td_attribute[$row_number][$column_number], array($attribute => $attribute_value));
 		} else {
 			// must be a row attribute
-			if ( ! empty($this->tr_attribute[$row_number]) && in_array($attribute, $this->attribute_to_append_to)) {
-				$this->tr_attribute[$row_number][$attribute] .= ' ' . $attribute_value;
-			} else {
-				$this->tr_attribute[$row_number][$attribute] = $attribute_value;
-			}
+			$this->tr_attribute[$row_number] = HTML::merge_attributes($this->tr_attribute[$row_number], array($attribute => $attribute_value));
 		} // if
 	} // function set_attribute
 
@@ -360,11 +376,15 @@ class cl4_HTMLTable {
 			if ($this->options['odd_even']) {
 				$tr_attributes['class'] .= ($row_num % 2 ? ' odd' : ' even');
 			}
-			if ( ! empty($this->tr_attribute[$row_num]) && is_array($this->tr_attribute[$row_num])) {
-				foreach ($this->tr_attribute[$row_num] as $attribute => $attribute_value) {
-					if (isset($tr_attributes[$attribute]) && in_array($attribute, $this->attribute_to_append_to)) $tr_attributes[$attribute] .= ' ' . $attribute_value;
-					else $tr_attributes[$attribute] = $attribute_value;
+			if ($this->options['is_email']) {
+				if ($row_num % 2) {
+					$tr_attributes = HTML::merge_attributes($tr_attributes, $this->options['email_options']['tr_odd_attributes']);
+				} else {
+					$tr_attributes = HTML::merge_attributes($tr_attributes, $this->options['email_options']['tr_even_attributes']);
 				}
+			}
+			if ( ! empty($this->tr_attribute[$row_num]) && is_array($this->tr_attribute[$row_num])) {
+				$tr_attributes = HTML::merge_attributes($tr_attributes, $this->tr_attribute[$row_num]);
 			}
 			$result_html .= $this->tab . '<tr' . HTML::attributes($tr_attributes) . '>' . $this->eol;
 
@@ -399,11 +419,8 @@ class cl4_HTMLTable {
 							$td_attributes['align'] = $this->options['cell_align'][$col_num];
 						}
 						if ( ! empty($this->td_attribute[$row_num][$col_num]) && is_array($this->td_attribute[$row_num][$col_num])) {
-							foreach ($this->td_attribute[$row_num][$col_num] as $attribute => $attribute_value) {
-								if (isset($td_attributes[$attribute]) && in_array($attribute, $this->attribute_to_append_to)) $td_attributes[$attribute] .= ' ' . $attribute_value;
-								else $td_attributes[$attribute] = $attribute_value;
-							}
-					 }
+							$td_attributes = HTML::merge_attributes($td_attributes, $this->td_attribute[$row_num][$col_num]);
+						}
 						$result_html .= '<td' . HTML::attributes($td_attributes) . '>';
 						if ($add_body_divs && $this->options['add_td_div']) $result_html .= '<div>';
 						$result_html .= $row_value;
