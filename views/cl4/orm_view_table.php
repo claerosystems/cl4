@@ -1,7 +1,7 @@
 <?php
 
 // generate the table
-$table = new HTMLTable(array('table_attributes' => array('class' => 'cl4_form')));
+$table = new HTMLTable($form_options['table_options']);
 
 foreach ($form_field_html as $column_name => $field_html) {
 	$table->add_row(array($field_html['label'], $field_html['field']));
@@ -10,4 +10,6 @@ foreach ($form_field_html as $column_name => $field_html) {
 // the table html
 echo $table->get_html();
 
-echo '<div class="cl4_buttons">' . implode('', $form_buttons) . '</div>' . EOL;
+if ($form_options['display_buttons']) {
+	echo '<div class="cl4_buttons">' . implode('', $form_buttons) . '</div>';
+}

@@ -147,7 +147,15 @@ return array(
 		),
 		'field_name_prefix' => 'c_record', // for all fields, default is c_record
 		'field_name_include_array' => TRUE, // if set to true, then a post array will be use, example: c_record[table_name][0][column_name]
+		/**
+		* The prefix to add to all the ids of all the fields in the form
+		* The end result will be something like [field_id_prefix]_[field_name_prefix]_table_name_[record number]_column_name
+		* If field_id_prefix is set to NULL then a uniqid() will be used instead (to avoid conflicts with other forms on the page, but still allow for use with labels)
+		* This will only be used if the id is not set in the field_attributes array in the _table_columns
+		*/
+		'field_id_prefix' => NULL,
 		'display_form_tag' => TRUE, // whether or not to display a form tag
+		'display_buttons' => TRUE, // whether ot not to display the sub, reset and cancel buttons including the surrounding div
 		'display_submit' => TRUE, // whether or not to display a submit button on the form
 		'display_reset' => TRUE, // whether or not to display the clear button on the form
 		'display_cancel' => TRUE, // whether or not to display the cancel button on the form
@@ -164,14 +172,14 @@ return array(
 		'delete_foreign' => FALSE, // whether to delete foreign records associated with this
 
 		// options for form and list
-		'mode' => 'edit', // possible values are edit (includes 'add'), search, or view
-		// used in get_list(), get_form(), and get_editable_list()
+		'mode' => 'edit', // possible values are edit, add, search, or view
+		// used in get_form() and get_view()
 		'table_options' => array(
 			'table_attributes' => array(
-				'class' => 'cl4_content',
+				'class' => 'cl4_form',
 			),
 		),
-		'text_area_br' => FALSE,
+
 		'hidden' => array(), // extra hidden fields to add to the form, done for admin
 
 		// formatting for views
@@ -190,6 +198,12 @@ return array(
 				'class' => 'cl4_multiple_edit_form',
 				'name' => NULL, // will be set in get_editable_list() if not provided
 				'id' => NULL, // will be set in get_editable_list() if not provided
+			),
+			// table options that will be passed to HTMLTable
+			'table_options' => array(
+				'table_attributes' => array(
+					'class' => 'cl4_content',
+				),
 			),
 			// the per row links/icons
 			'per_row_links' => array(
@@ -262,6 +276,12 @@ return array(
 			'tab_vertically' => TRUE,
 			// if set to true, the order in which the records are received in the post from the checkboxes will be the order in which they are edited
 			'keep_record_order' => TRUE,
+			// table options that will be passed to HTMLTable
+			'table_options' => array(
+				'table_attributes' => array(
+					'class' => 'cl4_edit_multiple',
+				),
+			),
 		),
 
 		// save options used when saving records
@@ -269,8 +289,6 @@ return array(
 		// todo: 'password_hash_type' => 'md5', // todo: add password hashig on save
 		// todo: 'force_insert' => FALSE,
 		// todo: 'select_default_0' => TRUE, // todo: on save, if 'none' is selected, save 0 as the value
-		// todo: 'data' => array(),
-		// todo: 'data_merge' => array(),
 
 		// list options used when generating lists
 		'new_search_flag' => FALSE,

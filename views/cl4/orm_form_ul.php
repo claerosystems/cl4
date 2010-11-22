@@ -1,5 +1,7 @@
 <?php echo $form_open_tag; ?>
+
 <?php echo implode(EOL, $form_fields_hidden) . EOL; ?>
+
 <?php
 // display the search specfic stuff
 if ($mode == 'search') { ?>
@@ -8,6 +10,7 @@ if ($mode == 'search') { ?>
 		Search method: <?php echo $like_type_html; ?>
 	</fieldset>
 <?php } // if ?>
+
 	<ul class="cl4_form">
 <?php foreach ($form_field_html AS $column_name => $field_html) { ?>
 		<li>
@@ -18,7 +21,11 @@ if ($mode == 'search') { ?>
 		</li>
 <?php } // foreach ?>
 	</ul>
-<div style="clear:both;">
-<?php echo implode(EOL, $form_buttons) . EOL; ?>
-</div>
+<div class="clear"></div>
+
+<?php if ($form_options['display_buttons']) {
+	// the buttons
+	echo '<div class="cl4_buttons">' . implode('', $form_buttons) . '</div>' . EOL;
+} ?>
+
 <?php echo $form_close_tag; ?>

@@ -233,6 +233,11 @@ class cl4_ORM extends Kohana_ORM {
 		$this->_form_id = $this->_options['form_id'];
 		$this->_mode = $this->_options['mode'];
 
+		// if the field id prefix is NULL, then set it to a unique id
+		if ($this->_options['field_id_prefix'] === NULL) {
+			$this->_options['field_id_prefix'] = uniqid();
+		}
+
 		// set the default database
 		// if _db is a string and not empty then use it as the db instance name
 		if (is_string($this->_db) && ! empty($this->_db)) {
@@ -417,20 +422,32 @@ class cl4_ORM extends Kohana_ORM {
 	} // function
 
 	/**
+	* Empties the 2 html field arrays
+	*
+	* @chainable
+	* @return ORM
+	*/
+	public function empty_fields() {
+		// reset the form field and hidden field html arrays
+		$this->_field_html = array();
+		$this->_form_fields_hidden = array();
+
+		return $this;
+	} // function empty_fields
+
+	/**
 	 * Loop through all of the columns in the model and generates the form label and field HTML for each one and stores
 	 * the results in $this->_field_html['label'] and $this->_field_html['field'].  For now, this function will
 	 * erase and replace any existing data in $this->_field_html;
 	 * This can be run multiple times and it will overwrite the pervious data every time either for all fields or a specific field
 	 *
+	 * @chainable
 	 * @param   array     $column_name     Can be a string or an array of column names
 	 * @param  array  $options  Options, the same as what can be passed into the object; sets the options within the object
 	 *
-	 * @return  void
+	 * @return  ORM
 	 */
 	public function prepare_form($column_name = NULL, array $options = array()) {
-		// reset the form field html, hidden, and buttons
-		$this->_field_html = array();
-		$this->_form_fields_hidden = array();
 		// add the extra hidden fields from options, if there is any
 		if (count($this->_options['hidden_fields'] > 0)) {
 			foreach ($this->_options['hidden_fields'] as $hidden_field) {
@@ -500,14 +517,20 @@ class cl4_ORM extends Kohana_ORM {
 					$field_attributes = $column_info['field_attributes'];
 					$label_attributes = array();
 					if ($this->_options['mode'] == 'edit' && isset($this->_rules[$column_name]['not_empty'])) {
-						HTML::set_class_attribute($field_attributes, 'cl4_required');
+						$field_attributes = HTML::set_class_attribute($field_attributes, 'cl4_required');
 						$label_attributes['class'] = 'cl4_required';
 					}
 
 					// determine the field type class name
 					$field_type_class_name = ORM_FieldType::get_field_type_class_name($column_info['field_type']);
 
+					// get the field name (for html)
 					$field_html_name = $this->get_field_html_name($column_name);
+
+					// get the field id
+					if ( ! array_key_exists('id', $field_attributes) || $field_attributes['id'] === NULL) {
+						$field_attributes['id'] = $this->get_field_id($column_name);
+					}
 
 					// determine the value of the field based on the default value
 					$pk = $this->pk();
@@ -518,14 +541,9 @@ class cl4_ORM extends Kohana_ORM {
 						$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 
 					} else {
-						// get the field label when it's set and not NULL
-						$field_label = (isset($this->_labels[$column_name]) && $this->_labels[$column_name] !== NULL ? $this->_labels[$column_name] : $column_name);
-						if ($column_info['field_type'] == 'password_confirm') {
-							$field_label .= HEOL . (isset($this->_labels[$column_name]) && $this->_labels[$column_name] !== NULL ? $this->_labels[$column_name] : $column_name) . ' Confirm';
-						}
-
-						// set default name, might be overidden below
-						$name_html = Form::label($field_html_name, $field_label, $label_attributes);
+						// create the label tag with the field name
+						$field_label = $this->get_field_label($column_name);
+						$label_html = Form::label($field_attributes['id'], $field_label, $label_attributes);
 
 						if ($field_type_class_function == 'view_html') {
 							// create an array of the options that need to be passed to view html
@@ -545,8 +563,10 @@ class cl4_ORM extends Kohana_ORM {
 						}
 
 						// add the field label and data in the object
-						$this->_field_html[$column_name]['label'] = $name_html;
-						$this->_field_html[$column_name]['field'] = $field_html;
+						$this->_field_html[$column_name] = array(
+							'label' => $label_html,
+							'field' => $field_html,
+						);
 					} // if
 				} // if
 			} catch (Exception $e) {
@@ -607,6 +627,39 @@ class cl4_ORM extends Kohana_ORM {
 			return $this->_options['field_name_prefix'] . $column_name;
 		}
 	} // function get_field_html_name
+
+	/**
+	* Returns the field ID for HTML
+	* Based on if the field name has an array, if the field_id_prefix is not empty and then the table name (possibly), record number (possibly) and column name
+	*
+	* @param string $column_name
+	* @return string
+	*/
+	public function get_field_id($column_name) {
+		$field_id_prefix = ( ! empty($this->_options['field_id_prefix']) ? $this->_options['field_id_prefix'] . '_' : '');
+		if ($this->_options['field_name_include_array']) {
+			return $field_id_prefix . $this->_options['field_name_prefix'] . '_' . $this->_table_name . '_' . $this->_record_number . '_' . $column_name;
+		} else {
+			return $field_id_prefix . $this->_options['field_name_prefix'] . '_' . $column_name;
+		}
+	} // function get_field_id
+
+	/**
+	* Returns the label for the column/field
+	* If the label is not set, then it uses the column name
+	*
+	* @param string $column_name
+	* @return string
+	*/
+	public function get_field_label($column_name) {
+		// get the field label when it's set and not NULL
+		$field_label = (isset($this->_labels[$column_name]) && $this->_labels[$column_name] !== NULL ? $this->_labels[$column_name] : $column_name);
+		if ($this->_table_columns[$column_name]['field_type'] == 'password_confirm') {
+			$field_label .= HEOL . (isset($this->_labels[$column_name]) && $this->_labels[$column_name] !== NULL ? $this->_labels[$column_name] : $column_name) . ' Confirm';
+		}
+
+		return $field_label;
+	} // function get_field_label
 
 	public function is_field_name_array() {
 		return (bool) $this->_options['field_name_include_array'];
@@ -687,24 +740,26 @@ class cl4_ORM extends Kohana_ORM {
 			$form_close_tag = NULL;
 		} // if
 
-		// set up the buttons
-		// todo: add ability to override button attributes properly through options
-		if ($this->_options['display_submit']) {
-			$this->_form_buttons[] = Form::submit('cl4_submit', ($this->_mode == 'search' ? __('Search') : __('Save')));
-		}
-		if ($this->_options['display_reset']) {
-			$this->_form_buttons[] = Form::input('cl4_reset', __('Reset'), array(
-				'type' => 'button',
-				'class' => 'cl4_button_link',
-				'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'edit', 'id' => $this->pk())),
-			));
-		}
-		if ($this->_options['display_cancel']) {
-			$this->_form_buttons[] = Form::input('cl4_cancel', __('Cancel'), array(
-				'type' => 'button',
-				'class' => 'cl4_button_link',
-				'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'cancel')),
-			));
+		if ($this->_options['display_buttons']) {
+			// set up the buttons
+			// todo: add ability to override button attributes properly through options
+			if ($this->_options['display_submit']) {
+				$this->_form_buttons[] = Form::submit('cl4_submit', ($this->_mode == 'search' ? __('Search') : __('Save')));
+			}
+			if ($this->_options['display_reset']) {
+				$this->_form_buttons[] = Form::input('cl4_reset', __('Reset'), array(
+					'type' => 'button',
+					'class' => 'cl4_button_link',
+					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'edit', 'id' => $this->pk())),
+				));
+			}
+			if ($this->_options['display_cancel']) {
+				$this->_form_buttons[] = Form::input('cl4_cancel', __('Cancel'), array(
+					'type' => 'button',
+					'class' => 'cl4_button_link',
+					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'cancel')),
+				));
+			}
 		}
 
 		// add search parameters
@@ -764,8 +819,8 @@ class cl4_ORM extends Kohana_ORM {
 		$this->prepare_form();
 
 		// set up the buttons
-		if ($this->_options['display_back_to_list']) {
-            $this->_form_buttons[] = Form::submit(NULL, __('Return to List'), array(
+		if ($this->_options['display_buttons'] && $this->_options['display_back_to_list']) {
+			$this->_form_buttons[] = Form::submit(NULL, __('Return to List'), array(
 				'data-cl4_link' => '/' . Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name, 'action' => 'cancel')),
 				'class' => 'cl4_button_link ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
 			));
@@ -773,6 +828,7 @@ class cl4_ORM extends Kohana_ORM {
 
 		// return the generated view
 		return View::factory($this->_options['get_view_view_file'], array(
+			'form_options' => $this->_options,
 			'form_field_html' => $this->_field_html,
 			'form_buttons' => $this->_form_buttons,
 		));
@@ -799,60 +855,6 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $field_html;
 	} // function
-
-	/**
-	* get a table with data from the specified model
-	* @todo: move to MultiORM
-	* @todo: merge this with get_editable_list() ?
-	* @todo: or implement all the latest functions in get_editable_list() that apply to this method as well
-	*
-	* @param array $options
-	*/
-	public function get_list($options = array()) {
-		if ( ! empty($options)) $this->set_options($options);
-
-		$table_data = array();
-		$table_heading = array();
-		$returnHtml = '';
-
-		// apply any mandatory search strings
-		$this->add_search_filter();
-
-		try {
-			// get the data
-			foreach($this->find_all()->as_array() AS $id => $record_model) {
-				$row_data = array();
-				//$returnHtml .= kohana::debug($record_model->as_array());
-				foreach ($record_model->as_array() AS $column => $value) {
-					// todo: check options / meta to see if/how the data should be displayed?
-
-					$row_data[] = $value;
-				} // if
-				$table_data[] = $row_data;
-			}
-
-			// get the headings from the default model column descriptions
-			$table_heading = array_keys($this->_table_columns);
-
-			// override with any column labels we might have
-			foreach($table_heading AS $column_name => $label) {
-				if (isset($this->_labels[$label])) $table_heading[$column_name] = $this->_labels[$label];
-			}
-
-			// generate the table of data
-			$table_options = array(
-				'table_attributes' => array(),
-				'heading' => $table_heading,
-				'data' => $table_data,
-			);
-			$returnHtml .= HTMLTable::factory($table_options)->get_html();
-
-		} catch (Exception $e) {
-			throw $e;
-		}
-
-		return $returnHtml;
-	} // function get_list
 
 	/**
 	* return the meta data from the table columns array in the model for the given column

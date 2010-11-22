@@ -161,9 +161,9 @@ class cl4_MultiORM {
 		$this->set_options($options);
 
 		$column = array();
-		$table_options = $this->_options['table_options'];
 		$target_route = Route::get($this->_options['target_route']);
 		$list_options = $this->_options['editable_list_options'];
+		$table_options = $list_options['table_options'];
 
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
 
@@ -229,7 +229,6 @@ class cl4_MultiORM {
 		} else {
 			$table_options['heading'][] = '&nbsp;';
 		}
-		$table_options['min_width'][0] = 15;
 		$column[] = '';
 
 		// create the form and table name and ids
@@ -237,17 +236,6 @@ class cl4_MultiORM {
 		if (empty($table_options['table_attributes']['id'])) {
 			$table_options['table_attributes']['id'] = $prefix . $this->_object_name . '_table';
 		} // if
-
-		// loop through each of the action links/buttons adding 15 px to the first col width
-		foreach ($list_options['per_row_links'] as $value) {
-			if ($value) $table_options['min_width'][0] += 15;
-		}
-		foreach ($list_options['per_row_links_uri'] as $value) {
-			$table_options['min_width'][0] += 15;
-		}
-		foreach ($list_options['per_row_links_route'] as $value) {
-			$table_options['min_width'][0] += 15;
-		}
 
 		// determines the URL to use in the table column headers for sorting
 		$additional_query = array();
@@ -571,18 +559,20 @@ class cl4_MultiORM {
 			$form_close_tag = NULL;
 		} // if
 
-		// set up the buttons
-		// todo: add ability to override button attributes properly through options
-		if ($this->_options['display_submit']) {
-			$form_buttons[] = Form::submit('cl4_submit', ($this->_mode == 'search' ? __('Search') : __('Save')));
-		}
-		if ($this->_options['display_cancel']) {
-			$form_buttons[] = Form::input('cl4_cancel', __('Cancel'), array(
-				'type' => 'button',
-				'class' => 'cl4_button_link',
-				'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_model_name, 'action' => 'cancel')),
-			));
-		}
+		if ($this->_options['display_buttons']) {
+			// set up the buttons
+			// todo: add ability to override button attributes properly through options
+			if ($this->_options['display_submit']) {
+				$form_buttons[] = Form::submit('cl4_submit', ($this->_mode == 'search' ? __('Search') : __('Save')));
+			}
+			if ($this->_options['display_cancel']) {
+				$form_buttons[] = Form::input('cl4_cancel', __('Cancel'), array(
+					'type' => 'button',
+					'class' => 'cl4_button_link',
+					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_model_name, 'action' => 'cancel')),
+				));
+			}
+		} // if
 
 		$labels = $this->_model->labels();
 		$table_columns = $this->_model->table_columns();
@@ -598,12 +588,12 @@ class cl4_MultiORM {
 			}
 		} // foreach
 
-		$table = new HTMLTable(array(
+		$table_options = array(
 			'heading' => $headings,
-			'table_attributes' => array(
-				'class' => 'cl4_edit_multiple',
-			),
-		));
+		);
+		$table_options += $edit_multiple_options['table_options'];
+
+		$table = new HTMLTable($table_options);
 
 		$hidden_fields = array();
 
@@ -668,6 +658,60 @@ class cl4_MultiORM {
 			'items' => $record_count,
 		));
 	} // function
+
+	/**
+	* get a table with data from the specified model
+	* @todo: move to MultiORM
+	* @todo: merge this with get_editable_list() ?
+	* @todo: or implement all the latest functions in get_editable_list() that apply to this method as well
+	*
+	* @param array $options
+	*/
+	public function get_list($options = array()) {
+		if ( ! empty($options)) $this->set_options($options);
+
+		$table_data = array();
+		$table_heading = array();
+		$returnHtml = '';
+
+		// apply any mandatory search strings
+		$this->add_search_filter();
+
+		try {
+			// get the data
+			foreach($this->find_all()->as_array() AS $id => $record_model) {
+				$row_data = array();
+				//$returnHtml .= kohana::debug($record_model->as_array());
+				foreach ($record_model->as_array() AS $column => $value) {
+					// todo: check options / meta to see if/how the data should be displayed?
+
+					$row_data[] = $value;
+				} // if
+				$table_data[] = $row_data;
+			}
+
+			// get the headings from the default model column descriptions
+			$table_heading = array_keys($this->_table_columns);
+
+			// override with any column labels we might have
+			foreach($table_heading AS $column_name => $label) {
+				if (isset($this->_labels[$label])) $table_heading[$column_name] = $this->_labels[$label];
+			}
+
+			// generate the table of data
+			$table_options = array(
+				'table_attributes' => array(),
+				'heading' => $table_heading,
+				'data' => $table_data,
+			);
+			$returnHtml .= HTMLTable::factory($table_options)->get_html();
+
+		} catch (Exception $e) {
+			throw $e;
+		}
+
+		return $returnHtml;
+	} // function get_list
 
 	/**
 	* Loops through the post values, setting them in the model and saving them through the model

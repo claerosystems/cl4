@@ -23,8 +23,10 @@ foreach ($form_field_html as $column_name => $field_html) {
 // the table html
 echo $table->get_html();
 
-// the buttons
-echo '<div class="cl4_buttons">' . implode('', $form_buttons) . '</div>' . EOL;
+if ($form_options['display_buttons']) {
+	// the buttons
+	echo '<div class="cl4_buttons">' . implode('', $form_buttons) . '</div>' . EOL;
+}
 
 // the form close tag
 echo $form_close_tag;
