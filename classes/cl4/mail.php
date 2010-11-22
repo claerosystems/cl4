@@ -29,9 +29,10 @@ class cl4_Mail extends PHPMailer {
 	protected $log_email;
 
 	/**
-	*   Constructor, sets up smtp
+	* Constructor, sets up smtp using config
 	*
-	*   @param      array       $options    Options for the object
+	* @param string $config The config in config/cl4orm to use (defaults to "default")
+	* @param      array       $options    Options for the object
 	*           ['from'] => the email from which all emails will come from, if not sent then will use SITE::$emailFrom if it's set
 	*           ['from_name'] => the name from which the email will come from (attached to the email address), if not sent then will use SITE::$emailFromName if it's set
 	*           ['log_email'] => the email address to send emails to while in dev, if not sent then will use SITE::$logEmail if it's set
@@ -177,19 +178,50 @@ class cl4_Mail extends PHPMailer {
 			throw new phpmailerException('The names received were not an array or string');
 		}
 
+		$add_status = TRUE;
 		try {
 			foreach ($addressArray as $key => $address) {
 				if (is_array($namesArray)) {
-					$add_status = $this->AddAddress(trim($address), isset($namesArray[$key]) ? $namesArray[$key] : '');
+					$_add_status = $this->AddAddress(trim($address), isset($namesArray[$key]) ? $namesArray[$key] : '');
 				} else {
-					$add_status = $this->AddAddress(trim($address), $namesArray);
+					$_add_status = $this->AddAddress(trim($address), $namesArray);
 				}
+				if ( ! $_add_status) $add_status = FALSE;
 			} // foreach
-		} catch (phpmailerException $e) {
+		} catch (Exception $e) {
 			throw $e;
 		}
 
 		return $add_status;
 	} // function add_multiple_addresses
 
+	/**
+	* Add an array of addresses
+	*
+	* @param array $array
+	* @return bool status of AddAddress()
+	*/
+	public function add_address_array(array $array) {
+		$add_status = TRUE;
+
+		try {
+			foreach ($array as $email => $name) {
+				$_add_status = $this->AddAddress($email, $name);
+				if ( ! $_add_status) $add_status = FALSE;
+			}
+		} catch (Exception $e) {
+			throw $e;
+		}
+
+		return $add_status;
+	} // function add_address_array
+
+	/**
+	* Adds the log address as a BCC
+	*
+	* @return bool status of AddAddress()
+	*/
+	public function add_log_bcc() {
+		return $this->AddAddress($this->log_email);
+	}
 } // class cl4_Mail
