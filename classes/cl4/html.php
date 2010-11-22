@@ -1,6 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 class cl4_HTML extends Kohana_HTML {
+	/**
+	* Attributes that should be appended to instead of overwritten
+	* Used in HTML::merge_attributes()
+	* @var array
+	*/
+	public static $append_attributes = array('class', 'style');
+
     /**
      * Creates a style sheet link element.
      * Same as Kohana_HTML::style() but supports using //example.com/path/to/file.css and doesn't add a type="text/css"
@@ -116,4 +123,24 @@ class cl4_HTML extends Kohana_HTML {
 
 		return $attributes;
 	} // function
+
+	/**
+	* Merges 2 arrays of attributes
+	* Has special cases for attributes that shouldn't be overwritten, but appended to (see HTML::$append_attributes)
+	*
+	* @param array $current_attributes The current list of attributes
+	* @param array $new_attributes The attributes that need to be added
+	* @return array The new array of attributes
+	*/
+	public static function merge_attributes($current_attributes, $new_attributes) {
+		foreach ($new_attributes as $attribute => $attribute_value) {
+			if (isset($current_attributes[$attribute]) && in_array($attribute, HTML::$append_attributes)) {
+				$current_attributes[$attribute] .= ' ' . $attribute_value;
+			} else {
+				$current_attributes[$attribute] = $attribute_value;
+			}
+		} // foreach
+
+		return $current_attributes;
+	} // function merge_attributes
 } // class
