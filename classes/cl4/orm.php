@@ -747,10 +747,15 @@ class cl4_ORM extends Kohana_ORM {
 				$this->_form_buttons[] = Form::submit('cl4_submit', ($this->_mode == 'search' ? __('Search') : __('Save')));
 			}
 			if ($this->_options['display_reset']) {
+				if ($this->_mode == 'search') {
+					$action = 'search';
+				} else {
+					$action = 'edit';
+				}
 				$this->_form_buttons[] = Form::input('cl4_reset', __('Reset'), array(
 					'type' => 'button',
 					'class' => 'cl4_button_link',
-					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'edit', 'id' => $this->pk())),
+					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => $action, 'id' => $this->pk())),
 				));
 			}
 			if ($this->_options['display_cancel']) {
@@ -760,7 +765,7 @@ class cl4_ORM extends Kohana_ORM {
 					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'cancel')),
 				));
 			}
-		}
+		} // if
 
 		// add search parameters
 		$search_type_html = '';
