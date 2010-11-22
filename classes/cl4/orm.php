@@ -1557,4 +1557,17 @@ class cl4_ORM extends Kohana_ORM {
 
 		return call_user_func(ORM_FieldType::get_field_type_class_name($field_type) . '::view_html', $this->$column_name, $column_name, $this, $view_html_options, $source);
 	} // if
+
+	/**
+	 * Unloads the current object and clears the status.
+	 * Also resets the html field arrays
+	 *
+	 * @chainable
+	 * @return  ORM
+	 */
+	public function clear() {
+		parent::clear();
+
+		$this->empty_fields();
+	}
 } // class
