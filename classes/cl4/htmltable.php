@@ -87,7 +87,6 @@ class cl4_HTMLTable {
 			'add_divs_to_all_cells' => FALSE,
 			'width' => NULL,
 			'col_span' => array(),
-			'cell_align' => array(),
 
 			'sort_column' => NULL,
 			'sort_order' => NULL,
@@ -156,15 +155,6 @@ class cl4_HTMLTable {
 			foreach ($this->options['col_span'] as $row_number => $cols) {
 				foreach ($cols as $column_number => $span) {
 					$this->set_col_span($row_number, $column_number, $span);
-				}
-			}
-		}
-
-		// loop through the col_spans using the set_col_span() function
-		if ( ! empty($this->options['cell_align'])) {
-			foreach ($this->options['cell_align'] as $row_number => $cols) {
-				foreach ($cols as $column_number => $cell_count) {
-					$this->set_attribute($row_number, $column_number, 'align', $cell_count);
 				}
 			}
 		}
@@ -330,7 +320,6 @@ class cl4_HTMLTable {
 			// create the header row if applicable
 			if ( ! $this->options['transpose'] && ! empty($this->options['heading'])) {
 				$add_cell_widths = ! empty($this->options['width']) && is_array($this->options['width']);
-				$add_cell_align = ! empty($this->options['cell_align']) && is_array($this->options['cell_align']);
 				// only disable adding divs to all the cells in the table if the option is false
 				if ( ! $this->options['add_divs_to_all_cells']) $add_body_divs = FALSE;
 
@@ -349,9 +338,6 @@ class cl4_HTMLTable {
 					// add column width if passed in options
 					if ($add_cell_widths && ! empty($this->options['width'][$j])) {
 						$th_attributes['width'] = $this->options['width'][$j];
-					}
-					if ($add_cell_align && ! empty($this->options['cell_align'][$j])) {
-						$th_attributes['align'] = $this->options['cell_align'][$j];
 					}
 					$result_html .= $this->tab . $this->tab . '<th' . HTML::attributes($th_attributes) . '>';
 
@@ -416,9 +402,6 @@ class cl4_HTMLTable {
 						);
 						if ($this->options['sort_column'] !== NULL && $col_num == $this->options['sort_column']) {
 							$td_attributes['class'] .= ' sort' . $col_num . ' sort_' . strtolower($this->options['sort_order']);
-						}
-						if ( ! empty($this->options['cell_align'][$col_num])) {
-							$td_attributes['align'] = $this->options['cell_align'][$col_num];
 						}
 						if ( ! empty($this->td_attribute[$row_num][$col_num]) && is_array($this->td_attribute[$row_num][$col_num])) {
 							$td_attributes = HTML::merge_attributes($td_attributes, $this->td_attribute[$row_num][$col_num]);
