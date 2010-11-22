@@ -179,9 +179,11 @@ class cl4_HTMLTable {
 	public function set_attribute($row_number, $column_number, $attribute, $attribute_value) {
 		if ($column_number !== FALSE) {
 			// must be cell attribute
+			if ( ! isset($this->td_attribute[$row_number][$column_number])) $this->td_attribute[$row_number][$column_number] = array();
 			$this->td_attribute[$row_number][$column_number] = HTML::merge_attributes($this->td_attribute[$row_number][$column_number], array($attribute => $attribute_value));
 		} else {
 			// must be a row attribute
+			if ( ! isset($this->tr_attribute[$row_number])) $this->tr_attribute[$row_number] = array();
 			$this->tr_attribute[$row_number] = HTML::merge_attributes($this->tr_attribute[$row_number], array($attribute => $attribute_value));
 		} // if
 	} // function set_attribute
