@@ -325,7 +325,7 @@ class cl4_Form extends Kohana_Form {
 		return $html;
 	} // function
 
-	public static function checkbox_layout_table($name, $col, $label = '', $checked = NULL, $checked = FALSE, array $attributes = NULL, array $options = array()) {
+	public static function checkbox_layout_table($name, $col, $label = '', $value, $checked = FALSE, array $attributes = NULL, array $options = array()) {
 		$html = '';
 
 		$default_options = array(
@@ -342,7 +342,7 @@ class cl4_Form extends Kohana_Form {
 
 		if ($col == 1) $html .= '<tr>';
 
-		$html .= '<td>' . Form::checkbox($name, $checked, $checked, $attributes) . '<label' . HTML::attributes(array('for' => $attributes['id'])) . '>' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label></td>' . EOL;
+		$html .= '<td>' . Form::checkbox($name, $value, $checked, $attributes) . '<label' . HTML::attributes(array('for' => $attributes['id'])) . '>' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label></td>' . EOL;
 
 		++ $col;
 
