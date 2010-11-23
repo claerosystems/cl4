@@ -599,13 +599,13 @@ class cl4_ORM extends Kohana_ORM {
 				// create the sql to get the full list of source data
 				// todo: fix this to use parameters
 				$source_sql = "SELECT {$relation_data['source_value']}, {$relation_data['source_label']} FROM {$source_table} ORDER BY {$relation_data['source_label']}";
-				//echo kohana::debug($this->cl4blogtag->find_all()->as_array()); // this gets the items that are already associated with this object (if any) but it is an array of objects ->? not efficient for large lists
-
+				// get the source values
+				$source_values = $this->_db->query(Database::SELECT, $source_sql, false)->as_array($relation_data['source_value'], $relation_data['source_label']);
+				// get the checked source values
 				$value = $this->get_foreign_values($through_table, $relation_data);
-
 				// add the field label and html
 				$this->_field_html[$source_table]['label'] = $relation_data['field_label'];
-				$this->_field_html[$source_table]['field'] = Form::checkboxes($through_table, $source_sql, $value, array(), $options);
+				$this->_field_html[$source_table]['field'] = Form::checkboxes($through_table . '[]', $source_values, $value, array(), $options);
 			} // if
 		} // foreach
 
