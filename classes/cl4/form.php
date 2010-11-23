@@ -249,6 +249,7 @@ class cl4_Form extends Kohana_Form {
 		$col = 1;
 		foreach ($source as $checkbox_value => $label) {
 			if (is_array($label)) { // is array so we have a sub
+				// 20101123 CSN what is this supposed to be doing and what is $id supposed to be?  right now I think it is undefined
 				if ($options['orientation'] == 'table') {
 					if ($col > 1) $html .= '</tr>';
 					$html .= EOL . '<tr><td colspan="' . HTML::chars($options['columns']) . '">' . $options['group_header_open'] . HTML::chars($id) . $options['group_header_close'] . '</td></tr>' . EOL;
