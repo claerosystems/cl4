@@ -203,7 +203,7 @@ class cl4_Form extends Kohana_Form {
 	*
 	* @param mixed $name          The name attribute of the checkbox fields (will be an array)
 	* @param array $source        An array
-	* @param mixed $checked         An array of default ids that are already checked
+	* @param mixed $checked       An array of default ids that are already checked
 	* @param mixed $attributes    The attributes for the field tags
 	* @param mixed $options       The options, see below
 	* @return string
@@ -295,7 +295,7 @@ class cl4_Form extends Kohana_Form {
 		return $html;
 	} // function
 
-	public static function checkbox_layout($name, $label = '', $checked = NULL, $checked = FALSE, array $attributes = NULL, array $options = array()) {
+	public static function checkbox_layout($name, $label = '', $value, $checked = FALSE, array $attributes = NULL, array $options = array()) {
 		$html = '';
 
 		$default_options = array(
@@ -320,7 +320,7 @@ class cl4_Form extends Kohana_Form {
 			}
 		}
 
-		$html .= EOL . Form::checkbox($name, $checked, $checked, $attributes) . '<label' . HTML::attributes(array('for' => $attributes['id'])) . '>' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label>';
+		$html .= EOL . Form::checkbox($name, $value, $checked, $attributes) . '<label' . HTML::attributes(array('for' => $attributes['id'])) . '>' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label>';
 
 		return $html;
 	} // function
