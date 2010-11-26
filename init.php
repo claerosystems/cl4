@@ -18,20 +18,20 @@ $routes = Kohana::config('cl4.routes');
 if ($routes['login']) {
 	// login page
 	Route::set('login', '(<lang>/)login(/<action>)', array('lang' => $lang_options))
-	    ->defaults(array(
-	        'lang' => DEFAULT_LANG,
-	        'controller' => 'login',
-	        'action' => 'index',
+		->defaults(array(
+			'lang' => DEFAULT_LANG,
+			'controller' => 'login',
+			'action' => 'index',
 	));
 }
 
 if ($routes['account']) {
 	// account: profile, change password, forgot, register
 	Route::set('account', '(<lang>/)account(/<action>)', array('lang' => $lang_options))
-	    ->defaults(array(
-	        'controller' => 'account',
-	        'lang' => DEFAULT_LANG,
-	        'action' => 'index',
+	->defaults(array(
+		'controller' => 'account',
+		'lang' => DEFAULT_LANG,
+		'action' => 'index',
 	));
 }
 
@@ -40,37 +40,37 @@ if ($routes['cl4admin']) {
 	// Most cases: /dbadmin/user/edit/2
 	// Special case for download: /dbadmin/demo/download/2/public_filename
 	Route::set('cl4admin', '(<lang>/)dbadmin(/<model>(/<action>(/<id>(/<column_name>))))', array('lang' => $lang_options))
-	    ->defaults(array(
-	        'lang' => DEFAULT_LANG,
-	        'controller' => 'cl4admin',
-	        'model' => NULL, // this is the default object that will be displayed when accessing cl4admin (dbadmin) without a model
-	        'action' => 'index',
-	        'id' => '',
-	        'column_name' => NULL,
+		->defaults(array(
+		'lang' => DEFAULT_LANG,
+		'controller' => 'cl4admin',
+		'model' => NULL, // this is the default object that will be displayed when accessing cl4admin (dbadmin) without a model
+		'action' => 'index',
+		'id' => '',
+		'column_name' => NULL,
 	));
 }
 
 // define some constants that make it easier to add line endings
 if ( ! defined('EOL')) {
-    /**
-    *   CONST :: end of line
-    *   @var    string
-    */
-    define('EOL', "\r\n");
+	/**
+	*   CONST :: end of line
+	*   @var    string
+	*/
+	define('EOL', "\r\n");
 } // if
 
 if ( ! defined('HEOL')) {
-    /**
-    *   CONST :: HTML line ending with new line
-    *   @var    string
-    */
-    define('HEOL', "<br />\r\n");
+	/**
+	*   CONST :: HTML line ending with new line
+	*   @var    string
+	*/
+	define('HEOL', "<br />\r\n");
 } // if
 
 if ( ! defined('TAB')) {
-    /**
-    *   CONST :: HTML line ending with new line
-    *   @var    string
-    */
-    define('TAB', "\t");
+	/**
+	*   CONST :: HTML line ending with new line
+	*   @var    string
+	*/
+	define('TAB', "\t");
 } // if
