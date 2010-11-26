@@ -57,7 +57,7 @@ return array(
 		* used within ORM_File
 		* the parameters set in the route will be model, column_name, id; all other parameters will be left as their defaults
 		*/
-		'target_route' => 'claeroadmin',
+		'target_route' => 'cl4admin',
 		// the name of the model to use when downloading (streaming/reading) a file through PHP
 		// required for streaming the file when using target_route (not file_download_url)
 		'model_name' => NULL,

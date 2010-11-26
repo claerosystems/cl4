@@ -4,6 +4,6 @@ return array(
 	'routes' => array(
 		'login' => TRUE,
 		'account' => TRUE,
-		'claeroadmin' => TRUE,
+		'cl4admin' => TRUE,
 	),
 );

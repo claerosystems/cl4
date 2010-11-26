@@ -35,15 +35,15 @@ if ($routes['account']) {
 	));
 }
 
-if ($routes['claeroadmin']) {
+if ($routes['cl4admin']) {
 	// claero admin
 	// Most cases: /dbadmin/user/edit/2
 	// Special case for download: /dbadmin/demo/download/2/public_filename
-	Route::set('claeroadmin', '(<lang>/)dbadmin(/<model>(/<action>(/<id>(/<column_name>))))', array('lang' => $lang_options))
+	Route::set('cl4admin', '(<lang>/)dbadmin(/<model>(/<action>(/<id>(/<column_name>))))', array('lang' => $lang_options))
 	    ->defaults(array(
 	        'lang' => DEFAULT_LANG,
-	        'controller' => 'claeroadmin',
-	        'model' => NULL, // this is the default object that will be displayed when accessing claeroadmin (dbadmin) without a model
+	        'controller' => 'cl4admin',
+	        'model' => NULL, // this is the default object that will be displayed when accessing cl4admin (dbadmin) without a model
 	        'action' => 'index',
 	        'id' => '',
 	        'column_name' => NULL,
