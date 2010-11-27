@@ -22,7 +22,7 @@ class cl4_HTML extends Kohana_HTML {
      * @uses    HTML::attributes
      */
     public static function style($file, array $attributes = NULL, $index = FALSE) {
-        if (strpos($file, '://') === FALSE && strpos($file, '/') !== 0) {
+        if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
             // Add the base URL
             $file = URL::base($index).$file;
         }
@@ -50,7 +50,7 @@ class cl4_HTML extends Kohana_HTML {
      * @uses    HTML::attributes
      */
     public static function script($file, array $attributes = NULL, $index = FALSE) {
-        if (strpos($file, '://') === FALSE && strpos($file, '/') !== 0) {
+        if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
             // Add the base URL
             $file = URL::base($index).$file;
         }
