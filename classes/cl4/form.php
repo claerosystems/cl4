@@ -364,6 +364,7 @@ class cl4_Form extends Kohana_Form {
 	public static function date($name, $value = FALSE, array $attributes = NULL) {
 		$html = '';
 
+		if ($attributes === NULL) $attributes = array();
 		$attributes += array(
 			'size' => 10,
 			'maxlength' => 10,
