@@ -7,6 +7,42 @@ class cl4_Core extends Kohana_Core {
 	public static $is_firephp;
 
 	/**
+	 * Display debugging information.
+	 *
+	 * @param mixed $content The debugging information to display
+	 */
+    public static function debug() {
+		if (func_num_args() === 0) {
+			return;
+		}
+
+		// Get all passed variables
+		$variables = func_get_args();
+
+		$output = array();
+		foreach ($variables as $var) {
+			$output[] 	= Kohana::_dump($var, 1024);
+			$fire[]		= $var;
+		}
+		
+		// Don't do this in production
+		if (Kohana::PRODUCTION !== Kohana::$environment) {
+			// If we haven't checked for FirePHP yet
+			if ( ! isset(self::$is_firephp)) {
+				// See if it's available
+				self::$is_firephp = (in_array('firephp', array_keys(Kohana::modules())));
+			}
+			
+			if (self::$is_firephp) {
+				Fire::log(implode("\n", $fire));
+			}
+			else {
+				echo '<pre class="debug">' . implode("\n", $output) . '</pre>';
+			}
+		}
+    } // function debug
+
+	/**
 	* Sets the exception handler to the customized cl4 version
 	* The error handler is left at the Kohana one as it just through an exception anyway
 	*/
