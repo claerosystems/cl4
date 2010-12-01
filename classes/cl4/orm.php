@@ -1372,6 +1372,9 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* Overrides the delete from Kohana_ORM so that it returns the number of records affected, and can handle expiring records/objects/models.
+	* This will also delete any files associated with the records (if delete_files is TRUE)
+	*
+	* @see ORM::delete_files()
 	*
 	* @param mixed $id the primary key id of the record to delete
 	* @return the number of rows affected: 1 if it worked, 0 if no record was deleted (not exists, etc.)
@@ -1396,6 +1399,9 @@ class cl4_ORM extends Kohana_ORM {
 
 			// If this model just deletes rows
 			} else {
+				// delete the files associated with the record
+				$this->delete_files();
+
 				// Delete the object
 				$num_affected = DB::delete($this->_table_name)
 					->where($this->_primary_key, '=', $id)
@@ -1405,6 +1411,73 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $num_affected;
 	} // function
+
+	/**
+	* Deletes all the files on the record, based on the field_type file in _table_columns
+	* Will only call delete_files() when then delete_files file_options is TRUE
+	*
+	* @chainable
+	* @return ORM
+	*/
+	public function delete_files() {
+		foreach ($this->_table_columns as $column_name => $options) {
+			if ($options['field_type'] == 'file' && $options['field_options']['file_options']['delete_files'] === TRUE) {
+				$this->delete_file($column_name);
+			}
+		} // foreach
+
+		return $this;
+	} // function delete_files
+
+	/**
+	* Deletes the file for a specific column
+	* This does no checking for the delete_files option in file_options
+	*
+	* @chainable
+	* @param string $column_name The column/field name
+	* @return ORM
+	*/
+	public function delete_file($column_name) {
+		if (isset($this->_table_columns[$column_name]) && $this->_table_columns[$column_name]['field_type'] == 'file') {
+			try {
+				$file_options = $this->_table_columns[$column_name]['field_options']['file_options'];
+
+				$destination_folder = cl4File::get_file_path($file_options['destination_folder'], $this->table_name(), $column_name, $file_options);
+
+				if ($file_options['delete_files']) {
+					// try to delete the existing file
+					$file_to_delete = $destination_folder . '/' . $this->$column_name;
+
+					if (file_exists($file_to_delete) && ! is_dir($file_to_delete) && ! cl4File::delete($file_to_delete)) {
+						throw new Kohana_Exception('The old file could not be removed: :filename:', array(':filename:' => $file_to_delete), 10001);
+					}
+				} // if
+
+				// check if the field can be nulled
+				if ($this->_table_columns[$column_name]['is_nullable']) {
+					$no_value = NULL;
+				} else {
+					$no_value = '';
+				}
+
+				// remove the existing filename and original file name column data
+				$this->$column_name = $no_value;
+
+				if ( ! empty($file_options['original_filename_column'])) {
+					if ($this->_table_columns[$file_options['original_filename_column']]['is_nullable']) {
+						$no_value = NULL;
+					} else {
+						$no_value = '';
+					}
+					$this->$file_options['original_filename_column'] = $no_value;
+				} // if
+			} catch (Exception $e) {
+				throw $e;
+			}
+		} // if
+
+		return $this;
+	} // function delete_file
 
 	/**
 	 * Sets this model's values.  Chainable.

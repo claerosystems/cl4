@@ -37,27 +37,7 @@ class cl4_ORM_File extends ORM_FieldType {
 		// see if the user requested the original file to be deleted
 		if (Arr::get($post, $remove_checkbox_name, FALSE)) {
 			try {
-				if ($file_options['delete_files']) {
-					// try to delete the existing file
-					$file_to_delete = $destination_folder . '/' . $orm_model->$column_name;
-
-					if (file_exists($file_to_delete) && ! is_dir($file_to_delete) && ! cl4File::delete($file_to_delete)) {
-						throw new Kohana_Exception('The old file could not be removed: :filename:', array(':filename:' => $file_to_delete), 10001);
-					}
-				} // if
-
-				// remove the existing filename and original file name column data
-				if ($options['is_nullable']) {
-					$no_value = NULL;
-				} else {
-					$no_value = '';
-				}
-
-				$orm_model->$column_name = $no_value;
-				if ( ! empty($file_options['original_filename_column'])) {
-					$orm_model->$file_options['original_filename_column'] = $no_value;
-				}
-
+				$orm_model->delete_file($column_name);
 			} catch (Exception $e) {
 				throw $e;
 			}
