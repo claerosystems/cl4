@@ -57,8 +57,10 @@ class cl4_ORM_Select extends ORM_FieldType {
 	* @param mixed $value
 	* @return array
 	*/
-	public static function search_prepare($column_name, $value, array $options = array()) {
+	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
 		$methods = array();
+
+		$sql_table_name = ORM_Select::get_sql_table_name($orm_model);
 
 		// nothing received or not an array or all is in the array so don't do anything with this field
 		if (empty($value) || ! is_array($value) || in_array('all', $value)) {
@@ -74,12 +76,12 @@ class cl4_ORM_Select extends ORM_FieldType {
 				// add clause to check for anything set to 0
 				array(
 					'name' => 'where',
-					'args' => array($column_name, '=', 0),
+					'args' => array($sql_table_name . $column_name, '=', 0),
 				),
 				// add clause to check for anything set to NULL
 				array(
 					'name' => 'or_where',
-					'args' => array($column_name, '=', NULL),
+					'args' => array($sql_table_name . $column_name, '=', NULL),
 				),
 				// close the bracket
 				array(
@@ -92,7 +94,7 @@ class cl4_ORM_Select extends ORM_FieldType {
 			$methods = array(
 				array(
 					// don't need to include key name because it is where and set within ORM::set_search()
-					'args' => array($column_name, 'IN', $value),
+					'args' => array($sql_table_name . $column_name, 'IN', $value),
 				)
 			);
 		}

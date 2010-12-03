@@ -48,8 +48,8 @@ class cl4_ORM_Gender extends ORM_FieldType {
 		return Form::select($html_name, $source, $selected, $attributes, $options);
 	} // function
 
-	public static function search_prepare($column_name, $value, array $options = array()) {
-		return ORM_Radios::search_prepare($column_name, $value, $options);
+	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
+		return ORM_Radios::search_prepare($column_name, $value, $options, $orm_model);
 	} // function
 
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {

@@ -51,8 +51,8 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 		return Form::range_select($html_name, $options['start'], $options['end'], $selected, $attributes, $options);
 	} // function
 
-	public static function search_prepare($column_name, $value, array $options = array()) {
-		return ORM_Select::search_prepare($column_name, $value, $options);
+	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
+		return ORM_Select::search_prepare($column_name, $value, $options, $orm_model);
 	} // function
 
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {

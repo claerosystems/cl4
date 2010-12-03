@@ -133,13 +133,15 @@ class cl4_ORM_File extends ORM_FieldType {
 		return Form::input($column_name, $value, $attributes);
 	}
 
-	public static function search_prepare($column_name, $value, array $options = array()) {
+	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
 		if (empty($value)) {
 			return array();
 		} else {
+			$sql_table_name = ORM_Select::get_sql_table_name($orm_model);
+
 			$method = array(
 				// don't need to include key name because it is where and set within ORM::set_search()
-				'args' => array($column_name, 'LIKE', ORM_FieldType::add_like_prefix_suffix($value, $options['search_like'])),
+				'args' => array($sql_table_name . $column_name, 'LIKE', ORM_FieldType::add_like_prefix_suffix($value, $options['search_like'])),
 			);
 			return array($method);
 		} // if

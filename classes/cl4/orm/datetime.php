@@ -52,7 +52,7 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 		return $date_option_html . Form::datetime($html_name, $value['date'], $attributes);
 	} // function
 
-	public static function search_prepare($column_name, $value, array $options = array()) {
+	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
 		if ( ! is_array($value)
 		|| empty($value)
 		// the date operand is not set or set to "not_set" and the date is empty
@@ -60,10 +60,12 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 			return array();
 		}
 
+		$sql_table_name = ORM_Select::get_sql_table_name($orm_model);
+
 		if ($value['date_operand'] == 'not_set') {
 			$methods = array(
 				array(
-					'args' => array($column_name, '=', 0),
+					'args' => array($sql_table_name . $column_name, '=', 0),
 				)
 			);
 
@@ -106,43 +108,54 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 						$date .= $value['sec'];
 
 						// they have set a very specific time, so put it in the query
-						$methods = ORM_Datetime::get_search_method_additional($column_name, $operand, $date, '', $options);
+						$methods = ORM_Datetime::get_search_method_additional($sql_table_name, $column_name, $operand, $date, '', $options);
 
 					// the second is not set, so check for everything within the minute
 					} else if ($operand == '=') {
-						$methods = ORM_Datetime::get_range_search_methods($column_name, $date, '00', '59', $options);
+						$methods = ORM_Datetime::get_range_search_methods($sql_table_name, $column_name, $date, '00', '59', $options);
 
 					// the operand is not equal to, so we can't do anything fancy
 					} else {
 						// just add the date/time with no second and the use operand passed
-						$methods = ORM_Datetime::get_search_method_additional($column_name, $operand, $date, '00', $options);
+						$methods = ORM_Datetime::get_search_method_additional($sql_table_name, $column_name, $operand, $date, '00', $options);
 					} // if
 
 				// the minute is not set, so check for everything with the hour
 				} else if ($operand == '=') {
-					$methods = ORM_Datetime::get_range_search_methods($column_name, $date, '00:00', '59:59', $options);
+					$methods = ORM_Datetime::get_range_search_methods($sql_table_name, $column_name, $date, '00:00', '59:59', $options);
 
 				// the operand is not equal to, so we can't do anything fancy
 				} else {
 					// just add the date/time with no minute or second and the use operand passed
-					$methods = ORM_Datetime::get_search_method_additional($column_name, $operand, $date, '00:00', $options);
+					$methods = ORM_Datetime::get_search_method_additional($sql_table_name, $column_name, $operand, $date, '00:00', $options);
 				} // if
 
 			// the date fields only contains a date and "is on" therefore add a combined where clause to look anywhere (midnight to midnight) on that day
 			} else if ($operand == '=') {
-				$methods = ORM_Datetime::get_range_search_methods($column_name, $date, ' 00:00:00', ' 23:59:59', $options);
+				$methods = ORM_Datetime::get_range_search_methods($sql_table_name, $column_name, $date, ' 00:00:00', ' 23:59:59', $options);
 
 			// the operand is not equal to, so we can't do anything fancy
 			} else {
 				// just add the date/time with no hour, minute or second and the use operand passed
-				$methods = ORM_Datetime::get_search_method_additional($column_name, $operand, $date, ' 00:00:00', $options);
+				$methods = ORM_Datetime::get_search_method_additional($sql_table_name, $column_name, $operand, $date, ' 00:00:00', $options);
 			} // if
 		}
 
 		return $methods;
 	} // function
 
-	protected static function get_range_search_methods($column_name, $date, $start_additional, $end_additional, $options) {
+	/**
+	*
+	*
+	* @param string $sql_table_name the table name include the . (period) separator
+	* @param string $column_name
+	* @param string $date date formatted for the sql query
+	* @param string $start_additional appended after the date for the first part of the where
+	* @param string $end_additional appended after the date for the second part of the where
+	* @param array $options
+	* @return array
+	*/
+	protected static function get_range_search_methods($sql_table_name, $column_name, $date, $start_additional, $end_additional, $options) {
 		return array(
 			// open a bracket
 			array(
@@ -151,12 +164,12 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 			// add clause to check for everything for (for example) 00:00:00 and after
 			array(
 				'name' => 'where',
-				'args' => array($column_name, '>=', $date . $start_additional),
+				'args' => array($sql_table_name . $column_name, '>=', $date . $start_additional),
 			),
 			// add clause to check for everything up to (for example) 23:59:59 and before
 			array(
 				'name' => 'where',
-				'args' => array($column_name, '<=', $date . $end_additional),
+				'args' => array($sql_table_name . $column_name, '<=', $date . $end_additional),
 			),
 			// close the bracket
 			array(
@@ -165,10 +178,10 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 		);
 	} // function
 
-	protected static function get_search_method_additional($column_name, $operand, $date, $additional) {
+	protected static function get_search_method_additional($sql_table_name, $column_name, $operand, $date, $additional) {
 		return array(
 			array(
-				'args' => array($column_name, $operand, $date . $additional),
+				'args' => array($sql_table_name . $column_name, $operand, $date . $additional),
 			),
 		);
 	}

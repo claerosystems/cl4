@@ -35,7 +35,7 @@ class cl4_ORM_Date extends ORM_FieldType {
 		return $date_option_html . Form::date($html_name . '[date]', $value['date'], $attributes);
 	} // function
 
-	public static function search_prepare($column_name, $value, array $options = array()) {
+	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
 		if ( ! is_array($value)
 		|| empty($value)
 		// the date operand is not set or set to "not_set" and the date is empty
@@ -43,10 +43,12 @@ class cl4_ORM_Date extends ORM_FieldType {
 			return array();
 		}
 
+		$sql_table_name = ORM_Select::get_sql_table_name($orm_model);
+
 		if ($value['date_operand'] == 'not_set') {
 			$methods = array(
 				array(
-					'args' => array($column_name, '=', 0),
+					'args' => array($sql_table_name . $column_name, '=', 0),
 				)
 			);
 
@@ -59,12 +61,12 @@ class cl4_ORM_Date extends ORM_FieldType {
 				// add clause to check for everything before the date
 				array(
 					'name' => 'where',
-					'args' => array($column_name, '<', $value['date']),
+					'args' => array($sql_table_name . $column_name, '<', $value['date']),
 				),
 				// add clause to check for everything that is set
 				array(
 					'name' => 'and_where',
-					'args' => array($column_name, '>', 0),
+					'args' => array($sql_table_name . $column_name, '>', 0),
 				),
 				// close the bracket
 				array(
@@ -86,7 +88,7 @@ class cl4_ORM_Date extends ORM_FieldType {
 
 			$methods = array(
 				array(
-					'args' => array($column_name, $operand, $value['date']),
+					'args' => array($sql_table_name . $column_name, $operand, $value['date']),
 				)
 			);
 		} // if

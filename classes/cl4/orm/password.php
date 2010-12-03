@@ -9,7 +9,7 @@ class cl4_ORM_Password extends ORM_FieldType {
 		return Form::password($html_name, $value, $attributes, $options);
 	}
 
-	public static function search_prepare($column_name, $value, array $options = array()) {
+	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
 		// don't allow searching on the password
 		return array();
 	}

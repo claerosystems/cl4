@@ -41,16 +41,18 @@ class cl4_ORM_Phone extends ORM_FieldType {
 		return ORM_Phone::edit($column_name, $html_name, $value, $attributes, $options, $orm_model);
 	}
 
-	public static function search_prepare($column_name, $value, array $options = array()) {
+	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
 		if (empty($value) || ! is_array($value)) {
 			return array();
 		} else if (array_key_exists('country_code', $value) && array_key_exists('area_code', $value) && array_key_exists('exchange', $value) && array_key_exists('line', $value) && array_key_exists('extension', $value)) {
+			$sql_table_name = ORM_Select::get_sql_table_name($orm_model);
+
 			// combine the fields into a string to search
 			$phone = ORM_Phone::combine_phone_post_values($value);
 			if ($phone != '----') {
 				return array(
 					array(
-						'args' => array($column_name, 'LIKE', ORM_FieldType::add_like_prefix_suffix($phone, $options['search_like'])),
+						'args' => array($sql_table_name . $column_name, 'LIKE', ORM_FieldType::add_like_prefix_suffix($phone, $options['search_like'])),
 					),
 				);
 

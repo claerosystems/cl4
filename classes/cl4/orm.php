@@ -1576,7 +1576,7 @@ class cl4_ORM extends Kohana_ORM {
 
 		foreach ($post as $column_name => $value) {
 			if (isset($this->_table_columns[$column_name]) && ($skip_search_flag || $this->_table_columns[$column_name]['search_flag'])) {
-				$methods = call_user_func(ORM_FieldType::get_field_type_class_name($this->_table_columns[$column_name]['field_type']) . '::search_prepare', $column_name, $value, $search_options);
+				$methods = call_user_func(ORM_FieldType::get_field_type_class_name($this->_table_columns[$column_name]['field_type']) . '::search_prepare', $column_name, $value, $search_options, $this);
 
 				// now loop through the methods passed in and add them to _db_pending (they will get added to the query in _build())
 				foreach ($methods as $method) {

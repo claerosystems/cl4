@@ -60,13 +60,15 @@ class cl4_ORM_FieldType {
 	*
 	* @return   array
 	*/
-	public static function search_prepare($column_name, $value, array $options = array()) {
+	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
 		if (empty($value)) {
 			return array();
 		} else {
+			$sql_table_name = ORM_Select::get_sql_table_name($orm_model);
+
 			$method = array(
 				// don't need to include key name because it is where and set within ORM::set_search()
-				'args' => array($column_name, '=', $value),
+				'args' => array($sql_table_name . $column_name, '=', $value),
 			);
 			return array($method);
 		} // if
@@ -143,5 +145,16 @@ class cl4_ORM_FieldType {
 	*/
 	public static function get_field_type_class_name($field_type) {
 		return 'ORM_' . str_replace('_', '', $field_type);
+	}
+
+	/**
+	* Returns the table name with the dot (period) separator after ready for use in SQL queries
+	* if the table name can be found. If the table name can't be found, an empty string will be returned.
+	*
+	* @param ORM $orm_model
+	* @return string
+	*/
+	public static function get_sql_table_name($orm_model) {
+		return $orm_model !== NULL ? $orm_model->table_name() . '.' : '';
 	}
 } // class
