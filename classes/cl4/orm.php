@@ -116,21 +116,28 @@ class cl4_ORM extends Kohana_ORM {
 	 * @return  ORM
 	 */
 	protected function _build($type) {
-		parent::_build($type);
-
 		// If this model expires rows instead of deleting them
-		if ( ! empty($this->_expires_column) && ! $this->_include_expired) {
+		if ( ! empty($this->_expires_column) && ! $this->_include_expired && Database::SELECT == $type) {
 			// Ignore any rows that have expired
-			if (Database::SELECT == $type) {
-				$this->_db_builder->and_where_open()
-					->where($this->_expires_column['column'], '>', DB::expr("NOW()"))
-					->or_where($this->_expires_column['column'], '=', $this->_expires_column['default'])
-					->and_where_close();
-			} // if
-		} // if
+			$this->add_expiry_where();
+		}
+
+		return parent::_build($type);
+	} // function _build
+
+	/**
+	* Adds the expiry where clause
+	*
+	* @return  ORM
+	*/
+	public function add_expiry_where() {
+		$this->_db_pending[] = array(
+			'name' => 'add_expiry_where',
+			'args' => array($this->_table_name, $this->_expires_column['column'], $this->_expires_column['default'])
+		);
 
 		return $this;
-	} // function _build
+	} // function add_expiry_where
 
 	/**
 	 * Creates and returns a new model.
