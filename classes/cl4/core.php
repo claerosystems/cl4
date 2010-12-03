@@ -361,28 +361,6 @@ class cl4_Core extends Kohana_Core {
 	} // function
 
 	/**
-	* format the given data in the requested format, if the data is 0's or invalid, return ''
-	*
-	* @param mixed $data
-	* @param mixed $format
-	* @return string
-	*/
-	public static function format_date($data, $format) {
-		if ($data == '0000-00-00' || $data == '0000-00-00 00:00:00') {
-			$r = '';
-		} else {
-			$unix = strtotime($data);
-			if ($unix) {
-				$r = date($format, $unix);
-			} else {
-				$r = '';
-			}
-		} // if
-
-		return $r;
-	} // function
-
-	/**
 	* Recursively translates all the values and optionally the keys of an array
 	*
 	* @param array $array The array to translate
