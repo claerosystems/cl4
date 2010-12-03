@@ -622,58 +622,6 @@ class cl4_File {
 	} // function delete
 
 	/**
-	*   "Streams" the file specified by $path to browser, determining if the file exists, the mime type and ensuring headers haven't been sent
-	*   Stores messages in $this->errorInfo['messages']
-	*
-	*   @param	  string	  $file_path	   Path to file
-	*
-	* 	@todo	decide if this should use Request::send_file()
-	*/
-	public static function stream($file_path, $display_filename = NULL, $disposition = 'attachment') {
-		// if no display filename was passed, then use the name of the original filename
-		if ($display_filename === NULL) $display_filename = $filename;
-
-		if ( ! file_exists($file_path)) {
-			throw new cl4_Exception_File('The file to be streamed does not exist: :file', array(':file' => $filepath), cl4_Exception_File::FILE_DOES_NOT_EXIST);
-
-		} else if ( ! is_file($file_path)) {
-			throw new cl4_Exception_File('The file to be streamed is not a file (possibly a directory): :file', array(':file' => $filepath), cl4_Exception_File::IS_NOT_REGULAR_FILE);
-
-		} else {
-			// get the mime type, couldn't find a better way to do this for now, this is just using the extension
-			$mime_type = File::mime($file_path);
-
-			// if can't determine the mime-type, default to octet-stream
-			if (empty($mime_type)) {
-				$mime_type = 'application/octet-stream';
-			}
-
-			// output a new header to force download and exit (any error that occurs will have to be handled by the browser)
-			// note: this is a very browser dependent, somewhat buggy process
-			if ( ! headers_sent()) {
-				header('Content-type: ' . $mime_type);
-				header('Content-length: ' . (string) (filesize($file_path)));
-				header('Content-Disposition: ' . $disposition . '; filename=' . $display_filename);
-				header('Pragma: Public');
-				header('Cache-control: private');
-
-				// this will write the session file so the user can continue to use the site (if the session has been started)
-				if ( ! empty($_SESSION)) session_write_close();
-				// next 2 lines: help to prevent occassional corruption of file streaming
-				ob_clean();
-				flush();
-
-				readfile($file_path);
-				exit();
-
-			} else {
-				throw new cl4_Exception_File('The headers have already been sent so the headers to download the file can\'t be sent', array(), cl4_Exception_File::DOWNLOAD_HEADERS_CANT_BE_SENT);
-			} // if headers sent
-		} // if exists
-	} // function
-
-
-	/**
 	* gets an array of mime types using the mime types supplied by Kohana
 	* removes the extenion as the key (uses numeric extensions)
 	*/
