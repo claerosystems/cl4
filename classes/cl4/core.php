@@ -11,7 +11,7 @@ class cl4_Core extends Kohana_Core {
 	 *
 	 * @param mixed $content The debugging information to display
 	 */
-    public static function debug() {
+	public static function debug() {
 		if (func_num_args() === 0) {
 			return;
 		}
@@ -24,7 +24,7 @@ class cl4_Core extends Kohana_Core {
 			$output[] 	= Kohana::_dump($var, 1024);
 			$fire[]		= $var;
 		}
-		
+
 		// Don't do this in production
 		if (Kohana::PRODUCTION !== Kohana::$environment) {
 			// If we haven't checked for FirePHP yet
@@ -32,7 +32,7 @@ class cl4_Core extends Kohana_Core {
 				// See if it's available
 				self::$is_firephp = (in_array('firephp', array_keys(Kohana::modules())));
 			}
-			
+
 			if (self::$is_firephp) {
 				Fire::log(implode("\n", $fire));
 			}
@@ -176,6 +176,8 @@ class cl4_Core extends Kohana_Core {
 
 	/**
 	* Returns TRUE if we are currently in development
+	*
+	* @return  bool
 	*/
 	public static function is_dev() {
 		return (Kohana::DEVELOPMENT === Kohana::$environment);
@@ -183,6 +185,8 @@ class cl4_Core extends Kohana_Core {
 
 	/**
 	* Returns TRUE if we are currently in production
+	*
+	* @return  bool
 	*/
 	public static function is_prod() {
 		return (Kohana::PRODUCTION === Kohana::$environment);
@@ -190,6 +194,8 @@ class cl4_Core extends Kohana_Core {
 
 	/**
 	* Returns TRUE if we are currently in staging
+	*
+	* @return  bool
 	*/
 	public static function is_staging() {
 		return (Kohana::STAGING === Kohana::$environment);
@@ -197,6 +203,8 @@ class cl4_Core extends Kohana_Core {
 
 	/**
 	* Returns TRUE if we are currently in testing
+	*
+	* @return  bool
 	*/
 	public static function is_testing() {
 		return (Kohana::TESTING === Kohana::$environment);
