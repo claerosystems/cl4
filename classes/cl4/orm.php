@@ -1342,23 +1342,23 @@ class cl4_ORM extends Kohana_ORM {
 	} // function
 
 	/**
-	* Run cl4File::stream() for the file in a specific column for the current record
+	* Run Request::send_file() for the file in a specific column for the current record
 	*
 	* @param  string  $column_name
-	* @return  mixed  NULL if there is file in the column otherwise the script will exit during cl4File::stream()
+	* @return  mixed  NULL if there is file in the column otherwise the script will exit during Request::send_file()
 	*/
-	public function stream_file($column_name) {
+	public function send_file($column_name) {
 		if ( ! empty($this->$column_name)) {
 			$file_path = $this->get_file_path($column_name) . '/' . $this->$column_name;
 
 			$file_name = ORM_File::view($this->$column_name, $column_name, $this, $this->_table_columns[$column_name]['field_options']);
 
-			cl4File::stream($file_path, $file_name);
+			Request::instance()->send_file($file_path, $file_name);
 		} // if
 
 		// nothing to stream
 		return NULL;
-	} // function
+	} // function send_file
 
 	protected function get_foreign_values($through_table, $relation_data) {
 		$value = array();
