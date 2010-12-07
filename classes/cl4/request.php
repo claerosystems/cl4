@@ -23,10 +23,10 @@ class CL4_Request extends Kohana_Request {
 	 *     $request->send_file(TRUE, $filename);
 	 *
 	 * [!!] No further processing can be done after this method is called!
-	 * 
+	 *
 	 * Modified to write and close session before sending file, so that user can continue to
 	 * browse site while downloading file, if file is large.
-	 * 
+	 *
 	 * @param   string   filename with path, or TRUE for the current response
 	 * @param   string   downloaded file name
 	 * @param   array    additional options
@@ -37,12 +37,12 @@ class CL4_Request extends Kohana_Request {
 	 * @uses    Request::send_headers
 	 */
 	public function send_file($filename, $download = NULL, array $options = NULL) {
-        // Write and close any open sessions
-        if ( ! empty($_SESSION)) {
-            session_write_close();
-        }
-        
-        // Send the file
-        parent::send_file($filename, $download, $options);
-    }
-}
+		// Write and close any open sessions
+		if ( ! empty($_SESSION)) {
+			session_write_close();
+		}
+
+		// Send the file
+		parent::send_file($filename, $download, $options);
+	} // function send_file
+} // class CL4_Request

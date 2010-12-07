@@ -1343,6 +1343,7 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* Run Request::send_file() for the file in a specific column for the current record
+	* Checks to see if the file exists before running send_file()
 	*
 	* @param  string  $column_name
 	* @return  mixed  NULL if there is file in the column otherwise the script will exit during Request::send_file()
@@ -1352,6 +1353,10 @@ class cl4_ORM extends Kohana_ORM {
 			$file_path = $this->get_file_path($column_name) . '/' . $this->$column_name;
 
 			$file_name = ORM_File::view($this->$column_name, $column_name, $this, $this->_table_columns[$column_name]['field_options']);
+
+			if ( ! file_exists($file_name)) {
+				throw new cl4_Exception_File('The file that was attempted to be sent to the browser does not exist: :file:', array(':file:' => $file_name), cl4_Exception_File::::FILE_DOES_NOT_EXIST);
+			}
 
 			Request::instance()->send_file($file_path, $file_name);
 		} // if
