@@ -104,10 +104,8 @@ class cl4_Core extends Kohana_Core {
 					if (version_compare(PHP_VERSION, '5.3', '<')) {
 						// Workaround for a bug in ErrorException::getTrace() that exists in
 						// all PHP 5.2 versions. @see http://bugs.php.net/bug.php?id=45895
-						for ($i = count($trace) - 1; $i > 0; --$i)
-						{
-							if (isset($trace[$i - 1]['args']))
-							{
+						for ($i = count($trace) - 1; $i > 0; --$i) {
+							if (isset($trace[$i - 1]['args'])) {
 								// Re-position the args
 								$trace[$i]['args'] = $trace[$i - 1]['args'];
 
@@ -131,9 +129,20 @@ class cl4_Core extends Kohana_Core {
 
 				// Display the contents of the output buffer
 				echo ob_get_clean();
-
+			// If not printing errors
 			} else {
-				// todo: send an email with the error info
+				// Create an email about this error to send out
+				$error_email = new Mail();
+				$error_email->AddAddress(Kohana::config('cl4mail.error_email'));
+				$error_email->Subject = "Error on " . LONG_NAME . " " .APP_VERSION;
+				$error_email->MsgHTML($error);
+				
+				// If we can't send this email
+				if ( ! $error_email->Send()) {
+					// At least make sure this error is logged, too
+					Kohana::$log->add(Kohana::ERROR, $error_email->ErrorInfo);
+					Kohana::$log->write();					
+				}
 			}
 
 			return TRUE;
