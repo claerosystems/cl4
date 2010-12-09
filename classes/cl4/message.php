@@ -75,21 +75,31 @@ class cl4_Message {
 	/**
 	* Returns a HTML unordered list with the errors from the validate object
 	* This can then be used with add() to add the messages to the session
-	* Uses views/cl4/cl4_message_validate to format the messages
+	* By default it uses views/cl4/cl4_message_validate to format the messages
+	* To add additional messages to the output (so they are included in this message), pass them in as an array in $additional_messages
 	*
 	* 	Message::add(__(Kohana::message('file', 'pre_message')) . Message::add_validate_errors($validate, 'file'), Message::$error);
 	*
 	* @param 	Validate 	$validate	The validate object
 	* @param 	string 		$file		The file to get the messages from
+	* @param    array       $additional_messages  Additional messages to add the errors from Validate
 	* @return 	string
 	*/
-	public static function add_validate_errors(Validate $validate, $file = NULL) {
+	public static function add_validate_errors(Validate $validate, $file = NULL, $additional_messages = NULL) {
 		if ($file === NULL) {
 			$file = '';
 		}
 
+		$messages = $validate->errors($file);
+
+		if ( ! empty($additional_messages)) {
+			foreach ($additional_messages as $message) {
+				$messages[] = $message;
+			}
+		} // if
+
 		return View::factory('cl4/message/validate_errors')
-			->set('messages', $validate->errors($file));
+			->set('messages', $messages);
 	} // function
 
 	/**
