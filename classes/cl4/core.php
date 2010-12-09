@@ -83,39 +83,39 @@ class cl4_Core extends Kohana_Core {
 				Kohana::$log->write();
 			}
 
-            // only do the following when errors is set to true
-			if (Kohana::$errors === TRUE) {
-				if (Kohana::$is_cli) {
-					// Just display the text of the exception
-					echo "\n{$error}\n";
+			if (Kohana::$is_cli) {
+				// Just display the text of the exception
+				echo "\n{$error}\n";
 
-					return TRUE;
+				return TRUE;
+			}
+
+			// Get the exception backtrace
+			$trace = $e->getTrace();
+
+			if ($e instanceof ErrorException) {
+				if (isset(Kohana::$php_errors[$code])) {
+					// Use the human-readable error name
+					$code = Kohana::$php_errors[$code];
 				}
 
-				// Get the exception backtrace
-				$trace = $e->getTrace();
+				if (version_compare(PHP_VERSION, '5.3', '<')) {
+					// Workaround for a bug in ErrorException::getTrace() that exists in
+					// all PHP 5.2 versions. @see http://bugs.php.net/bug.php?id=45895
+					for ($i = count($trace) - 1; $i > 0; --$i) {
+						if (isset($trace[$i - 1]['args'])) {
+							// Re-position the args
+							$trace[$i]['args'] = $trace[$i - 1]['args'];
 
-				if ($e instanceof ErrorException) {
-					if (isset(Kohana::$php_errors[$code])) {
-						// Use the human-readable error name
-						$code = Kohana::$php_errors[$code];
-					}
-
-					if (version_compare(PHP_VERSION, '5.3', '<')) {
-						// Workaround for a bug in ErrorException::getTrace() that exists in
-						// all PHP 5.2 versions. @see http://bugs.php.net/bug.php?id=45895
-						for ($i = count($trace) - 1; $i > 0; --$i) {
-							if (isset($trace[$i - 1]['args'])) {
-								// Re-position the args
-								$trace[$i]['args'] = $trace[$i - 1]['args'];
-
-								// Remove the args
-								unset($trace[$i - 1]['args']);
-							}
+							// Remove the args
+							unset($trace[$i - 1]['args']);
 						}
 					}
 				}
+			}
 
+			// only echo out the message when errors is set to true
+			if (Kohana::$errors === TRUE) {
 				if ( ! headers_sent()) {
 					// Make sure the proper content type is sent with a 500 status
 					header('Content-Type: text/html; charset='.Kohana::$charset, TRUE, 500);
@@ -129,21 +129,45 @@ class cl4_Core extends Kohana_Core {
 
 				// Display the contents of the output buffer
 				echo ob_get_clean();
-			// If not printing errors
-			} else {
-				// Create an email about this error to send out
-				$error_email = new Mail();
-				$error_email->AddAddress(Kohana::config('cl4mail.error_email'));
-				$error_email->Subject = "Error on " . LONG_NAME . " " .APP_VERSION;
-				$error_email->MsgHTML($error);
 
-				// If we can't send this email
-				if ( ! $error_email->Send()) {
-					// At least make sure this error is logged, too
+			// If not echoing errors
+			} else {
+				try {
+					// Start an output buffer
+					ob_start();
+
+					echo '<html>
+<head>
+	<title>Error on ' . LONG_NAME . ' ' . APP_VERSION . '</title>
+</head>
+<body>';
+
+					// Include the exception HTML
+					include Kohana::find_file('views', Kohana::$error_view);
+
+echo '</body></html>';
+
+					// Display the contents of the output buffer
+					$full_error = ob_get_clean();
+
+					// Create an email about this error to send out
+					$error_email = new Mail();
+					$error_email->AddAddress(cl4::get_error_email());
+					$error_email->Subject = 'Error on ' . LONG_NAME . ' ' . APP_VERSION;
+					$error_email->MsgHTML($error);
+
+					$error_email->AddStringAttachment($full_error, 'error_details.html');
+
+					$error_email->Send();
+
+				} catch (phpmailerException $e) {
 					Kohana::$log->add(Kohana::ERROR, $error_email->ErrorInfo);
 					Kohana::$log->write();
+				} catch (Exception $e) {
+					Kohana::$log->add(Kohana::ERROR, Kohana::exception_text($e));
+					Kohana::$log->write();
 				}
-			}
+			} // if
 
 			return TRUE;
 
@@ -160,6 +184,17 @@ class cl4_Core extends Kohana_Core {
 			} // if
 		} // catch
 	} // function
+
+	/**
+	* Returns the email address the error messages should be sent to
+	* By default it uses the cl4mail config, default.error_email
+	*
+	* @param  string  $mail_config  The config in mail_config to use, default: default
+	* @return  string
+	*/
+	public static function get_error_email($mail_config = 'default') {
+		return Kohana::config('cl4mail.' . $mail_config . '.error_email');
+	}
 
 	/**
 	 * Display debugging information, will use firephp if it is activated.
