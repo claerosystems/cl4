@@ -46,52 +46,52 @@ class cl4_Mail extends PHPMailer {
 		// Set default options
 		$default_options = Kohana::config('cl4mail');
 		$options += $default_options[$config];
-		
+
 		// Run PHPMailer constructor
 		parent::__construct($options['phpmailer_throw_exceptions']);
-		
+
 		// Are we in debug mode for this mailing?
 		$this->debug = (bool) $options['debug'];
-		
-		// Set the language this mail is in
+
+		// Set the language this object, does not affect the message, only affects error messages
 		$phpmailer_loc = str_replace('class.phpmailer.php', 'language/', Kohana::find_file('vendor', 'phpmailer/class.phpmailer'));
 		$this->SetLanguage($options['language'], $phpmailer_loc);
-		
+
 		// Set the character set for the email
 		if ( ! empty($options['char_set'])) $this->CharSet = $options['char_set'];
-		
+
 		// Set the from email, name and log email (used in dev)
 		if ( ! empty($options['from'])) $this->From = $options['from'];
 		if ( ! empty($options['from_name'])) $this->FromName = $options['from_name'];
 		if ( ! empty($options['log_email'])) $this->log_email = $options['log_email'];
-		
+
 		// Set the values of the user table where the user's email and name can be retrieved from
 		if ( ! empty($options['model'])) $this->user_table['model'] = $options['model'];
 		if ( ! empty($options['email_field'])) $this->user_table['email_field'] = $options['email_field'];
 		if ( ! empty($options['first_name_field'])) $this->user_table['first_name_field'] = $options['first_name_field'];
 		if ( ! empty($options['last_name_field'])) $this->user_table['last_name_field'] = $options['last_name_field'];
-		
+
 		// If we're using PHP's built-in mailer
 		if (empty($options['mailer']) || $options['mailer'] == 'sendmail') {
 			$this->IsMail();
 		// If we're using an SMTP server
 		} else if ($options['mailer'] == 'smtp') {
 			$this->IsSMTP();
-			
+
 			if ( ! empty($options['smtp']['host'])) $this->Host = $options['smtp']['host'];
 			if ( ! empty($options['smtp']['port'])) $this->Port = $options['smtp']['port'];
 			if ( ! empty($options['smtp']['timeout'])) $this->Timeout = $options['smtp']['timeout'];
-			
+
+			// If using secure connection, this will be a type of security: ssl or tls
+			if ( ! empty($options['smtp']['secure'])) $this->SMTPSecure = $options['smtp']['secure'];
+
 			// if the username is not set or empty, then don't login
 			if ( ! empty($options['smtp']['username'])) {
-				$this->SMTPAuth = true;
+				$this->SMTPAuth = TRUE;
 				$this->Username = $options['smtp']['username'];
-				$this->Password = $options['smtp']['password'];
-				
-				// If using secure connection
-				if ( ! empty($options['smtp']['secure'])) $this->SMTPSecure = $options['smtp']['secure'];
-			}
-		}
+				if ( ! empty($options['smtp']['password'])) $this->Password = $options['smtp']['password'];
+			} // if
+		} // if
 	} // function
 
 	/**

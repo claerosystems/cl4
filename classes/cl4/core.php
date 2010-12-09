@@ -136,12 +136,12 @@ class cl4_Core extends Kohana_Core {
 				$error_email->AddAddress(Kohana::config('cl4mail.error_email'));
 				$error_email->Subject = "Error on " . LONG_NAME . " " .APP_VERSION;
 				$error_email->MsgHTML($error);
-				
+
 				// If we can't send this email
 				if ( ! $error_email->Send()) {
 					// At least make sure this error is logged, too
 					Kohana::$log->add(Kohana::ERROR, $error_email->ErrorInfo);
-					Kohana::$log->write();					
+					Kohana::$log->write();
 				}
 			}
 
