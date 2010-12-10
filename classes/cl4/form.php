@@ -622,28 +622,6 @@ class cl4_Form extends Kohana_Form {
 		return Form::radios($name, $source, $value, $attributes);
 	} // function checkbox_search
 
-	public static function password_confirm($name, $value = NULL, array $attributes = NULL, array $options = array()) {
-		$html = '';
-
-		$default_options = array(
-			'confirm_name_append' => '_confirm',
-			'confirm_id_append' => '_confirm',
-			'2_lines' => TRUE,
-		);
-		$options += $default_options;
-
-		$html .= parent::password($name, $value, $attributes);
-		if (array_key_exists('id', $attributes)) {
-			$this_attributes = Arr::overwrite($attributes, array('id' => $attributes['id'] . $options['confirm_id_append']));
-		} else {
-			$this_attributes = $attributes;
-		}
-		$this_attributes = Form::increment_tabindex($this_attributes);
-		$html .= ($options['2_lines'] ? HEOL : '') . parent::password($name . $options['confirm_name_append'], $value, $this_attributes);
-
-		return $html;
-	} // function password_confirm
-
 	public static function yes_no($name, $selected = NULL, array $attributes = NULL, array $options = array()) {
 		$default_options = array(
 			'reverse' => FALSE,

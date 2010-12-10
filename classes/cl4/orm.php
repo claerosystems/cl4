@@ -664,9 +664,6 @@ class cl4_ORM extends Kohana_ORM {
 	public function get_field_label($column_name) {
 		// get the field label when it's set and not NULL
 		$field_label = (isset($this->_labels[$column_name]) && $this->_labels[$column_name] !== NULL ? $this->_labels[$column_name] : $column_name);
-		if ($this->_table_columns[$column_name]['field_type'] == 'password_confirm') {
-			$field_label .= HEOL . (isset($this->_labels[$column_name]) && $this->_labels[$column_name] !== NULL ? $this->_labels[$column_name] : $column_name) . ' Confirm';
-		}
 
 		return $field_label;
 	} // function get_field_label

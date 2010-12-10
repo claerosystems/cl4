@@ -7,7 +7,7 @@ return array(
 	'default_meta_data' => array(
 		/**
 		* This is the type of field to display to the user and may not exactly match the field in the database
-		* The currently supported field types are: checkbox, date, datetime, file, gender, hidden, password, password_confirm, phone, radios, select, text, textarea, yes_no
+		* The currently supported field types are: checkbox, date, datetime, file, gender, hidden, password, phone, radios, select, text, textarea, yes_no
 		* To add support for other field types, add a class with the name ORM_TypeName in classes/orm/
 		*/
 		'field_type' => NULL,

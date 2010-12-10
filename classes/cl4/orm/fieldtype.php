@@ -176,9 +176,9 @@ class cl4_ORM_FieldType {
 	* Takes the field type and returns the field type class name
 	* For example
 	*
-	*     field type: password_confirm
-	*     class name: ORM_PasswordConfirm
-	*     returns: ORM_passwordconfirm
+	*     field type: range_select
+	*     class name: ORM_RangeSelect
+	*     returns: ORM_rangeselect
 	*
 	* @param   string  $field_type  The field type
 	* @return  string
