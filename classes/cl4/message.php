@@ -1,17 +1,23 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 class cl4_Message {
+	// the error levels
+	// when they are output, the meessages are order in descending numerical order
 	public static $error = 300;
 	public static $warning = 200;
 	public static $notice = 100;
 	public static $debug = 50;
+	// the levels and the class that should be used when outputing the HTML
 	public static $level_to_class = array(
 		300 => 'error',
 		200 => 'warning',
 		100 => 'notice',
 		50  => 'debug',
 	);
+	// the default level when no level is passed to Message::add()
+	public static $default_level = 300;
 
+	// the session key where the messages should be stored
 	public static $session_key = 'messages';
 
 	/**
@@ -26,7 +32,7 @@ class cl4_Message {
 	*/
 	public static function add($message, $level = NULL, $data = NULL) {
 		if ($level === NULL) {
-			$level = Message::$error;
+			$level = Message::$default_level;
 		}
 
 		// we are in dev/debug so we don't want to add the message because it's a debug only message
@@ -71,6 +77,25 @@ class cl4_Message {
 
 		return $messages;
 	} // function
+
+	/**
+	* Adds a message using Kohana::message(), including translate & data merge.
+	* Saves doing the following:
+	*
+	*     Message::add(__(Kohana::message('file', 'path'), array(':data_key' => 'data merge')), Message::$error);
+	*
+	* @see  Kohana::message()
+	* @see  __()
+	*
+	* @param   string  $file   The message file name
+	* @param   string  $path   The key path to get
+	* @param   array   $data   Values to replace in the message during translation
+	* @param   int     $level  The message level
+	* @return  array   The current array of messages in the session
+	*/
+	public static function message($file, $path = NULL, $data = NULL, $level = NULL) {
+		return Message::add(__(Kohana::message($file, $path), $data), $level);
+	}
 
 	/**
 	* Returns a HTML unordered list with the errors from the validate object
