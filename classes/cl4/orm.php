@@ -11,7 +11,6 @@
 class cl4_ORM extends Kohana_ORM {
 	/**
 	* this will hold the current database instance to be used for database actions
-	*
 	* @var database instance
 	*/
 	protected $_db;
@@ -541,7 +540,11 @@ class cl4_ORM extends Kohana_ORM {
 
 					// determine the value of the field based on the default value
 					$pk = $this->pk();
-					$field_value = ($this->_options['load_defaults'] && $this->_mode == 'add' && empty($pk) && empty($this->$column_name) ? $column_info['field_options']['default_value'] : $this->$column_name);
+					if ($this->_options['load_defaults'] && $this->_mode == 'add' && empty($pk) && empty($this->$column_name)) {
+						$field_value = $column_info['field_options']['default_value'];
+					} else {
+						$field_value = $this->$column_name;
+					}
 
 					if ($this->_mode != 'view' && in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 						// hidden (or other fields) are a special case because they don't get a column or row in a table and they will not be displayed
