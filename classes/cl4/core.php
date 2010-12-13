@@ -165,7 +165,7 @@ echo '</body></html>';
 	 *
 	 * @param mixed $content The debugging information to display
 	 */
-	public static function printr() {
+	public static function debug() {
 		if (func_num_args() === 0) {
 			return;
 		}
