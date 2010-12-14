@@ -540,8 +540,8 @@ class cl4_ORM extends Kohana_ORM {
 						$field_attributes['id'] = $this->get_field_id($column_name);
 					}
 
-					// If first field
-					if ($first) {
+					// If first non-hidden field
+					if (('ORM_hidden' != $field_type_class_name) && ($first)) {
 						// Autofocus
 						$field_attributes['autofocus'] = 'autofocus';
 						$first = false;
