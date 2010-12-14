@@ -484,6 +484,8 @@ class cl4_ORM extends Kohana_ORM {
 				break;
 		} // switch
 
+		$first = true;
+
 		// loop through and create all of the form field HTML snippets and store in $this->_field_html[$column_name] as ['label'] and ['field']
 		foreach ($process_columns as $column_name) {
 			if ( ! array_key_exists($column_name, $this->_table_columns)) {
@@ -536,6 +538,13 @@ class cl4_ORM extends Kohana_ORM {
 					// get the field id
 					if ( ! array_key_exists('id', $field_attributes) || $field_attributes['id'] === NULL) {
 						$field_attributes['id'] = $this->get_field_id($column_name);
+					}
+
+					// If first field
+					if ($first) {
+						// Autofocus
+						$field_attributes['autofocus'] = 'autofocus';
+						$first = false;
 					}
 
 					// determine the value of the field based on the default value
