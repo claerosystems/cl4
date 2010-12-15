@@ -10,12 +10,6 @@
  */
 class cl4_ORM extends Kohana_ORM {
 	/**
-	* this will hold the current database instance to be used for database actions
-	* @var database instance
-	*/
-	protected $_db;
-
-	/**
 	* this is the array of options
 	* @var    string
 	*/
