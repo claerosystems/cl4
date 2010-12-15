@@ -461,6 +461,9 @@ class cl4_ORM extends Kohana_ORM {
 			} // foreach
 		} // if
 
+		// flag used to determine if the field is the first field
+		$first_field_autofocus = FALSE;
+
 		// do some columns, 1 column or all columns
 		if (is_array($column_name)) {
 			$process_columns = $column_name;
@@ -468,6 +471,9 @@ class cl4_ORM extends Kohana_ORM {
 			$process_columns = array($column_name);
 		} else {
 			$process_columns = array_keys($this->_table_columns);
+
+			// as we are processing all of the table columns, allow the first column to be autofocused
+			$first_field_autofocus = TRUE;
 		}
 
 		$field_type_class_function = 'view';
@@ -483,8 +489,6 @@ class cl4_ORM extends Kohana_ORM {
 				$field_type_class_function = 'edit';
 				break;
 		} // switch
-
-		$first = true;
 
 		// loop through and create all of the form field HTML snippets and store in $this->_field_html[$column_name] as ['label'] and ['field']
 		foreach ($process_columns as $column_name) {
@@ -540,13 +544,6 @@ class cl4_ORM extends Kohana_ORM {
 						$field_attributes['id'] = $this->get_field_id($column_name);
 					}
 
-					// If first non-hidden field
-					if (('ORM_hidden' != $field_type_class_name) && ($first)) {
-						// Autofocus
-						$field_attributes['autofocus'] = 'autofocus';
-						$first = false;
-					}
-
 					// determine the value of the field based on the default value
 					$pk = $this->pk();
 					if ($this->_options['load_defaults'] && $this->_mode == 'add' && empty($pk) && empty($this->$column_name)) {
@@ -560,6 +557,12 @@ class cl4_ORM extends Kohana_ORM {
 						$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 
 					} else {
+						if ($first_field_autofocus) {
+							// this is the first visible field, so add the autofocus attribute
+							$first_field_autofocus = FALSE;
+							$field_attributes = HTML::merge_attributes($field_attributes, array('autofocus' => 'autofocus'));
+						}
+
 						// create the label tag with the field name
 						$field_label = $this->get_field_label($column_name);
 						$label_html = Form::label($field_attributes['id'], $field_label, $label_attributes);
