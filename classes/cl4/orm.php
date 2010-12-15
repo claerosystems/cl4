@@ -449,11 +449,10 @@ class cl4_ORM extends Kohana_ORM {
 	 *
 	 * @chainable
 	 * @param   array     $column_name     Can be a string or an array of column names
-	 * @param  array  $options  Options, the same as what can be passed into the object; sets the options within the object
 	 *
 	 * @return  ORM
 	 */
-	public function prepare_form($column_name = NULL, array $options = array()) {
+	public function prepare_form($column_name = NULL) {
 		// add the extra hidden fields from options, if there is any
 		if (count($this->_options['hidden_fields'] > 0)) {
 			foreach ($this->_options['hidden_fields'] as $hidden_field) {
