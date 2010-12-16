@@ -287,7 +287,7 @@ echo '</body></html>';
 	* Security::xss_clean() will only be applied on string and array values (other values don't need to be cleaned)
 	*
 	* @param  mixed  $value  the value to be cleaned
-	* @param  string  $type  used for type casting, can be 'int', 'string' or 'array'
+	* @param  string  $type  used for type casting, can be 'int', 'string', 'bool' or 'array'
 	* @return  mixed  the cleaned value
 	*/
 	public static function clean_param($value, $type = NULL) {
@@ -302,13 +302,16 @@ echo '</body></html>';
 
 		// cast the type if one is specified
 		switch($type) {
-			case 'int':
+			case 'int' :
 				$cleaned_value = (int) $cleaned_value;
 				break;
 			case 'array' :
 				if ( ! is_array($cleaned_value)) $cleaned_value = (array) $cleaned_value;
-			case 'string':
+			case 'string' :
 				$cleaned_value = (string) $cleaned_value;
+				break;
+			case 'bool' :
+				$cleaned_value = (bool) $cleaned_value;
 				break;
 		} // switch
 
