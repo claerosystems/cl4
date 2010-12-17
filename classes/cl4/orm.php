@@ -1359,8 +1359,8 @@ class cl4_ORM extends Kohana_ORM {
 
 			$file_name = ORM_File::view($this->$column_name, $column_name, $this, $this->_table_columns[$column_name]['field_options']);
 
-			if ( ! file_exists($file_name)) {
-				throw new cl4_Exception_File('The file that was attempted to be sent to the browser does not exist: :file:', array(':file:' => $file_name), cl4_Exception_File::FILE_DOES_NOT_EXIST);
+			if ( ! file_exists($file_path)) {
+				throw new cl4_Exception_File('The file that was attempted to be sent to the browser does not exist: :file:', array(':file:' => $file_path), cl4_Exception_File::FILE_DOES_NOT_EXIST);
 			}
 
 			Request::instance()->send_file($file_path, $file_name);

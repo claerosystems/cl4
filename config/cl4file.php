@@ -58,8 +58,11 @@ return array(
 		* the parameters set in the route will be model, column_name, id; all other parameters will be left as their defaults
 		*/
 		'target_route' => 'cl4admin',
-		// the name of the model to use when downloading (streaming/reading) a file through PHP
-		// required for streaming the file when using target_route (not file_download_url)
+		/**
+		* the name of the model to use when downloading (streaming/reading) a file through PHP
+		* required for streaming the file when using target_route (not file_download_url)
+		* if left as null, it will automatically be determined by looking at ORM::_object_name
+		*/
 		'model_name' => NULL,
 		// value to set the action to within the target_route
 		'route_action' => 'download',

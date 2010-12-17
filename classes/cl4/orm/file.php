@@ -184,8 +184,15 @@ class cl4_ORM_File extends ORM_FieldType {
 
 		// no file_download_url but there is a target route, so use it
 		} else if ( ! empty($file_options['target_route'])) {
+			// try to determine the model name
+			if ( ! empty($file_options['model_name'])) {
+				$model_name = $file_options['model_name'];
+			} else {
+				$model_name = $orm_model->object_name();
+			}
+
 			$link = Route::get($file_options['target_route'])->uri(array(
-				'model' => $file_options['model_name'],
+				'model' => $model_name,
 				'action' => $file_options['route_action'],
 				'id' => $orm_model->pk(),
 				'column_name' => $column_name,
