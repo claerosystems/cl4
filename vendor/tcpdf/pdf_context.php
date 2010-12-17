@@ -1,6 +1,6 @@
 <?php
 //
-//  FPDI - Version 1.3.3
+//  FPDI - Version 1.4
 //
 //    Copyright 2004-2010 Setasign - Jan Slabon
 //
@@ -17,8 +17,7 @@
 //  limitations under the License.
 //
 
-$__tmp = version_compare(phpversion(), "5") == -1 ? array('pdf_context') : array('pdf_context', false);
-if (!call_user_func_array('class_exists', $__tmp)) {
+if (!class_exists('pdf_context', false)) {
     
     class pdf_context {
     
@@ -83,7 +82,7 @@ if (!call_user_func_array('class_exists', $__tmp)) {
     
     	// Forcefully read more data into the buffer
     
-    	function increase_length($l=100) {
+    	function increase_length($l = 100) {
     		if ($this->_mode == 0 && feof($this->file)) {
     			return false;
     		} else if ($this->_mode == 0) {
@@ -99,5 +98,3 @@ if (!call_user_func_array('class_exists', $__tmp)) {
     	}
     }
 }
-
-unset($__tmp);

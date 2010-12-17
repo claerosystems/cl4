@@ -1,6 +1,6 @@
 <?php
 //
-//  FPDI - Version 1.3.2
+//  FPDI - Version 1.4
 //
 //    Copyright 2004-2010 Setasign - Jan Slabon
 //
@@ -17,8 +17,7 @@
 //  limitations under the License.
 //
 
-$__tmp = version_compare(phpversion(), "5") == -1 ? array('FilterLZW') : array('FilterLZW', false);
-if (!call_user_func_array('class_exists', $__tmp)) {
+if (!class_exists('FilterLZW', false)) {
 
     class FilterLZW {
         
@@ -156,5 +155,3 @@ if (!call_user_func_array('class_exists', $__tmp)) {
         }
     }
 }
-
-unset($__tmp);

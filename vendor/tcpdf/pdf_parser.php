@@ -1,6 +1,6 @@
 <?php
 // +---------------------------------------------------------------------+
-// | FPDI PDF-Parser v.1.0.2                                             |
+// | FPDI PDF-Parser v.1.0.3                                             |
 // | Copyright (c) 2009-2010 Setasign - Jan Slabon                       |
 // +---------------------------------------------------------------------+
 // | This source file is subject to the                                  |
@@ -104,7 +104,7 @@ class pdf_parser {
         $this->f = @fopen($this->filename, 'rb');
         
         if (!$this->f)
-            $this->error(sprintf('Cannot open %s !',$filename));
+            $this->error(sprintf('Cannot open %s !', $filename));
         
         $this->getPDFVersion();
         
@@ -140,7 +140,7 @@ class pdf_parser {
      * @param string $msg  Error-Message
      */
     function error($msg) {
-    	die('<b>PDF-Parser Error:</b> '.$msg);	
+    	die('<b>PDF-Parser Error:</b> ' . $msg);	
     }
     
     /**
@@ -180,7 +180,7 @@ class pdf_parser {
      */
     function getPDFVersion() {
         fseek($this->f, 0);
-        preg_match('/\d\.\d/', fread($this->f,16),$m);
+        preg_match('/\d\.\d/', fread($this->f, 16), $m);
         if (isset($m[0]))
             $this->pdfVersion = $m[0];
         return $this->pdfVersion;
@@ -209,8 +209,9 @@ class pdf_parser {
     }
 
     function pdf_read_xref(&$result, $offset) {
-        fseek($this->f, $o_pos = $offset-20); // set some bytes backwards to fetch errorious docs
-            
+        $o_pos = $offset-min(20, $offset);
+    	fseek($this->f, $o_pos); // set some bytes backwards to fetch errorious docs
+                
         $data = fread($this->f, 100);
         
         $xrefPos = strrpos($data, 'xref');
@@ -745,6 +746,8 @@ class pdf_parser {
                 	$toSearchFor = $obj_spec[1].' '.$obj_spec[2].' obj';
     				if (preg_match('/'.$toSearchFor.'/', $c->buffer)) {
     					$c->offset = strpos($c->buffer, $toSearchFor) + strlen($toSearchFor);
+    					// reset stack
+        				$c->stack = array();
     				} else {
         				$this->error("Unable to find object ({$obj_spec[1]}, {$obj_spec[2]}) at expected location");
     				}
@@ -875,6 +878,7 @@ class pdf_parser {
     			    extract($this->_objStreamCache[(string)$streamObjId]);
     			}
     			
+    			$sc->reset();
     			$sc->offset = $objectPos[$obj_spec[1]];
     			$oReadPlain = $this->readPlain;
     			$this->readPlain = false;

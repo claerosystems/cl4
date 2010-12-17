@@ -1,6 +1,6 @@
 <?php
 //
-//  FPDI - Version 1.3.2
+//  FPDI - Version 1.4
 //
 //    Copyright 2004-2010 Setasign - Jan Slabon
 //
@@ -26,8 +26,7 @@ if (!defined('ORD_u'))
 if (!defined('ORD_tilde'))
 	define('ORD_tilde', ord('~'));
 
-$__tmp = version_compare(phpversion(), "5") == -1 ? array('FilterASCII85') : array('FilterASCII85', false);
-if (!call_user_func_array('class_exists', $__tmp)) {
+if (!class_exists('FilterASCII85', false)) {
 
     class FilterASCII85 {
         
@@ -100,5 +99,3 @@ if (!call_user_func_array('class_exists', $__tmp)) {
         }
     }
 }
-
-unset($__tmp);

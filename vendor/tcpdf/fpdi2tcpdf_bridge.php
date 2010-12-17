@@ -1,6 +1,6 @@
 <?php
 //
-//  FPDI - Version 1.3.3
+//  FPDI - Version 1.4
 //
 //    Copyright 2004-2010 Setasign - Jan Slabon
 //
@@ -21,102 +21,28 @@
  * This class is used as a bridge between TCPDF and FPDI
  * and will create the possibility to use both FPDF and TCPDF
  * via one FPDI version.
- *
+ * 
  * We'll simply remap TCPDF to FPDF again.
- *
+ * 
  * It'll be loaded and extended by FPDF_TPL.
  */
 class FPDF extends TCPDF {
-
-    function __get($name) {
-        switch ($name) {
-            case 'PDFVersion':
-                return $this->PDFVersion;
-            case 'k':
-                return $this->k;
-            default:
-                // Error handling
-                //$this->Error('Cannot access protected property '.get_class($this).':$'.$name.' / Undefined property: '.get_class($this).'::$'.$name);
-        }
-    }
-
-    function __set($name, $value) {
-        switch ($name) {
-            case 'PDFVersion':
-                $this->PDFVersion = $value;
-                break;
-            default:
-                // Error handling
-                //$this->Error('Cannot access protected property '.get_class($this).':$'.$name.' / Undefined property: '.get_class($this).'::$'.$name);
-        }
-    }
-
-    function _putstream($s, $n=0)
-	{
-        $this->_out($this->_getstream($s, $n));
+    
+	function _putstream($s) {
+		$this->_out($this->_getstream($s));
 	}
-
-	function _putresourcedict() {
-		$out = '2 0 obj';
-		$out .= ' << /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]';
-		$out .= ' /Font <<';
-		foreach ($this->fontkeys as $fontkey) {
-			$font = $this->getFontBuffer($fontkey);
-			$out .= ' /F'.$font['i'].' '.$font['n'].' 0 R';
-		}
-		$out .= ' >>';
-		$out .= ' /XObject <<';
-		foreach ($this->imagekeys as $file) {
-			$info = $this->getImageBuffer($file);
-			$out .= ' /I'.$info['i'].' '.$info['n'].' 0 R';
-		}
-		if (count($this->tpls)) {
+	
+	function _getxobjectdict() {
+        $out = parent::_getxobjectdict();
+        if (count($this->tpls)) {
             foreach($this->tpls as $tplidx => $tpl) {
                 $out .= sprintf('%s%d %d 0 R', $this->tplprefix, $tplidx, $tpl['n']);
             }
         }
-		$out .= ' >>';
-		// visibility
-		$out .= ' /Properties <</OC1 '.$this->n_ocg_print.' 0 R /OC2 '.$this->n_ocg_view.' 0 R>>';
-		// transparency
-		$out .= ' /ExtGState <<';
-		foreach ($this->extgstates as $k => $extgstate) {
-			if (isset($extgstate['name'])) {
-				$out .= ' /'.$extgstate['name'];
-			} else {
-				$out .= ' /GS'.$k;
-			}
-			$out .= ' '.$extgstate['n'].' 0 R';
-		}
-		$out .= ' >>';
-		// gradient patterns
-		if (isset($this->gradients) AND (count($this->gradients) > 0)) {
-			$out .= ' /Pattern <<';
-			foreach ($this->gradients as $id => $grad) {
-				$out .= ' /p'.$id.' '.$grad['pattern'].' 0 R';
-			}
-			$out .= ' >>';
-		}
-		// gradient shadings
-		if (isset($this->gradients) AND (count($this->gradients) > 0)) {
-			$out .= ' /Shading <<';
-			foreach ($this->gradients as $id => $grad) {
-				$out .= ' /Sh'.$id.' '.$grad['id'].' 0 R';
-			}
-			$out .= ' >>';
-		}
-		// spot colors
-		if (isset($this->spot_colors) AND (count($this->spot_colors) > 0)) {
-			$out .= ' /ColorSpace <<';
-			foreach ($this->spot_colors as $color) {
-				$out .= ' /CS'.$color['i'].' '.$color['n'].' 0 R';
-			}
-			$out .= ' >>';
-		}
-		$out .= ' >> endobj';
-		$this->_out($out);
-	}
-
+        
+        return $out;
+    }
+	
     /**
      * Encryption of imported data by FPDI
      *
@@ -124,32 +50,32 @@ class FPDF extends TCPDF {
      */
     function pdf_write_value(&$value) {
         switch ($value[0]) {
-    		case PDF_TYPE_STRING :
+    		case PDF_TYPE_STRING:
 				if ($this->encrypted) {
 				    $value[1] = $this->_unescape($value[1]);
                     $value[1] = $this->_RC4($this->_objectkey($this->_current_obj_id), $value[1]);
                  	$value[1] = $this->_escape($value[1]);
-                }
+                } 
     			break;
-
-			case PDF_TYPE_STREAM :
+    			
+			case PDF_TYPE_STREAM:
 			    if ($this->encrypted) {
 			        $value[2][1] = $this->_RC4($this->_objectkey($this->_current_obj_id), $value[2][1]);
                 }
                 break;
-
-            case PDF_TYPE_HEX :
+                
+            case PDF_TYPE_HEX:
             	if ($this->encrypted) {
                 	$value[1] = $this->hex2str($value[1]);
                 	$value[1] = $this->_RC4($this->_objectkey($this->_current_obj_id), $value[1]);
-
+                    
                 	// remake hexstring of encrypted string
     				$value[1] = $this->str2hex($value[1]);
                 }
                 break;
     	}
     }
-
+    
     /**
      * Unescapes a PDF string
      *
@@ -194,17 +120,17 @@ class FPDF extends TCPDF {
                         if (ord($s[$count]) >= ord('0') &&
                             ord($s[$count]) <= ord('9')) {
                             $oct = ''. $s[$count];
-
+                                
                             if (ord($s[$count+1]) >= ord('0') &&
                                 ord($s[$count+1]) <= ord('9')) {
                                 $oct .= $s[++$count];
-
+                                
                                 if (ord($s[$count+1]) >= ord('0') &&
                                     ord($s[$count+1]) <= ord('9')) {
-                                    $oct .= $s[++$count];
-                                }
+                                    $oct .= $s[++$count];    
+                                }                            
                             }
-
+                            
                             $out .= chr(octdec($oct));
                         } else {
                             $out .= $s[$count];
@@ -214,7 +140,7 @@ class FPDF extends TCPDF {
         }
         return $out;
     }
-
+    
     /**
      * Hexadecimal to string
      *
@@ -224,7 +150,7 @@ class FPDF extends TCPDF {
     function hex2str($hex) {
     	return pack('H*', str_replace(array("\r", "\n", ' '), '', $hex));
     }
-
+    
     /**
      * String to hexadecimal
      *

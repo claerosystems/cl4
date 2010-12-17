@@ -1,6 +1,6 @@
 <?php
 // +---------------------------------------------------------------------+
-// | FPDI PDF-Parser v.1.0.1                                             |
+// | FPDI PDF-Parser v.1.0.3                                             |
 // | Copyright (c) 2009 Setasign - Jan Slabon                            |
 // +---------------------------------------------------------------------+
 // | This source file is subject to the                                  |
