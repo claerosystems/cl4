@@ -25,19 +25,6 @@ if ( ! Kohana::load(Kohana::find_file('vendor', 'tcpdf/var_stream'))) {
 *   @copyright  Claero Systems / XM Media Inc  2004-2010
 *   @version    $Id: class-claero_tcpdf.php 786 2010-07-20 05:35:45Z dhein $
 */
-
-//require_once('tcpdf/config/lang/eng.php');
-//require_once('tcpdf/tcpdf.php');
-//require_once('tcpdf/fpdi2tcpdf_bridge.php');
-//require_once('tcpdf/fpdi.php');
-//require_once('tcpdf/class-var_stream.php');
-
-/**
-*
-*
-*   @author     Claero Systems <craig.nakamoto@claero.com> / XM Media Inc <dhein@xmmedia.net>
-*   @copyright  Claero Systems / XM Media Inc  2004-2010
-*/
 class cl4_PDF extends FPDI {
     /**
     *   If the PDF creation has been rolled back
