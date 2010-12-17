@@ -1,19 +1,24 @@
 <?php defined('SYSPATH') or die ('No direct script access.');
 
-if ( ! Kohana::load(Kohana::find_file('vendor', 'tcpdf/config/lang/eng'))) {
-	throw new Kohana_Exception('Unable to find the TCPDF language (English). Ensure it\'s in a vendor folder');
-}
-if ( ! Kohana::load(Kohana::find_file('vendor', 'tcpdf/tcpdf'))) {
-	throw new Kohana_Exception('Unable to find TCPDF. Ensure it\'s in a vendor folder');
-}
-if ( ! Kohana::load(Kohana::find_file('vendor', 'tcpdf/fpdi2tcpdf_bridge'))) {
-	throw new Kohana_Exception('Unable to find FPI2TCPDF Bridge. Ensure it\'s in a vendor folder');
-}
-if ( ! Kohana::load(Kohana::find_file('vendor', 'tcpdf/fpdi'))) {
-	throw new Kohana_Exception('Unable to find FPDI. Ensure it\'s in a vendor folder');
-}
-if ( ! Kohana::load(Kohana::find_file('vendor', 'tcpdf/var_stream'))) {
-	throw new Kohana_Exception('Unable to find Var_Stream. Ensure it\'s in a vendor folder');
+try {
+	Kohana::load(Kohana::find_file('vendor', 'tcpdf/config/lang/eng'));
+	Kohana::load(Kohana::find_file('vendor', 'tcpdf/tcpdf'));
+	Kohana::load(Kohana::find_file('vendor', 'tcpdf/fpdi2tcpdf_bridge'));
+	Kohana::load(Kohana::find_file('vendor', 'tcpdf/fpdi'));
+} catch (Exception $e) {
+	// produce error for user
+	if (Kohana::$errors) {
+		echo 'Unable to find TCPDF and related files. Ensure it\'s in a vendor folder and doesn\'t have any errors';
+	} else {
+		echo 'There was a problem generating the PDF. Please contact the system administrator.';
+	}
+	// throw and then catch an exception so an error is logged and then throw the exception again
+	try {
+		throw new Kohana_Exception('Unable to find TCPDF and related files. Ensure it\'s in a vendor folder and doesn\'t have any errors');
+	} catch (Exception $e) {
+		cl4::exception_handler($e);
+		throw $e;
+	}
 }
 
 /**
