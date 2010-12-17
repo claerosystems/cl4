@@ -50,6 +50,8 @@ return array(
 		* these fields should not have the edit_flag set as TRUE because it will create another field in the form that could override the value that is set in ORM_File::save()
 		*/
 		'original_filename_column' => 'original_filename',
+		// if not empty, then this will be used instead of the original filename for display to the user (useful when not using the original filename column)
+		'alternate_filename_display' => NULL,
 		// the URL to the helper that will stream private files to the browser; checked first and then target_route
 		'file_download_url' => NULL,
 		/**

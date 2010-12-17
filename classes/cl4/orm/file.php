@@ -178,6 +178,11 @@ class cl4_ORM_File extends ORM_FieldType {
 	} // function
 
 	public static function download_link($column_name, $value, $file_name, $file_options, ORM $orm_model) {
+		// check if we should be using an alternate file name to display to the user
+		if ( ! empty($file_options['alternate_filename_display'])) {
+			$file_name = $file_options['alternate_filename_display'];
+		}
+
 		// prepare a link to download the file
 		if ( ! empty($file_options['file_download_url'])) {
 			$link = $file_options['file_download_url'] . '/' . $value;
