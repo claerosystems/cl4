@@ -1,5 +1,6 @@
 <?php defined('SYSPATH') or die ('No direct script access.');
 
+// include all the necessary files
 try {
 	Kohana::load(Kohana::find_file('vendor', 'tcpdf/config/lang/eng'));
 	Kohana::load(Kohana::find_file('vendor', 'tcpdf/tcpdf'));
@@ -19,7 +20,7 @@ try {
 		cl4::exception_handler($e);
 		throw $e;
 	}
-}
+} // try
 
 /**
 *   This file contains the ClaeroTcpdf class used with TCPDF to add additional PDF functionality
@@ -82,10 +83,10 @@ class cl4_PDF extends FPDI {
         parent::__construct($orientation, 'mm', $format, true, 'UTF-8', false); // the 4th parameter should be true, but there seems to be some issues with a library called pcre that isn't configured correctly on centos
 
         $this->SetCreator(PDF_CREATOR);
-        //$this->SetAuthor(SITE::$applicationLongName);
+        $this->SetAuthor(LONG_NAME);
 
         // the default header data
-        //$this->SetHeaderData('', '', SITE::$applicationLongName, '');
+        $this->SetHeaderData('', '', LONG_NAME, '');
         $this->setHeaderFont(array('helvetica', '', 10));
         $this->setFooterFont(array('helvetica', '', 10));
 
@@ -427,7 +428,9 @@ class cl4_PDF extends FPDI {
         if (is_string($w) && strpos($w, '%') !== false) {
             $w = $this->CalculatePercentageWidth($w);
         }
+
         $border = strtoupper($border);
+
         parent::Cell($w, $h, $txt, $border, $ln, $align, $fill, $link, $stretch, $ignore_min_height);
     } // function Cell
 
