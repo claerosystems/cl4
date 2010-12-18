@@ -207,7 +207,7 @@ class cl4_PDF extends FPDI {
 	*
 	*   @return	 bool	false if content is not on 1 page, true if the content is on 1 page or will not fit on 1 page and has been added anyway
 	*/
-	function KeepTogether() {
+	public function KeepTogether() {
 		++$this->runCount;
 
 		if ($this->runCount > 1) { // we have moved to the next page
@@ -255,6 +255,7 @@ class cl4_PDF extends FPDI {
 	*	   fill_colour => the grey shade to apply to the background of the cells (default 200)
 	*	   row_height => the height of the cells (default 7)
 	*	   end_ln => if a line should be added at the end of the row (default true); this can allow for 2 column headings to be put beside each other
+	*      cell_align => the alignment of the cells as accepted by Cell() and MultiCell() (default all C)
 	*/
 	public function AddTableHeadings($headings, $colWidths, $options = array()) {
 		$possibleOptions = array(
@@ -263,8 +264,9 @@ class cl4_PDF extends FPDI {
 			'fill_colour' => 200,
 			'row_height' => 7,
 			'end_ln' => true,
+			'cell_align' => array(),
 		);
-		$options = SetFunctionOptions($options, $possibleOptions);
+		$options += $possibleOptions;
 
 		// Colors, line width and bold font
 		$this->SetDefaultFontFill();
@@ -291,7 +293,9 @@ class cl4_PDF extends FPDI {
 				$colWidth = $colWidths[$i];
 			}
 
-			$this->Cell($colWidth, $options['row_height'], $headings[$origI], 1, 0, 'C', 1);
+			$cell_align = isset($options['cell_align'][$i]) ? $options['cell_align'][$i] : 'C';
+
+			$this->Cell($colWidth, $options['row_height'], $headings[$origI], 1, 0, $cell_align, 1);
 		}
 
 		if ($options['end_ln']) $this->Ln();
@@ -313,7 +317,7 @@ class cl4_PDF extends FPDI {
 			'max_row_height' => null,
 			'use_multicells' => true, // if set to false, all text will be added with cells & therefore no wrapping will be done
 		);
-		$options = SetFunctionOptions($options, $possibleOptions);
+		$options += $possibleOptions;
 
 		// check to see if the cell alignment has been set; if not set to left (L)
 		foreach ($this->headerWidths as $num => $width) {
@@ -374,9 +378,9 @@ class cl4_PDF extends FPDI {
 	*
 	*   @return	 float   The width of the page between the margins
 	*/
-	public function GetPageMaginWidth() {
+	public function GetPageMarginWidth() {
 		return $this->w - $this->rMargin - $this->lMargin;
-	} // function GetPageMaginWidth
+	} // function GetPageMarginWidth
 
 	/**
 	*   Gets the page height between the top and bottom margins
@@ -396,14 +400,14 @@ class cl4_PDF extends FPDI {
 	*/
 	public function GetRowHeight($numLines = 1) {
 		$lineHeight = ($this->GetFontSize() * $this->getCellHeightRatio());
-		return ($numLines * $lineHeight) + (2 * $this->cMargin);
+		return ($numLines * $lineHeight) + $this->cell_padding['L'] + $this->cell_padding['R'];
 	} // function GetRowHeight
 
 	/**
 	*   Prints a cell (rectangular area) with optional borders, background color and character string. The upper-left corner of the cell corresponds to the current position. The text can be aligned or centered. After the call, the current position moves to the right or to the next line. It is possible to put a link on the text.<br />
 	*   If automatic page breaking is enabled and the cell goes beyond the limit, a page break is done before outputting.
 	*
-	*   @param  float/string   $w   Cell width. If 0, the cell extends up to the right margin. This can also be a string precentage, which is used with GetPageMaginWidth() to calculate the with the cell based on a percentage of the page width
+	*   @param  float/string   $w   Cell width. If 0, the cell extends up to the right margin. This can also be a string precentage, which is used with GetPageMarginWidth() to calculate the with the cell based on a percentage of the page width
 	*   @param  float   $h		  Cell height. Default value: 0.
 	*   @param  string  $txt		String to print. Default value: empty string.
 	*   @param  mixed   $border	 Indicates if borders must be drawn around the cell. The value can be either a number:<ul><li>0: no border (default)</li><li>1: frame</li></ul>or a string containing some or all of the following characters (in any order):<ul><li>L: left</li><li>T: top</li><li>R: right</li><li>B: bottom</li></ul>
@@ -438,7 +442,7 @@ class cl4_PDF extends FPDI {
 	*   They can be automatic (as soon as the text reaches the right border of the cell) or explicit (via the \n character). As many cells as necessary are output, one below the other.<br />
 	*   Text can be aligned, centered or justified. The cell block can be framed and the background painted.
 	*
-	*   @param  float/string   $w   Width of cells. If 0, they extend up to the right margin of the page. This can also be a string precentage, which is used with GetPageMaginWidth() to calculate the with the cell based on a percentage of the page width
+	*   @param  float/string   $w   Width of cells. If 0, they extend up to the right margin of the page. This can also be a string precentage, which is used with GetPageMarginWidth() to calculate the with the cell based on a percentage of the page width
 	*   @param  float   $h		  Cell minimum height. The cell extends automatically if needed.
 	*   @param  string  $txt		String to print
 	*   @param  mixed   $border	 Indicates if borders must be drawn around the cell block. The value can be either a number:<ul><li>0: no border (default)</li><li>1: frame</li></ul>or a string containing some or all of the following characters (in any order):<ul><li>L: left</li><li>T: top</li><li>R: right</li><li>B: bottom</li></ul>
@@ -467,7 +471,9 @@ class cl4_PDF extends FPDI {
 		if (is_string($w) && strpos($w, '%') !== false) {
 			$w = $this->CalculatePercentageWidth($w);
 		}
+
 		$border = strtoupper($border);
+
 		return parent::MultiCell($w, $h, $txt, $border, $align, $fill, $ln, $x, $y, $reseth, $stretch, $ishtml, $autopadding, $maxh);
 	} // function MultiCell
 
@@ -476,14 +482,14 @@ class cl4_PDF extends FPDI {
 	*   They can be automatic (as soon as the text reaches the right border of the cell) or explicit (via the \n character). As many cells as necessary are output, one below the other.<br />
 	*   Text can be aligned, centered or justified. The cell block can be framed and the background painted.
 	*
-	*   @param  float/string   $w   Width of cells. If 0, they extend up to the right margin of the page. This can also be a string precentage, which is used with GetPageMaginWidth() to calculate the with the cell based on a percentage of the page width; widths includes the padding specified by the left and right keys in the padding array
+	*   @param  float/string   $w   Width of cells. If 0, they extend up to the right margin of the page. This can also be a string precentage, which is used with GetPageMarginWidth() to calculate the with the cell based on a percentage of the page width; widths includes the padding specified by the left and right keys in the padding array
 	*   @param  float   $h		  Cell minimum height. The cell extends automatically if needed.
 	*   @param  string  $txt		String to print
 	*   @param  mixed   $border	 Indicates if borders must be drawn around the cell block. The value can be either a number:<ul><li>0: no border (default)</li><li>1: frame</li></ul>or a string containing some or all of the following characters (in any order):<ul><li>L: left</li><li>T: top</li><li>R: right</li><li>B: bottom</li></ul>
 	*   @param  string  $align	  Allows to center or align the text. Possible values are:<ul><li>L or empty string: left align</li><li>C: center</li><li>R: right align</li><li>J: justification (default value when $ishtml=false)</li></ul>
 	*   @param  int	 $fill	   Indicates if the cell background must be painted (1) or transparent (0). Default value: 0.
 	*   @param  int	 $ln		 Indicates where the current position should go after the call. Possible values are:<ul><li>0: to the right</li><li>1: to the beginning of the next line [DEFAULT]</li><li>2: below</li></ul>
-	*   @param  array   $padding	this can be an array to specific the padding around the multicell; the array can contain some or all of the following; the key is the side the value is the amount of padding: array('left' => #, 'right' => #, 'top' => #, 'bottom' => #); the width ($w) includes the padding
+	*   @param  array   $padding	this can be an array with the specific the padding around the multicell; the array can contain some or all of the following; the key is the side the value is the amount of padding: array('left' => #, 'right' => #, 'top' => #, 'bottom' => #); the width ($w) includes the padding
 	*   @param  float   $x		  x position in user units
 	*   @param  float   $y		  y position in user units
 	*   @param  boolean $reseth	 if true reset the last cell height (default true).
@@ -501,12 +507,21 @@ class cl4_PDF extends FPDI {
 	*   @see SetFont(), SetDrawColor(), SetFillColor(), SetTextColor(), SetLineWidth(), Cell(), Write(), SetAutoPageBreak()
 	*/
 	public function MultiCellPadded($w, $h, $txt, $border = 0, $align = 'J', $fill = 0, $ln = 1, $padding = null, $x = '', $y = '', $reseth = true, $stretch = 0, $ishtml = false, $autopadding = false, $maxh = 0) {
+		if ( ! empty($padding) && ! is_array($padding)) {
+			$padding = array(
+				'left' => $padding,
+				'right' => $padding,
+				'top' => $padding,
+				'bottom' => $padding,
+			);
+		}
+
 		if (is_array($padding)) {
 			$origX = $this->GetX();
 			$origY = $this->GetY();
 			$startPage = $this->page;
 
-			$padding = SetFunctionOptions($padding, array('left' => 0, 'right' => 0, 'top' => 0, 'bottom' => 0));
+			$padding += array('left' => 0, 'right' => 0, 'top' => 0, 'bottom' => 0);
 
 			$border = strtoupper($border);
 
@@ -525,8 +540,28 @@ class cl4_PDF extends FPDI {
 			$endPage = $this->page;
 			$bottomY = $this->GetY();
 			$rectBorderArray = array();
-			foreach (str_split($border) as $borderSide) { // rectangle requires the border property as array('L' => 1, 'R' => 1...)
-				$rectBorderArray[$borderSide] = 1;
+			if ($border == 0) {
+				// no border
+			} else if ($border === '1') {
+				$rectBorderArray = array(
+					'L' => 1,
+					'R' => 1,
+					'T' => 1,
+					'B' => 1,
+				);
+			} else {
+				foreach (str_split($border) as $borderSide) { // rectangle requires the border property as array('L' => 1, 'R' => 1...)
+					$rectBorderArray[$borderSide] = 1;
+				}
+			}
+
+			// set width
+			if ($this->empty_string($w) OR ($w <= 0)) {
+				if ($this->rtl) {
+					$w = $this->x - $this->lMargin - $this->cell_margin['L'];
+				} else {
+					$w = $this->w - $this->x - $this->rMargin - $this->cell_margin['R'];
+				}
 			}
 
 			// we have changed pages, so we have to draw different borders on each page
@@ -558,7 +593,7 @@ class cl4_PDF extends FPDI {
 			} else {
 				$this->Rect($origX, $origY, ($this->GetX() + $w) - $origX, ($this->GetY() - $origY) + $padding['bottom'], '', $rectBorderArray); // draw a rectangle around the multicell, but add the padding around it
 			}
-			$this->SetY($bottomY + $padding['bottom']); // set the Y to the bottom of the rectangle
+			$this->SetXY($origX, $bottomY + $padding['bottom']); // set the Y to the bottom of the rectangle
 		} // if padding
 
 		return $multiCellReturn;
@@ -572,7 +607,7 @@ class cl4_PDF extends FPDI {
 	*   @return		 float		   the width based on the percentage of the width between the margins
 	*/
 	public function CalculatePercentageWidth($percentage) {
-		return (floatval(substr($percentage, 0, -1)) / 100) * $this->GetPageMaginWidth();
+		return (floatval(substr($percentage, 0, -1)) / 100) * $this->GetPageMarginWidth();
 	} // function CalculatePercentageWidth
 
 	/**
