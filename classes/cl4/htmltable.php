@@ -457,7 +457,7 @@ class cl4_HTMLTable {
 		// see if there are any col_spans in this row first
 		if (isset($this->col_span[$row_num])) {
 			// now find which columns are in col_spans
-			foreach ($this->col_span[$row_num] AS $column => $span) {
+			foreach ($this->col_span[$row_num] as $column => $span) {
 				// add all the columns in the this span to the array
 				for ($i = $column + 1; $i < $column + $span; $i++) $columns_in_span[] = $i;
 			} // foreach
