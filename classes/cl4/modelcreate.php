@@ -157,6 +157,7 @@ class cl4_ModelCreate {
 					// looks like an original filename column, let assume it is for now
 					$meta_data['field_type'] = 'hidden';
 					$meta_data['list_flag'] = FALSE;
+					$meta_data['edit_flag'] = FALSE;
 				} else {
 					$meta_data['field_type'] = 'file';
 					$meta_data['search_flag'] = FALSE;
