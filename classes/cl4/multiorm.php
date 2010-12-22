@@ -483,18 +483,19 @@ class cl4_MultiORM {
 		$nav_html = $pagination->render();
 
 		return View::factory($list_options['view'], array(
-			'options' => $this->_options,
-			'prefix' => $prefix,
-			'object_name' => $this->_object_name,
-			'object_name_display' => $this->_model->_table_name_display,
-			'form_open_tag' => $form_open_tag,
-			'top_row_buttons' => $top_row_buttons,
-			'hidden_fields' => $this->_options['hidden'],
-			'data_table' => $content_table->get_html(),
-			'nav_html' => $nav_html,
-			'nav_right' => $this->_options['nav_right'],
-			'items_on_page' => $items_on_page,
-			'total_records' => $this->_num_rows,
+			'any_visible'			=> $this->_model->any_visible('list'),
+			'options' 				=> $this->_options,
+			'prefix' 				=> $prefix,
+			'object_name' 			=> $this->_object_name,
+			'object_name_display' 	=> $this->_model->_table_name_display,
+			'form_open_tag' 		=> $form_open_tag,
+			'top_row_buttons' 		=> $top_row_buttons,
+			'hidden_fields' 		=> $this->_options['hidden'],
+			'data_table' 			=> $content_table->get_html(),
+			'nav_html' 				=> $nav_html,
+			'nav_right' 			=> $this->_options['nav_right'],
+			'items_on_page' 		=> $items_on_page,
+			'total_records' 		=> $this->_num_rows,
 		));
 	} // function get_editable_list
 
