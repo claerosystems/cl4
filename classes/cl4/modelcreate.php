@@ -370,7 +370,11 @@ class cl4_ModelCreate {
 	} // function
 
 	/**
-	* @param mixed $data
+	* Returns a string base on the type of data in the variable
+	* For example, NULL will return "NULL"
+	*
+	* @param   mixed   $data  The variable to return the value of as a string
+	* @return  string  The string value of the variable
 	*/
 	public static function return_code_value($data) {
 		if ($data === NULL) {
@@ -386,5 +390,5 @@ class cl4_ModelCreate {
 		}
 
 		return $formatted_data;
-	} // function
+	} // function return_code_value
 } // class
