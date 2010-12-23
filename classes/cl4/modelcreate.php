@@ -141,7 +141,8 @@ class cl4_ModelCreate {
 			if ($last_field_part == '_id') {
 				$meta_data['field_type'] = 'select';
 				$meta_data['field_options']['source']['source'] = 'model';
-				$meta_data['field_options']['source']['data'] = substr($column_name, 0, strpos($column_name, '_'));;
+				// the model name is determined as the everything but the last part of the column name (_id)
+				$meta_data['field_options']['source']['data'] = substr($column_name, 0, strrpos($column_name, '_'));
 			}
 			if ($column_data['data_type'] == 'datetime' || $column_data['data_type'] == 'timestamp') {
 				$meta_data['field_type'] = 'datetime';
@@ -241,7 +242,8 @@ class cl4_ModelCreate {
 
 			if (in_array($meta_data['field_type'], array('select', 'radios'))) {
 				// because the last part of the field is _id, add a select with a foreign key record
-				$column_name_wo_id = strtolower(substr($column_name, 0, -3)); // remove the last 3 characters to get the name of the field
+				// get the column name with the last bit (likely _id)
+				$column_name_wo_id = substr($column_name, 0, strrpos($column_name, '_'));
 
 				// look for a related table and generate the has_one relationship
 				$expire_sql = '';
