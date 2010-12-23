@@ -13,19 +13,27 @@ if ($mode == 'search') { ?>
 	</fieldset>
 <?php
 } // if
-// generate the table
-$table = new HTMLTable(array('table_attributes' => array('class' => 'cl4_form')));
 
-foreach ($form_field_html as $column_name => $field_html) {
-	$table->add_row(array($field_html['label'], $field_html['field']));
-} // foreach
+// If any fields are visible
+if ($any_visible) {
+	// generate the table
+	$table = new HTMLTable(array('table_attributes' => array('class' => 'cl4_form')));
 
-// the table html
-echo $table->get_html();
+	foreach ($form_field_html as $column_name => $field_html) {
+		$table->add_row(array($field_html['label'], $field_html['field']));
+	} // foreach
 
-if ($form_options['display_buttons']) {
-	// the buttons
-	echo '<div class="cl4_buttons">' . implode('', $form_buttons) . '</div>' . EOL;
+	// the table html
+	echo $table->get_html();
+
+	if ($form_options['display_buttons']) {
+		// the buttons
+		echo '<div class="cl4_buttons">' . implode('', $form_buttons) . '</div>' . EOL;
+	}
+
+// If no fields are visible
+} else {
+	echo '<p>No fields are visible.</p>';
 }
 
 // the form close tag

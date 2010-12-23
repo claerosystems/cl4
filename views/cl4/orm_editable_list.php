@@ -16,21 +16,25 @@
 
 	<div id="<?php echo HTML::chars($prefix . $object_name); ?>_header"></div>
 
-	<?php if ($nav_right) { ?>
-	<div style="display:block; float:right; text-align:right;"><?php echo $nav_right; ?></div>
+	<?php if ($any_visible) { ?>
+		<?php if ($nav_right) { ?>
+		<div style="display:block; float:right; text-align:right;"><?php echo $nav_right; ?></div>
+		<?php } // if ?>
+
+		<?php echo $nav_html; ?>
+
+		<?php if ($options['display_no_rows'] && $items_on_page == 0) { // check to see if there are no rows ?>
+		<div class="cl4_no_rows">0 items found</div>
+		<?php } else { // if ?>
+		<div class="<?php echo HTML::chars($object_name); ?>_editable_list">
+		<?php echo $data_table; ?>
+		</div>
+		<?php } ?>
+
+		<?php echo $nav_html; ?>
+	<?php } else { ?>
+		<p>There are no fields to display.</p>
 	<?php } // if ?>
-
-	<?php echo $nav_html; ?>
-
-	<?php if ($options['display_no_rows'] && $items_on_page == 0) { // check to see if there are no rows ?>
-	<div class="cl4_no_rows">0 items found</div>
-	<?php } else { // if ?>
-	<div class="<?php echo HTML::chars($object_name); ?>_editable_list">
-	<?php echo $data_table; ?>
-	</div>
-	<?php } ?>
-
-	<?php echo $nav_html; ?>
 
 	<?php echo Form::close(); ?>
 </div>

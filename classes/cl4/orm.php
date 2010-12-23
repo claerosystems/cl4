@@ -91,6 +91,34 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_override_properties = array();
 
 	/**
+	 * Checks to see if any fields in this model are visible in this context.
+	 *
+	 * @param  string  $mode  The context this model is being viewed in. (list, search, edit, view)
+	 * @return  bool  TRUE if a field is visible, FALSE otherwise
+	 */
+	public function any_visible($mode) {
+		// Ensure a valid context
+		assert("in_array('$mode', array('list', 'search', 'edit', 'view'))");
+
+		$any_visible = FALSE;
+
+		foreach ($this->_table_columns as $column_name => $data) {
+			// If this is the add case, we might be adding a record based on another, in which case the primary key field is not visible
+			if ($mode == 'add' && $column_name == $this->_primary_key) {
+				continue;
+			}
+
+			// If this field is visible
+			if ($data[$mode . '_flag']) {
+				$any_visible = TRUE;
+				break;
+			}
+		} // foreach
+
+		return $any_visible;
+	} // function any_visible
+
+	/**
 	 * Instructs builder to include expired rows in select queries.
 	 *
 	 * @chainable
@@ -809,15 +837,16 @@ class cl4_ORM extends Kohana_ORM {
 
 		// return the generated view
 		return View::factory($this->_options['get_form_view_file'], array(
-			'form_options' => $this->_options,
-			'form_field_html' => $this->_field_html,
-			'form_fields_hidden' => $this->_form_fields_hidden,
-			'form_buttons' => $this->_form_buttons,
-			'form_open_tag' => $form_open_tag,
-			'form_close_tag' => $form_close_tag,
-			'mode' => $this->_mode,
-			'search_type_html' => $search_type_html,
-			'like_type_html' => $like_type_html,
+			'any_visible'			=> $this->any_visible('edit'),
+			'form_options' 			=> $this->_options,
+			'form_field_html' 		=> $this->_field_html,
+			'form_fields_hidden' 	=> $this->_form_fields_hidden,
+			'form_buttons' 			=> $this->_form_buttons,
+			'form_open_tag' 		=> $form_open_tag,
+			'form_close_tag' 		=> $form_close_tag,
+			'mode' 					=> $this->_mode,
+			'search_type_html' 		=> $search_type_html,
+			'like_type_html' 		=> $like_type_html,
 		));
 	} // function
 
@@ -845,9 +874,10 @@ class cl4_ORM extends Kohana_ORM {
 
 		// return the generated view
 		return View::factory($this->_options['get_view_view_file'], array(
-			'form_options' => $this->_options,
-			'form_field_html' => $this->_field_html,
-			'form_buttons' => $this->_form_buttons,
+			'any_visible'		=> $this->any_visible('view'),
+			'form_options' 		=> $this->_options,
+			'form_field_html' 	=> $this->_field_html,
+			'form_buttons' 		=> $this->_form_buttons,
 		));
 	} // function
 
