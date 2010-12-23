@@ -164,6 +164,7 @@ class cl4_MultiORM {
 		$target_route = Route::get($this->_options['target_route']);
 		$list_options = $this->_options['editable_list_options'];
 		$table_options = $list_options['table_options'];
+		$display_order = $this->_model->get_display_order();
 
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
 
@@ -268,7 +269,13 @@ class cl4_MultiORM {
 
 		// set up the headings and sort links, etc. based on model
 		$i = -1;
-		foreach ($this->_table_columns[$this->_object_name] as $column_name => $column_data) {
+		foreach ($display_order as $column_name) {
+			try {
+				$column_data = $this->_table_columns[$this->_object_name][$column_name];
+			} catch (Exception $e) {
+				throw new Kohana_Exception('The column :column_name in _display_order is not defined in _table_columns', array(':column_name' => $column_name));
+			}
+
 			// only add the column if the list_flag is set to true
 			if ($column_data['list_flag']) {
 				++$i;
@@ -457,16 +464,22 @@ class cl4_MultiORM {
 			$no_replace_spaces_types = array('checkbox', 'textarea', 'file');
 
 			// todo: implement multiple tables
-			foreach ($this->_table_columns[$this->_object_name] as $column_name => $column_meta_data) {
+			foreach ($display_order as $column_name) {
+				try {
+					$column_data = $this->_table_columns[$this->_object_name][$column_name];
+				} catch (Exception $e) {
+					throw new Kohana_Exception('The column :column_name in _display_order is not defined in _table_columns', array(':column_name' => $column_name));
+				}
+
 				// only add the column if the list_flag is true
-				if ($column_meta_data['list_flag']) {
+				if ($column_data['list_flag']) {
 					++$i;
 
 					$source = (isset($this->_lookup_data[$this->_object_name][$column_name]) ? $this->_lookup_data[$this->_object_name][$column_name] : NULL);
 					$row_data[$i] = $record_model->get_view_html($column_name, $source);
 
 					// implement option to replace spaces for better formatting
-					if ($this->_options['replace_spaces'] && ! in_array($column_meta_data['form_type'], $no_replace_spaces_types)) {
+					if ($this->_options['replace_spaces'] && ! in_array($column_data['form_type'], $no_replace_spaces_types)) {
 						// adds extra spaces for padding on right side of every column
 						$row_data[$i] = str_replace(' ', '&nbsp;', $row_data[$i]) . '&nbsp;&nbsp;';
 					} // if

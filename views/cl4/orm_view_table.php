@@ -5,8 +5,10 @@ if ($any_visible) {
 	// generate the table
 	$table = new HTMLTable($form_options['table_options']);
 
-	foreach ($form_field_html as $column_name => $field_html) {
-		$table->add_row(array($field_html['label'], $field_html['field']));
+	foreach ($display_order as $column) {
+		if (isset($form_field_html[$column])) {
+			$table->add_row(array($form_field_html[$column]['label'], $form_field_html[$column]['field']));
+		}
 	} // foreach
 
 	// the table html

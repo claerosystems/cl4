@@ -53,14 +53,12 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* holds all status messages to be displayed to the user
-	*
 	* @var mixed
 	*/
 	protected $_message = array();
 
 	/**
 	* a cache for any lookups we do for select or relationship data
-	*
 	* @var mixed
 	*/
 	protected $_lookup_data = array();
@@ -80,6 +78,12 @@ class cl4_ORM extends Kohana_ORM {
 	* @var 	string
 	*/
 	public $_table_name_display;
+
+	/**
+	 * @var array $_display_order The order to display columns in, if different from as listed in $_table_columns.
+	 * Columns not listed here will be added beneath these columns, in the order they are listed in $_table_columns.
+	 */
+	protected $_display_order = array();
 
 	/**
 	* An array of values that should be merged with the properties
@@ -294,6 +298,7 @@ class cl4_ORM extends Kohana_ORM {
 	*   defaults for field type
 	*   defaults for all field types
 	* For file, the options found in config/cl4file.options will also be merged in
+	* Also ensures all the columns are in the display order array
 	*
 	* @chainable
 	* @param array $options
@@ -377,6 +382,20 @@ class cl4_ORM extends Kohana_ORM {
 			$this->_table_columns = $ordered_meta_data;
 		} // if
 
+		// Loop through all columns ensuring they are in the display order array
+		foreach ($this->_table_columns as $column => $data) {
+			// If this column isn't already ordered and isn't hidden
+			if ( ! in_array($column, $this->_display_order) && ! in_array($data['field_type'], $this->_options['field_types_treated_as_hidden'])) {
+				// Add it to the end of the our order
+				$this->_display_order[] = $column;
+			}
+		} // foreach
+
+		if ( ! empty($this->_display_order)) {
+			// Order display order by the keys as it will be used in order
+			ksort($this->_display_order);
+		}
+
 		return $this;
 	} // function
 
@@ -393,6 +412,15 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function set_mode
+
+	/**
+	 * Gets the display order of the table columns.
+	 *
+	 * @return array
+	 */
+	public function get_display_order() {
+		return $this->_display_order;
+	}
 
 	/**
 	* get a formatted value of a model column
@@ -847,6 +875,7 @@ class cl4_ORM extends Kohana_ORM {
 			'mode' 					=> $this->_mode,
 			'search_type_html' 		=> $search_type_html,
 			'like_type_html' 		=> $like_type_html,
+			'display_order'			=> $this->_display_order,
 		));
 	} // function
 
@@ -878,6 +907,7 @@ class cl4_ORM extends Kohana_ORM {
 			'form_options' 		=> $this->_options,
 			'form_field_html' 	=> $this->_field_html,
 			'form_buttons' 		=> $this->_form_buttons,
+			'display_order'		=> $this->_display_order,
 		));
 	} // function
 

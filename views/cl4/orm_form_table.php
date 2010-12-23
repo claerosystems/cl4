@@ -17,10 +17,16 @@ if ($mode == 'search') { ?>
 // If any fields are visible
 if ($any_visible) {
 	// generate the table
-	$table = new HTMLTable(array('table_attributes' => array('class' => 'cl4_form')));
+	$table = new HTMLTable(array(
+		'table_attributes' => array(
+			'class' => 'cl4_form'
+		)
+	));
 
-	foreach ($form_field_html as $column_name => $field_html) {
-		$table->add_row(array($field_html['label'], $field_html['field']));
+	foreach ($display_order as $column) {
+		if (isset($form_field_html[$column])) {
+			$table->add_row(array($form_field_html[$column]['label'], $form_field_html[$column]['field']));
+		}
 	} // foreach
 
 	// the table html

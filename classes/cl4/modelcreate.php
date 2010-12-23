@@ -262,14 +262,6 @@ class cl4_ModelCreate {
 			// add the cl4 meta data
 			$model_code .= TAB . TAB . '\'' . $column_name . '\' => array(' . EOL;
 			foreach ($meta_data as $key => $data) {
-				if ($key == 'display_order') {
-					if ($data !== FALSE) {
-						$data = $display_order;
-					} else {
-						break;
-					} // if
-				} // if
-
 				// filter out optional fields for now, just include required
 				if ( ! array_key_exists($key, $default_meta_data) || $data !== $default_meta_data[$key] || in_array($key, array('field_type', 'display_order'))) {
 					$model_code .= TAB . TAB . TAB . "'" . $key . "' => ";
@@ -307,8 +299,6 @@ class cl4_ModelCreate {
 			} // foreach
 
 			$model_code .= TAB . TAB . '),' . EOL;
-
-			$display_order += 10;
 		} // foreach
 		$model_code .= TAB . ');' . EOL;
 
@@ -352,7 +342,22 @@ class cl4_ModelCreate {
 		$model_code .= TAB . TAB . '\'column\' 	=> \'expiry_date\',' . EOL;
 		$model_code .= TAB . TAB . '\'default\'	=> 0,' . EOL;
 		$model_code .= TAB . ');' . EOL;
-		if ( ! isset($columns['expiry_date'])) $model_code .= TAB . '*/' . EOL;
+		if ( ! isset($columns['expiry_date'])) $model_code .= TAB . '*/' . EOL . EOL;
+
+		// Add display order property
+		$model_code .= TAB . '/**' . EOL;
+		$model_code .= TAB . ' * @var array $_display_order The order to display columns in, if different from as listed in $_table_columns.' . EOL;
+		$model_code .= TAB . ' * Columns not listed here will be added beneath these columns, in the order they are listed in $_table_columns.' . EOL;
+		$model_code .= TAB . ' */' . EOL;
+		$model_code .= TAB . 'protected $_display_order = array(' . EOL;
+		$model_code .= TAB . TAB . '/*' . EOL;
+		$display_order = 0;
+		foreach ($columns as $column_name => $column_data) {
+			$display_order += 10;
+			$model_code .= TAB . TAB . "{$display_order} => '{$column_name}'," . EOL;
+		}
+		$model_code .= TAB . TAB . '*/' . EOL;
+		$model_code .= TAB . ');' . EOL;
 
 		$model_code .= '} // class';
 
@@ -360,7 +365,7 @@ class cl4_ModelCreate {
 	} // function
 
 	/**
-	* make a nice class name by capitalizing first letters of words and replacing spaces with underscores
+	* Make a nice class name by capitalizing first letters of words and replacing spaces with underscores
 	*
 	* @param mixed $name
 	* @return mixed
