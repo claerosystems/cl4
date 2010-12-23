@@ -247,7 +247,6 @@ class cl4_ModelCreate {
 
 				// look for a related table and generate the has_one relationship
 				$expire_sql = '';
-				$display_order_sql = 'name';
 				$tables = $_db->list_tables($column_name_wo_id);
 				if (count($tables) > 0) {
 					$has_one_code .= EOL;
