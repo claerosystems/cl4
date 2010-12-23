@@ -93,29 +93,30 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	 * Checks to see if any fields in this model are visible in this context.
 	 *
-	 * @param string $context The context this model is being viewed in. (list, search, edit, view)
+	 * @param  string  $mode  The context this model is being viewed in. (list, search, edit, view)
+	 * @return  bool  TRUE if a field is visible, FALSE otherwise
 	 */
-	public function any_visible($context) {
+	public function any_visible($mode) {
 		// Ensure a valid context
-		assert("in_array('$context', array('list', 'search', 'edit', 'view'))");
+		assert("in_array('$mode', array('list', 'search', 'edit', 'view'))");
 
-		$any_visible = false;
+		$any_visible = FALSE;
 
 		foreach ($this->_table_columns as $column_name => $data) {
 			// If this is the add case, we might be adding a record based on another, in which case the primary key field is not visible
-			if ('add' === $context && $column_name === $this->_primary_key) {
+			if ($mode == 'add' && $column_name == $this->_primary_key) {
 				continue;
 			}
 
 			// If this field is visible
-			if ($data[$context . '_flag']) {
-				$any_visible = true;
+			if ($data[$mode . '_flag']) {
+				$any_visible = TRUE;
 				break;
 			}
-		}
+		} // foreach
 
 		return $any_visible;
-	}
+	} // function any_visible
 
 	/**
 	 * Instructs builder to include expired rows in select queries.

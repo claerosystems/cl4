@@ -31,10 +31,9 @@ if ($any_visible) {
 		echo '<div class="cl4_buttons">' . implode('', $form_buttons) . '</div>' . EOL;
 	}
 
-}
 // If no fields are visible
-else {
-	echo "<p>No fields in this model are visible.</p>";
+} else {
+	echo '<p>No fields are visible.</p>';
 }
 
 // the form close tag

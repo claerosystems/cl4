@@ -11,10 +11,10 @@ if ($any_visible) {
 
 	// the table html
 	echo $table->get_html();
-}
+
 // If no fields are visible
-else {
-	echo "<p>No fields in this model are visible.</p>";
+} else {
+	echo '<p>No fields are visible.</p>';
 }
 
 if ($form_options['display_buttons']) {
