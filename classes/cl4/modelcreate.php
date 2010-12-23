@@ -341,7 +341,8 @@ class cl4_ModelCreate {
 		$model_code .= TAB . TAB . '\'column\' 	=> \'expiry_date\',' . EOL;
 		$model_code .= TAB . TAB . '\'default\'	=> 0,' . EOL;
 		$model_code .= TAB . ');' . EOL;
-		if ( ! isset($columns['expiry_date'])) $model_code .= TAB . '*/' . EOL . EOL;
+		if ( ! isset($columns['expiry_date'])) $model_code .= TAB . '*/' . EOL;
+		$model_code .= EOL;
 
 		// Add display order property
 		$model_code .= TAB . '/**' . EOL;
