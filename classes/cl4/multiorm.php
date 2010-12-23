@@ -556,8 +556,8 @@ class cl4_MultiORM {
 
 	/**
 	* Returns a view for editing multiple records
+	* A method to populdate _records must be called before this can be run
 	*
-	* @param mixed $ids
 	* @return View
 	*/
 	public function get_record_edit_view() {
