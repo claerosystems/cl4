@@ -67,7 +67,7 @@ class cl4_CSV {
 					throw $e;
 				}
 			} else {
-				throw new Exception('No filename to the CSV class was passed for reading');
+				throw new Kohana_Exception('No filename to the CSV class was passed for reading');
 			} // if
 		} else {
 			$this->filename = $filename;
@@ -84,11 +84,11 @@ class cl4_CSV {
 					$this->fp = fopen($this->filename, 'r');
 				} // if
 			} catch (Exception $e) {
-				throw new Exception('There was a problem opening the file for ' . ($this->mode == 'write' ? 'writing' : 'reading') . ': ' . ($this->filename ? $this->filename : 'temp file'));
+				throw new Kohana_Exception('There was a problem opening the file for ' . ($this->mode == 'write' ? 'writing' : 'reading') . ': ' . ($this->filename ? $this->filename : 'temp file'));
 			}
 
 			if ($this->fp === FALSE) {
-				throw new Exception('There was a problem opening the file for ' . ($this->mode == 'write' ? 'writing' : 'reading') . ': ' . ($this->filename ? $this->filename : 'temp file'));
+				throw new Kohana_Exception('There was a problem opening the file for ' . ($this->mode == 'write' ? 'writing' : 'reading') . ': ' . ($this->filename ? $this->filename : 'temp file'));
 			} // if
 		} // if
     } // function __construct
@@ -115,11 +115,11 @@ class cl4_CSV {
 	*/
 	public function add_row($data, $delimiter = ',', $enclosure = '"') {
 		if ($this->mode != 'write') {
-			throw new Exception('A CSV write function has been called when not in write mode');
+			throw new Kohana_Exception('A CSV write function has been called when not in write mode');
 		}
 
 		if ( ! fputcsv($this->fp, $data, $delimiter, $enclosure)) {
-			throw new Exception('There was a problem while adding the data row to the CSV');
+			throw new Kohana_Exception('There was a problem while adding the data row to the CSV');
 		} else {
 			++ $this->row_num;
 		}
@@ -153,11 +153,11 @@ class cl4_CSV {
 	*/
 	public function close_csv() {
 		if ($this->mode != 'write') {
-			throw new Exception('A CSV write function has been called when not in write mode');
+			throw new Kohana_Exception('A CSV write function has been called when not in write mode');
 		}
 
 		if ( ! fclose($this->fp)) {
-			throw new Exception('Failed to close CSV file pointer');
+			throw new Kohana_Exception('Failed to close CSV file pointer');
 		}
 
 		return $this;
@@ -170,7 +170,7 @@ class cl4_CSV {
 	*/
 	public function get_csv($user_filename = NULL) {
 		if ($this->mode != 'write') {
-			throw new Exception('A CSV write function has been called when not in write mode');
+			throw new Kohana_Exception('A CSV write function has been called when not in write mode');
 		}
 
 		if (empty($user_filename)) {
@@ -227,7 +227,7 @@ class cl4_CSV {
 	*/
 	public function get_row($delimiter = ',', $enclosure = '"', $escape = '\\') {
 		if ($this->mode != 'read') {
-			throw new Exception('Input Error: A write function has been called when not in write mode');
+			throw new Kohana_Exception('Input Error: A write function has been called when not in write mode');
 		}
 
 		// Set some defaults
