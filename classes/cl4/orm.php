@@ -334,26 +334,6 @@ class cl4_ORM extends Kohana_ORM {
 			$this->_table_columns[$column_name] = $merged_column_options;
 		} // foreach
 
-		// now record the meta data based on display_order
-		$meta_data_display_order = array();
-		$has_display_order = FALSE;
-		foreach ($this->_table_columns as $column_name => $meta_data) {
-			if ($meta_data['display_order'] != 0) $has_display_order;
-			$meta_data_display_order[$column_name] = $meta_data['display_order'];
-		}
-
-		// only do the following if one of the columns has a display order other than 0
-		if ($has_display_order) {
-			asort($meta_data_display_order);
-
-			$ordered_meta_data = array();
-			foreach ($meta_data_display_order as $column_name => $display_order) {
-				$ordered_meta_data[$column_name] = $this->_table_columns[$column_name];
-			}
-
-			$this->_table_columns = $ordered_meta_data;
-		} // if
-
 		// Loop through all columns ensuring they are in the display order array
 		foreach ($this->_table_columns as $column => $data) {
 			// If this column isn't already ordered and isn't hidden

@@ -120,7 +120,6 @@ class cl4_ModelCreate {
 		$has_one_code = '';
 
 		// now create the column meta data lines
-		$display_order = 10;
 		foreach ($columns as $column_name => $column_data) {
 			// now that we know the field type, lets merge in some defaults
 			// global field type defaults

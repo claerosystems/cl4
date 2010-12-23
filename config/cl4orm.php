@@ -16,7 +16,6 @@ return array(
 		'edit_flag' => FALSE,      // displays this field in any edit forms and allows the user to save new values
 		'search_flag' => FALSE,    // displays this field in the search mode (search form)
 		'view_flag' => FALSE,      // displays this field in the view mode
-		'display_order' => 0,      // the order in which to display the columns
 		/**
 		* determines if the field can be set to NULL; TRUE means that it can be set to NULL; FALSE means that it can't
 		* this is used most often in situations where the field is not received in the post because the field wasn't display although still editable
