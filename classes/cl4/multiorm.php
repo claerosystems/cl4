@@ -63,13 +63,6 @@ class cl4_MultiORM {
 	protected $_records;
 
 	/**
-	* After _records is populated, the count of the number of records will be stored in this property
-	* Before being set, the value will be NULL
-	* @var  int
-	*/
-	public $_record_count;
-
-	/**
 	* The number of rows being display or edited
 	* @var int
 	*/
@@ -176,9 +169,9 @@ class cl4_MultiORM {
 
 		// Load the records
 		$this->_records = $this->_model->find_ids($ids);
-		$this->_record_count = count($this->_records);
+		$this->_num_rows = count($this->_records);
 
-		if ($this->_record_count == 0) {
+		if ($this->_num_rows == 0) {
 			throw new Kohana_Exception('None of the passed records could be found');
 		}
 
@@ -640,7 +633,7 @@ class cl4_MultiORM {
 				// the tab indexes will increase by 20 (starting at 20) so that columns with multiple fields don't screw things up (unless there are more than 20 fields in 1 column)
 				$table_column_options = array();
 				foreach ($fields as $field_num => $column_name) {
-					$table_column_options[$column_name]['field_attributes']['tabindex'] = (($record_count * $field_num) + $num + 1) * 20;
+					$table_column_options[$column_name]['field_attributes']['tabindex'] = (($this->_num_rows * $field_num) + $num + 1) * 20;
 				}
 				$record_model->set_column_defaults(array('table_columns' => $table_column_options));
 			} // if
@@ -689,7 +682,7 @@ class cl4_MultiORM {
 			'form_buttons' => $form_buttons,
 			'form_open_tag' => $form_open_tag,
 			'form_close_tag' => $form_close_tag,
-			'items' => $record_count,
+			'items' => $this->_num_rows,
 		));
 	} // function
 
