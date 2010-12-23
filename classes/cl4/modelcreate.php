@@ -349,13 +349,13 @@ class cl4_ModelCreate {
 		$model_code .= TAB . ' * @var array $_display_order The order to display columns in, if different from as listed in $_table_columns.' . EOL;
 		$model_code .= TAB . ' * Columns not listed here will be added beneath these columns, in the order they are listed in $_table_columns.' . EOL;
 		$model_code .= TAB . ' */' . EOL;
+		$model_code .= TAB . '/*' . EOL;
 		$model_code .= TAB . 'protected $_display_order = array(' . EOL;
-		$model_code .= TAB . TAB . '/*' . EOL;
 		foreach ($columns as $column_name => $column_data) {
 			$model_code .= TAB . TAB . "'{$column_name}'," . EOL;
 		}
-		$model_code .= TAB . TAB . '*/' . EOL;
 		$model_code .= TAB . ');' . EOL;
+		$model_code .= TAB . '*/' . EOL;
 
 		$model_code .= '} // class';
 
