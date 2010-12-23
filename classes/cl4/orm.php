@@ -101,8 +101,10 @@ class cl4_ORM extends Kohana_ORM {
 	 * @return  bool  TRUE if a field is visible, FALSE otherwise
 	 */
 	public function any_visible($mode) {
-		// Ensure a valid context
-		assert("in_array('$mode', array('list', 'search', 'edit', 'view'))");
+		// ensure the mode is valid (because we will be using it to check for flags later)
+		if ( ! in_array($mode, array('list', 'search', 'edit', 'view'))) {
+			throw new Kohana_Exception('The mode passed is not valid');
+		}
 
 		$any_visible = FALSE;
 

@@ -151,42 +151,12 @@ class cl4_MultiORM {
 	} // function set_options
 
 	/**
-	* Returns a view for editing multiple records.
-	*
-	* @param  array  $ids  The record primary keys (IDs) to load.
-	*
-	* @return View
-	*/
-	public function get_edit_multiple($ids) {
-		if (empty($ids)) {
-			throw new Kohana_Exception('No IDs were received for the multiple edit');
-		}
-
-		// Attempt to order the records by the order they are received in
-		if ($this->_options['edit_multiple_options']['keep_record_order']) {
-			$this->_model->order_by(DB::expr('FIND_IN_SET(' . $this->_db->quote_identifier($this->_model->table_name() . '.' . $this->_model->primary_key()) . ', ' . $this->_db->escape(implode(',', $ids)) . ')'), 'ASC');
-		}
-
-		// Load the records
-		$this->_records = $this->_model->find_ids($ids);
-		$this->_num_rows = count($this->_records);
-
-		if ($this->_num_rows == 0) {
-			throw new Kohana_Exception('None of the passed records could be found');
-		}
-
-		return $this->get_record_edit_view();
-	} // function get_edit_multiple
-
-	/**
 	* Generates an HTML record list with edit, delete, view and add similar links for the given object including add/edit/del, pagination, etc.
 	*
 	* @param  array  $options
 	* @return View
 	*/
 	public function get_editable_list($options = array()) {
-		assert('($this->_records === NULL); /* _records must be set/populated before calling get_editable_list() */');
-
 		// update the options if passed
 		$this->set_options($options);
 
@@ -554,7 +524,35 @@ class cl4_MultiORM {
 		$this->_search = $post;
 
 		return $this;
-	} // function
+	} // function set_search
+
+	/**
+	* Returns a view for editing multiple records.
+	*
+	* @param  array  $ids  The record primary keys (IDs) to load.
+	*
+	* @return View
+	*/
+	public function get_edit_multiple($ids) {
+		if (empty($ids)) {
+			throw new Kohana_Exception('No IDs were received for the multiple edit');
+		}
+
+		// Attempt to order the records by the order they are received in
+		if ($this->_options['edit_multiple_options']['keep_record_order']) {
+			$this->_model->order_by(DB::expr('FIND_IN_SET(' . $this->_db->quote_identifier($this->_model->table_name() . '.' . $this->_model->primary_key()) . ', ' . $this->_db->escape(implode(',', $ids)) . ')'), 'ASC');
+		}
+
+		// Load the records
+		$this->_records = $this->_model->find_ids($ids);
+		$this->_num_rows = count($this->_records);
+
+		if ($this->_num_rows == 0) {
+			throw new Kohana_Exception('None of the passed records could be found');
+		}
+
+		return $this->get_record_edit_view();
+	} // function get_edit_multiple
 
 	/**
 	* Returns a view for editing multiple records
@@ -563,6 +561,10 @@ class cl4_MultiORM {
 	* @return View
 	*/
 	public function get_record_edit_view() {
+		if ($this->_records === NULL) {
+		    throw new Exception('_records must be set/populated before calling get_editable_list()');
+		}
+
 		$form_buttons = array();
 		$target_route = $this->_options['target_route'];
 		$edit_multiple_options = $this->_options['edit_multiple_options'];
@@ -684,7 +686,7 @@ class cl4_MultiORM {
 			'form_close_tag' => $form_close_tag,
 			'items' => $this->_num_rows,
 		));
-	} // function
+	} // function get_record_edit_view
 
 	/**
 	* get a table with data from the specified model
