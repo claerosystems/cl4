@@ -95,36 +95,6 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_override_properties = array();
 
 	/**
-	 * Checks to see if any fields in this model are visible in this context.
-	 *
-	 * @param  string  $mode  The context this model is being viewed in. (list, search, edit, view)
-	 * @return  bool  TRUE if a field is visible, FALSE otherwise
-	 */
-	public function any_visible($mode) {
-		// ensure the mode is valid (because we will be using it to check for flags later)
-		if ( ! in_array($mode, array('list', 'search', 'edit', 'view'))) {
-			throw new Kohana_Exception('The mode passed is not valid');
-		}
-
-		$any_visible = FALSE;
-
-		foreach ($this->_table_columns as $column_name => $data) {
-			// If this is the add case, we might be adding a record based on another, in which case the primary key field is not visible
-			if ($mode == 'add' && $column_name == $this->_primary_key) {
-				continue;
-			}
-
-			// If this field is visible
-			if ($data[$mode . '_flag']) {
-				$any_visible = TRUE;
-				break;
-			}
-		} // foreach
-
-		return $any_visible;
-	} // function any_visible
-
-	/**
 	 * Instructs builder to include expired rows in select queries.
 	 *
 	 * @chainable
@@ -684,6 +654,36 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function prepare_form
+
+	/**
+	 * Checks to see if any fields in this model are visible in this context.
+	 *
+	 * @param  string  $mode  The context this model is being viewed in. (list, search, edit, view)
+	 * @return  bool  TRUE if a field is visible, FALSE otherwise
+	 */
+	public function any_visible($mode) {
+		// ensure the mode is valid (because we will be using it to check for flags later)
+		if ( ! in_array($mode, array('list', 'search', 'edit', 'view'))) {
+			throw new Kohana_Exception('The mode passed is not valid');
+		}
+
+		$any_visible = FALSE;
+
+		foreach ($this->_table_columns as $column_name => $data) {
+			// If this is the add case, we might be adding a record based on another, in which case the primary key field is not visible
+			if ($mode == 'add' && $column_name == $this->_primary_key) {
+				continue;
+			}
+
+			// If this field is visible
+			if ($data[$mode . '_flag']) {
+				$any_visible = TRUE;
+				break;
+			}
+		} // foreach
+
+		return $any_visible;
+	} // function any_visible
 
 	/**
 	* Returns the name of the field for HTML
