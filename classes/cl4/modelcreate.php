@@ -351,10 +351,8 @@ class cl4_ModelCreate {
 		$model_code .= TAB . ' */' . EOL;
 		$model_code .= TAB . 'protected $_display_order = array(' . EOL;
 		$model_code .= TAB . TAB . '/*' . EOL;
-		$display_order = 0;
 		foreach ($columns as $column_name => $column_data) {
-			$display_order += 10;
-			$model_code .= TAB . TAB . "{$display_order} => '{$column_name}'," . EOL;
+			$model_code .= TAB . TAB . "'{$column_name}'," . EOL;
 		}
 		$model_code .= TAB . TAB . '*/' . EOL;
 		$model_code .= TAB . ');' . EOL;
