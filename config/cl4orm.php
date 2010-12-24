@@ -179,6 +179,8 @@ return array(
 			),
 		),
 
+		'hidden' => array(), // extra hidden fields to add to the form, done for admin
+
 		// formatting for views
 		'nbsp' => FALSE, // replace spaces with &nbsp; in the data to avoid wrapping in view_html()
 		'checkmark_icons' => TRUE, // will display check mark icons (using a span with class cl4_check or cl4_no_check) when TRUE or Y/N when FALSE in view_html()
