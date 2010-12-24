@@ -520,7 +520,7 @@ class cl4_MultiORM {
 					$row_data[$i] = $record_model->get_view_html($column_name, $source);
 
 					// If this is a textarea check to see if we should limit the number of words
-					if ( ! empty($textarea_word_limit) && ! in_array($column_data['field_type'], $this->_options['field_types_treaded_as_textarea'])) {
+					if ( ! empty($textarea_word_limit) && in_array($column_data['field_type'], $this->_options['field_types_treaded_as_textarea'])) {
 						$row_data[$i] = Text::limit_words($row_data[$i], $textarea_word_limit);
 					}
 
