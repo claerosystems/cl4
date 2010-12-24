@@ -374,8 +374,8 @@ class cl4_MultiORM {
 				$add_multiple_uniqid = uniqid('cl4_add_multiple_button_');
 
 				$top_row_buttons .= Form::submit(NULL, __('Add:'), array(
-					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'add', 'id' => 1, 'column_name' => 'multiple')),
-					'data-cl4_add_multiple_form_action_prefix' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'add')), // used to determine data-cl4_form_action when the selection is changed
+					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'add_multiple', 'id' => 1)),
+					'data-cl4_add_multiple_form_action_prefix' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'add_multiple')), // used to determine data-cl4_form_action when the selection is changed
 					'class' => 'cl4_button_link_form' . $button_class,
 					'id' => $add_multiple_uniqid,
 				));
@@ -618,6 +618,7 @@ class cl4_MultiORM {
 		$form_buttons = array();
 		$target_route = $this->_options['target_route'];
 		$edit_multiple_options = $this->_options['edit_multiple_options'];
+		$display_order = $this->_model->get_display_order();
 
 		if ($this->_options['display_form_tag']) {
 			// generate the form name
@@ -659,7 +660,13 @@ class cl4_MultiORM {
 		$headings = array('');
 		$fields = array();
 		$i = 1;
-		foreach ($table_columns as $column_name => $column_info) {
+		foreach ($display_order as $column_name) {
+			try {
+				$column_info = $table_columns[$column_name];
+			} catch (Exception $e) {
+				throw new Kohana_Exception('The column :column_name in _display_order is not defined in $table_columns', array(':column_name' => $column_name));
+			}
+
 			if ($column_info['edit_flag'] && ! in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 				$headings[$i] = $labels[$column_name];
 				$fields[] = $column_name;
@@ -705,7 +712,13 @@ class cl4_MultiORM {
 			$hidden_fields[] = ORM_Hidden::edit($record_model->primary_key(), $id_field_name, $record_model->pk());
 
 			// add each of the fields to the row data array, except for fields that shouldn't be displayed (edit_flag) or are hidden
-			foreach ($table_columns as $column_name => $column_info) {
+			foreach ($display_order as $column_name) {
+				try {
+					$column_info = $table_columns[$column_name];
+				} catch (Exception $e) {
+					throw new Kohana_Exception('The column :column_name in _display_order is not defined in $table_columns', array(':column_name' => $column_name));
+				}
+
 				if ($column_info['edit_flag']) {
 					if ( ! in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 						$row_data[] = $record_model->get_field($column_name);
