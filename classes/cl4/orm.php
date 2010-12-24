@@ -914,10 +914,10 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	 * Generate and return the formatted HTML for the given field
 	 *
-	 * @param 		string		the name of the field in the model
-	 * @return  	string		the HTML for the given fieldname, based on the model
+	 * @param   string  $column_name  the name of the field in the model
+	 * @return  string  the HTML for the given fieldname, based on the model
 	 */
-	public function get_field($column_name = null) {
+	public function get_field($column_name = NULL) {
 		if ( ! isset($this->_field_html[$column_name]['field']) && ! isset($this->_form_fields_hidden[$column_name])) {
 			$this->prepare_form($column_name);
 		}
@@ -927,7 +927,7 @@ class cl4_ORM extends Kohana_ORM {
 		} else if (isset($this->_form_fields_hidden[$column_name])) {
 			return $this->_form_fields_hidden[$column_name];
 		} else {
-			throw new Kohana_Exception('Prepare form was unable to prepare the field therefore there is no field available');
+			throw new Kohana_Exception('Prepare form was unable to prepare the field therefore there is no field available: :column_name', array(':column_name' => $column_name));
 		} // if
 
 		return $field_html;
