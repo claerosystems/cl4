@@ -88,6 +88,12 @@ class cl4_MultiORM {
 	protected $_search;
 
 	/**
+	* Stores an array Validate objects from each record in _records after check() if any Models don't validate
+	* @var  Validate
+	*/
+	protected $_validate_objects;
+
+	/**
 	* Returns an instance of MultiORM
 	*
 	* @chainable
@@ -574,17 +580,19 @@ class cl4_MultiORM {
 	* @return View
 	*/
 	public function get_edit_multiple($ids) {
-		if (empty($ids)) {
-			throw new Kohana_Exception('No IDs were received for the multiple edit');
+		if (empty($ids) && empty($this->_records)) {
+			throw new Kohana_Exception('No IDs were received and _records is empty for the multiple edit');
 		}
 
-		// Attempt to order the records by the order they are received in
-		if ($this->_options['edit_multiple_options']['keep_record_order']) {
-			$this->_model->order_by(DB::expr('FIND_IN_SET(' . $this->_db->quote_identifier($this->_model->table_name() . '.' . $this->_model->primary_key()) . ', ' . $this->_db->escape(implode(',', $ids)) . ')'), 'ASC');
-		}
+		if (empty($this->_records)) {
+			// Attempt to order the records by the order they are received in
+			if ($this->_options['edit_multiple_options']['keep_record_order']) {
+				$this->_model->order_by(DB::expr('FIND_IN_SET(' . $this->_db->quote_identifier($this->_model->table_name() . '.' . $this->_model->primary_key()) . ', ' . $this->_db->escape(implode(',', $ids)) . ')'), 'ASC');
+			}
 
-		// Load the records
-		$this->_records = $this->_model->find_ids($ids);
+			// Load the records
+			$this->_records = $this->_model->find_ids($ids);
+		}
 		$this->_num_rows = count($this->_records);
 
 		if ($this->_num_rows == 0) {
@@ -597,15 +605,17 @@ class cl4_MultiORM {
 	/**
 	 * Returns a view for adding multiple records
 	 *
-	 * @param integer $count The number of records to add.
+	 * @param  integer  $count  The number of records to add.
 	 *
 	 * @return View
 	 */
 	public function get_add_multiple($count) {
-		// Load blank records
-		for ($i = 0; $i < $count; $i++) {
-			$this->_records[] = ORM::factory($this->_model_name);
-		}
+		if (empty($this->_records)) {
+			// Load blank records
+			for ($i = 0; $i < $count; $i++) {
+				$this->_records[] = ORM::factory($this->_model_name);
+			}
+		} // if
 
 		return $this->get_record_edit_view();
 	} // function get_add_multiple
@@ -711,11 +721,14 @@ class cl4_MultiORM {
 			}
 
 			// set the record number so the field name is correct and then prepare the fields (form)
-			$record_model->set_record_number($num)->prepare_form();
+			$record_model->set_record_number($num)
+				->prepare_form();
 
 			// create a hidden field for the primary key (ID)
-			$id_field_name = $record_model->get_field_html_name($record_model->primary_key());
-			$hidden_fields[] = ORM_Hidden::edit($record_model->primary_key(), $id_field_name, $record_model->pk());
+			if ($this->_mode != 'add') {
+				$id_field_name = $record_model->get_field_html_name($record_model->primary_key());
+				$hidden_fields[] = ORM_Hidden::edit($record_model->primary_key(), $id_field_name, $record_model->pk());
+			}
 
 			// add each of the fields to the row data array, except for fields that shouldn't be displayed (edit_flag) or are hidden
 			foreach ($display_order as $column_name) {
@@ -725,7 +738,14 @@ class cl4_MultiORM {
 					throw new Kohana_Exception('The column :column_name in _display_order is not defined in $table_columns', array(':column_name' => $column_name));
 				}
 
+				$show_field = FALSE;
 				if ($column_info['edit_flag']) {
+					if ( ! ($this->_mode == 'add' && $column_name == $record_model->primary_key())) {
+						$show_field = TRUE;
+					}
+				}
+
+				if ($show_field) {
 					if ( ! in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 						$row_data[] = $record_model->get_field($column_name);
 					} else {
@@ -818,13 +838,14 @@ class cl4_MultiORM {
 	} // function get_list
 
 	/**
-	* Loops through the post values, setting them in the model and saving (add or update/insert or update) them through the model
+	* Loops through the post values, setting them in the model
+	* By default it will use $_POST if nothing is passed
 	*
 	* @chainable
-	* @param mixed $post
-	* @return MultiORM
+	* @param  array  $post  The values from the post or a custom array
+	* @return  MultiORM
 	*/
-	public function save_multiple($post = NULL) {
+	public function save_values($post = NULL) {
 		if ($post === NULL) {
 			$post = $_POST;
 		}
@@ -840,11 +861,9 @@ class cl4_MultiORM {
 
 				foreach ($table_records as $num => $record_data) {
 					try {
-						$model = ORM::factory($this->_model_name, NULL, $this->_options)
+						$this->_records[$num] = ORM::factory($this->_model_name, NULL, $this->_options)
 							->set_record_number($num)
-							->save_values($record_data)
-							->save();
-						++ $this->_records_saved;
+							->save_values($record_data);
 					} catch (Exception $e) {
 						throw $e;
 					}
@@ -857,6 +876,62 @@ class cl4_MultiORM {
 
 		return $this;
 	} // function save_multiple
+
+	/**
+	* Loops through all of the records validating them
+	* If any object doesn't valid, the Validate object will be stored in _validate_objects
+	* Will return false if any record doesn't validate
+	* This will empty the _validate_object first
+	*
+	* @return  boolean
+	*/
+	public function check() {
+		$this->_validate_objects = array();
+
+		foreach ($this->_records as $num => $record_model) {
+			if ( ! $record_model->check()) {
+				$this->_validate_objects[$num] = $record_model->validate();
+			}
+		}
+
+		return empty($this->_validate_objects);
+	} // function check
+
+	/**
+	* Returns all of the validate objects in the object
+	* If there are none, FALSE will be returned
+	*
+	* @return  array
+	*/
+	public function validate_objects() {
+		if (empty($this->_validate_objects)) {
+			return FALSE;
+		}
+
+		return $this->_validate_objects;
+	} // function validate_objects
+
+	/**
+	* Saves all of the records within the object
+	* _records_saved will be incremented for each Model successfully saved
+	*
+	* @return  MultiOrm
+	*/
+	public function save() {
+		foreach ($this->_records as $num => $record_model) {
+			try {
+				$record_model->save();
+
+				if ($record_model->saved()) {
+					++ $this->_records_saved;
+				}
+			} catch (Exception $e) {
+				throw $e;
+			}
+		} // foreach
+
+		return $this;
+	} // function save
 
 	/**
 	* Returns the number of records saved in the last save_multiple()
