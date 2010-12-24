@@ -264,6 +264,24 @@ class cl4_ORM extends Kohana_ORM {
 	} // function
 
 	/**
+	* Allows setting of a specific option using a path
+	* Becareful when using this: check what done in set_options() to ensure there isn't special functionality for an option
+	*
+	* @uses  Arr::set_deep()
+	*
+	* @chainable
+	* @param  string  $option_path  The path to the option
+	* @param  mixed   $value        The option to set
+	* @param  string  $deliminator  The deliminator (if not passed, will use the default one in Arr)
+	* @return  ORM
+	*/
+	public function set_option($option_path, $value, $deliminator = NULL) {
+		$this->_options = Arr::set_deep($this->_options, $option_path, $value, $deliminator);
+
+		return $this;
+	} // function set_option
+
+	/**
 	* Sets the all the column defaults in _table_columns, including merging defaults for specific field types and records the table columns in the order based on display_order
 	* The options higher up this list will take precedence:
 	*   model
@@ -558,7 +576,7 @@ class cl4_ORM extends Kohana_ORM {
 						$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 
 					} else {
-						if ($first_field_autofocus) {
+						if ($first_field_autofocus && $this->_options['add_autofocus']) {
 							// this is the first visible field, so add the autofocus attribute
 							$first_field_autofocus = FALSE;
 							$field_attributes = HTML::merge_attributes($field_attributes, array('autofocus' => 'autofocus'));

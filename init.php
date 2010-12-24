@@ -39,6 +39,7 @@ if ($routes['cl4admin']) {
 	// claero admin
 	// Most cases: /dbadmin/user/edit/2
 	// Special case for download: /dbadmin/demo/download/2/public_filename
+	// Special case for add_multiple: /dbadmin/demo/add/5/multiple
 	Route::set('cl4admin', '(<lang>/)dbadmin(/<model>(/<action>(/<id>(/<column_name>))))', array('lang' => $lang_options))
 		->defaults(array(
 		'lang' => DEFAULT_LANG,

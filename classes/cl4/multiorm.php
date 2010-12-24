@@ -362,6 +362,25 @@ class cl4_MultiORM {
 				));
 			} // if
 */
+			// set up ADD multiple button and count select
+			if ($list_options['top_bar_buttons']['add_multiple']) {
+				$add_multiple_uniqid = uniqid('cl4_add_multiple_button_');
+
+				$top_row_buttons .= Form::submit(NULL, __('Add:'), array(
+					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'add', 'id' => 1, 'column_name' => 'multiple')),
+					'data-cl4_add_multiple_form_action_prefix' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'add')), // used to determine data-cl4_form_action when the selection is changed
+					'class' => 'cl4_button_link_form' . $button_class,
+					'id' => $add_multiple_uniqid,
+				));
+
+				// Set up multiple add dropdown
+				$add_count_array = array_combine(range(1, 10), range(1, 10));
+				$top_row_buttons .= Form::select(NULL, $add_count_array, 1, array(
+					'class' => 'cl4_add_multiple_count',
+					'data-cl4_add_multiple_related_button' => $add_multiple_uniqid,
+				));
+			} // if
+
 			// set up other actions
 			if ( ! empty($this->_options['top_bar_buttons_custom'])) {
 				if (is_array($this->_options['top_bar_buttons_custom'])) {
@@ -482,7 +501,7 @@ class cl4_MultiORM {
 					$row_data[$i] = $record_model->get_view_html($column_name, $source);
 
 					// If this is a textarea check to see if we should limit the number of words
-					if ( ! empty($textarea_word_limit) && ! in_array($column_meta_data['field_type'], $this->_options['field_types_treaded_as_textarea'])) {
+					if ( ! empty($textarea_word_limit) && ! in_array($column_data['field_type'], $this->_options['field_types_treaded_as_textarea'])) {
 						$row_data[$i] = Text::limit_words($row_data[$i], $textarea_word_limit);
 					}
 
@@ -511,7 +530,7 @@ class cl4_MultiORM {
 			'object_name_display' 	=> $this->_model->_table_name_display,
 			'form_open_tag' 		=> $form_open_tag,
 			'top_row_buttons' 		=> $top_row_buttons,
-			'hidden_fields' 		=> $this->_options['hidden'],
+			'hidden_fields' 		=> $list_options['hidden_fields'],
 			'data_table' 			=> $content_table->get_html(),
 			'nav_html' 				=> $nav_html,
 			'nav_right' 			=> $this->_options['nav_right'],
@@ -561,6 +580,22 @@ class cl4_MultiORM {
 
 		return $this->get_record_edit_view();
 	} // function get_edit_multiple
+
+	/**
+	 * Returns a view for adding multiple records
+	 *
+	 * @param integer $count The number of records to add.
+	 *
+	 * @return View
+	 */
+	public function get_add_multiple($count) {
+		// Load blank records
+		for ($i = 0; $i < $count; $i++) {
+			$this->_records[] = ORM::factory($this->_model_name);
+		}
+
+		return $this->get_record_edit_view();
+	} // function get_add_multiple
 
 	/**
 	* Returns a view for editing multiple records
@@ -618,7 +653,7 @@ class cl4_MultiORM {
 		$fields = array();
 		$i = 1;
 		foreach ($table_columns as $column_name => $column_info) {
-			if ($column_info['edit_flag'] && $column_info['field_type'] != 'hidden') {
+			if ($column_info['edit_flag'] && ! in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 				$headings[$i] = $labels[$column_name];
 				$fields[] = $column_name;
 				++$i;
@@ -629,10 +664,10 @@ class cl4_MultiORM {
 			'heading' => $headings,
 		);
 		$table_options += $edit_multiple_options['table_options'];
-
 		$table = new HTMLTable($table_options);
 
 		$hidden_fields = array();
+		$is_first_row = TRUE;
 
 		foreach ($this->_records as $num => $record_model) {
 			$display_row_num = $num + 1;
@@ -648,6 +683,13 @@ class cl4_MultiORM {
 				$record_model->set_column_defaults(array('table_columns' => $table_column_options));
 			} // if
 
+			// If this is the first row, then allow autofocus, otherwise don't
+			if ( ! $is_first_row) {
+				$record_model->set_option('add_autofocus', FALSE);
+			} else {
+				$is_first_row = FALSE;
+			}
+
 			// set the record number so the field name is correct and then prepare the fields (form)
 			$record_model->set_record_number($num)->prepare_form();
 
@@ -658,7 +700,7 @@ class cl4_MultiORM {
 			// add each of the fields to the row data array, except for fields that shouldn't be displayed (edit_flag) or are hidden
 			foreach ($table_columns as $column_name => $column_info) {
 				if ($column_info['edit_flag']) {
-					if ($column_info['field_type'] != 'hidden') {
+					if ( ! in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 						$row_data[] = $record_model->get_field($column_name);
 					} else {
 						$hidden_fields[] = $record_model->get_field($column_name);
@@ -675,7 +717,7 @@ class cl4_MultiORM {
 				$table->set_attribute($row_num, 0, 'class', 'nowrap');
 				$col = 1;
 				foreach ($table_columns as $column_name => $column_info) {
-					if ($column_info['edit_flag'] && $column_info['field_type'] != 'hidden') {
+					if ($column_info['edit_flag'] && ! in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 						if (in_array($column_info['field_type'], $this->_options['edit_multiple_options']['column_type_no_wrap'])) {
 							$table->set_attribute($row_num, $col, 'class', 'nowrap');
 						}
