@@ -155,7 +155,8 @@ return array(
 		*/
 		'field_id_prefix' => NULL,
 		'display_form_tag' => TRUE, // whether or not to display a form tag
-		'display_buttons' => TRUE, // whether ot not to display the sub, reset and cancel buttons including the surrounding div
+		'display_buttons' => TRUE, // whether or not to display the sub, reset and cancel buttons including the surrounding div
+		'display_buttons_at_top' => FALSE, // whether or not the save, cancel, search, etc buttons should also be displays at the top of the form
 		'display_submit' => TRUE, // whether or not to display a submit button on the form
 		'display_reset' => TRUE, // whether or not to display the clear button on the form
 		'display_cancel' => TRUE, // whether or not to display the cancel button on the form

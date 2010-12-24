@@ -16,6 +16,11 @@ if ($mode == 'search') { ?>
 
 // If any fields are visible
 if ($any_visible) {
+	if ($form_options['display_buttons'] && $form_options['display_buttons_at_top']) {
+		// the buttons
+		echo '<div class="cl4_buttons cl4_buttons_top">' . implode('', $form_buttons) . '</div>' . EOL;
+	}
+
 	// generate the table
 	$table = new HTMLTable(array(
 		'table_attributes' => array(

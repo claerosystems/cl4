@@ -11,7 +11,13 @@ if ($mode == 'search') { ?>
 	</fieldset>
 <?php } // if
 
-if ($any_visible) { ?>
+if ($any_visible) {
+	if ($form_options['display_buttons'] && $form_options['display_buttons_at_top']) {
+		// the buttons
+		echo '<div class="cl4_buttons cl4_buttons_top">' . implode('', $form_buttons) . '</div>' . EOL;
+	}
+	?>
+
 	<ul class="cl4_form">
 <?php
 	foreach ($display_order as $column) {

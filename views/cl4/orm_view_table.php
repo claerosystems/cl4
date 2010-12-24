@@ -1,5 +1,9 @@
 <?php
 
+if ($form_options['display_buttons'] && $form_options['display_buttons_at_top']) {
+	echo '<div class="cl4_buttons cl4_buttons_top">' . implode('', $form_buttons) . '</div>' . EOL;
+}
+
 // If any fields are visible
 if ($any_visible) {
 	// generate the table
