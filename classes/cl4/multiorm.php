@@ -812,13 +812,13 @@ class cl4_MultiORM {
 	} // function get_list
 
 	/**
-	* Loops through the post values, setting them in the model and saving them through the model
+	* Loops through the post values, setting them in the model and saving (add or update/insert or update) them through the model
 	*
 	* @chainable
 	* @param mixed $post
 	* @return MultiORM
 	*/
-	public function save_edit_multiple($post = NULL) {
+	public function save_multiple($post = NULL) {
 		if ($post === NULL) {
 			$post = $_POST;
 		}
