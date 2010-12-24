@@ -309,18 +309,20 @@ class cl4_MultiORM {
 		// add the top row of control buttons
 		$top_row_buttons = '';
 		if ( ! $this->_options['hide_top_row_buttons']) {
+			$button_class = ( ! empty($this->_options['button_class']) ? ' ' . $this->_options['button_class'] : '');
+
 			// set up SEARCH button
 			if ($list_options['top_bar_buttons']['search']) {
 				$top_row_buttons .= Form::submit(NULL, __('Search'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'search')),
-					'class' => 'cl4_button_link_form ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+					'class' => 'cl4_button_link_form ' . $button_class,
 				));
 
 				// set up CLEAR SEARCH button
 				if ($this->_options['in_search']) {
 					$top_row_buttons .= Form::submit(NULL, __('Clear Search/Sort'), array(
 						'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'cancel_search')),
-						'class' => 'cl4_button_link_form ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+						'class' => 'cl4_button_link_form ' . $button_class,
 					));
 				} // if
 			} // if
@@ -329,7 +331,7 @@ class cl4_MultiORM {
 			if ($list_options['top_bar_buttons']['add']) {
 				$top_row_buttons .= Form::submit(NULL, __('Add New'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'add')),
-					'class' => 'cl4_button_link_form ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+					'class' => 'cl4_button_link_form ' . $button_class,
 				));
 			} // if
 
@@ -338,7 +340,7 @@ class cl4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Edit Selected'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'edit_multiple')),
 					'disabled' => 'disabled',
-					'class' => 'cl4_button_link_form cl4_multiple_edit ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+					'class' => 'cl4_button_link_form cl4_multiple_edit' . $button_class,
 				));
 			} // if
 /* commented out for now, until implemented
@@ -346,7 +348,7 @@ class cl4_MultiORM {
 				$link = '';
 				$top_row_buttons .= Form::submit(NULL, __('Export All'), array(
 					'data-cl4_form_action' => '/' . $link,
-					'class' => 'cl4_button_link_form ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+					'class' => 'cl4_button_link_form ' . $button_class,
 				));
 			} // if
 
@@ -356,7 +358,7 @@ class cl4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Export Selected'), array(
 					'data-cl4_form_action' => '/' . $link,
 					'disabled' => 'disabled',
-					'class' => ' cl4_button_link_form cl4_export_selected ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+					'class' => ' cl4_button_link_form cl4_export_selected ' . $button_class,
 				));
 			} // if
 */
