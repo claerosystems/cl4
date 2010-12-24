@@ -160,11 +160,13 @@ class cl4_MultiORM {
 		// update the options if passed
 		$this->set_options($options);
 
-		$column = array();
 		$target_route = Route::get($this->_options['target_route']);
 		$list_options = $this->_options['editable_list_options'];
 		$table_options = $list_options['table_options'];
 		$display_order = $this->_model->get_display_order();
+
+		// Find out how many words we limit textareas to
+		$textarea_word_limit = Kohana::config('cl4orm.default_options.editable_list_options.textarea_word_limit');
 
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
 
@@ -230,7 +232,6 @@ class cl4_MultiORM {
 		} else {
 			$table_options['heading'][] = '&nbsp;';
 		}
-		$column[] = '';
 
 		// create the form and table name and ids
 		$prefix = (empty($list_options['table_id_prefix']) ? substr(md5(time()), 0, 8) . '_' : $list_options['table_id_prefix']);
@@ -478,6 +479,11 @@ class cl4_MultiORM {
 					$source = (isset($this->_lookup_data[$this->_object_name][$column_name]) ? $this->_lookup_data[$this->_object_name][$column_name] : NULL);
 					$row_data[$i] = $record_model->get_view_html($column_name, $source);
 
+					// If this is a textarea check to see if we should limit the number of words
+					if ( ! empty($textarea_word_limit) && ! in_array($column_meta_data['field_type'], $this->_options['field_types_treaded_as_textarea'])) {
+						$row_data[$i] = Text::limit_words($row_data[$i], $textarea_word_limit);
+					}
+
 					// implement option to replace spaces for better formatting
 					if ($this->_options['replace_spaces'] && ! in_array($column_data['form_type'], $no_replace_spaces_types)) {
 						// adds extra spaces for padding on right side of every column
@@ -710,8 +716,7 @@ class cl4_MultiORM {
 			// get the data
 			foreach($this->find_all()->as_array() AS $id => $record_model) {
 				$row_data = array();
-				//$returnHtml .= kohana::debug($record_model->as_array());
-				foreach ($record_model->as_array() AS $column => $value) {
+				foreach ($record_model->as_array() as $column => $value) {
 					// todo: check options / meta to see if/how the data should be displayed?
 
 					$row_data[] = $value;
