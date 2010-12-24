@@ -75,6 +75,12 @@ class cl4_MultiORM {
 	protected $_num_rows;
 
 	/**
+	* The number of records saved in the last save_multiple()
+	* @var  int
+	*/
+	protected $_records_saved;
+
+	/**
 	* The current search as the post from the search form
 	* Passed into ORM::set_search(); set through MultiORM::set_search()
 	* @var array
@@ -824,6 +830,7 @@ class cl4_MultiORM {
 		}
 
 		$table_name = $this->_model->table_name();
+		$this->_records_saved = 0;
 
 		// deal with post arrays, as c_record[table_name][{record_number}][column_name]
 		if (isset($post[$this->_options['field_name_prefix']])) {
@@ -833,22 +840,32 @@ class cl4_MultiORM {
 
 				foreach ($table_records as $num => $record_data) {
 					try {
-						$model = ORM::factory($this->_model_name, NULL, $this->_options)->set_record_number($num)
+						$model = ORM::factory($this->_model_name, NULL, $this->_options)
+							->set_record_number($num)
 							->save_values($record_data)
 							->save();
+						++ $this->_records_saved;
 					} catch (Exception $e) {
 						throw $e;
 					}
 				} // foreach
 			} // if
 
-		// we don't have a post array, so just save the record normally
 		} else {
 			throw new Kohana_Exception('Cannot save multiple records without a post array');
 		} // if
 
 		return $this;
-	} // function
+	} // function save_multiple
+
+	/**
+	* Returns the number of records saved in the last save_multiple()
+	*
+	* @return  int
+	*/
+	public function records_saved() {
+		return $this->_records_saved;
+	}
 
 	/**
 	* Returns an array of the values for a column for the current model
