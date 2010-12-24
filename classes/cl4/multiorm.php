@@ -36,6 +36,12 @@ class cl4_MultiORM {
 	protected $_object_name;
 
 	/**
+	* The table name to display
+	* @var 	string
+	*/
+	public $_table_name_display;
+
+	/**
 	* this is the array of options
 	* @var    string
 	*/
@@ -122,6 +128,7 @@ class cl4_MultiORM {
 
 		// this needs to be called here because it requires that the model be loaded
 		$this->_object_name = $this->_model->object_name();
+		$this->_table_name_display = $this->_model->_table_name_display;
 
 		if (empty($this->_options['form_id'])) {
 			$this->_options['form_id'] = substr(md5(time()), 0, 8) . '_' . $this->_object_name . '_form';
