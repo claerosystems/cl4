@@ -154,7 +154,7 @@ class cl4_ORM_File extends ORM_FieldType {
 	* @return   string
 	*/
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-		$file_options = $options['file_options'];
+		$file_options = ! empty($options['file_options']) ? $options['file_options'] : array();
 
 		// if there is an existing file, determine the name of the file based on the original_filename column
 		if ( ! empty($value) && ! empty($file_options['original_filename_column'])) {
@@ -172,6 +172,8 @@ class cl4_ORM_File extends ORM_FieldType {
 	* @return   string
 	*/
 	public static function view_html($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
+		$options['file_options'] = ! empty($options['file_options']) ? $options['file_options'] : array();
+
 		$file_name = ORM_File::view($value, $column_name, $orm_model, $options);
 
 		return ORM_File::download_link($column_name, $value, $file_name, $options['file_options'], $orm_model);
