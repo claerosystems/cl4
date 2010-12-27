@@ -43,7 +43,7 @@ class cl4_ModelCreate {
 		$model_code .= 'class Model_' . ModelCreate::make_class_name($table_name) . ' extends ORM {' . EOL;
 
 		if (empty($db_name)) {
-			$model_code .= TAB . '// protected $_db = \'default\'; // or any group in database configuration' . EOL;
+			$model_code .= TAB . '//protected $_db = \'default\'; // or any group in database configuration' . EOL;
 		} else {
 			$model_code .= TAB . 'protected $_db = \'' . $db_name . '\'; // or any group in database configuration' . EOL;
 		}
