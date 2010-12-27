@@ -1283,7 +1283,7 @@ class cl4_ORM extends Kohana_ORM {
 		$post = $this->get_table_records_from_post($post);
 
 		// get the id from the post and set it in the object (if there is one, won't be one in 'add' case)
-		if (isset($post[$this->_primary_key])) {
+		if ( ! empty($post[$this->_primary_key])) {
 			$this->find($post[$this->_primary_key]);
 			// remove the id as we don't want to risk changing it
 			unset($post[$this->_primary_key]);
