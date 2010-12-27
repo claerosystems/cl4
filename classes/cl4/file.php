@@ -191,7 +191,6 @@ class cl4_File {
 		// ensure it's an uploaded file
 		if ( ! is_uploaded_file($file_info['tmp_file'])) {
 			throw new cl4_Exception_File('File received is not an uploaded file: :file:', array(':file:' => $file_info['tmp_file']), cl4_Exception_File::NOT_UPLOADED_FILE);
-		// ensure the mime type from the $_FILES is allowed
 		}
 
 		// check the mime type or extension if we need to
