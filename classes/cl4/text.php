@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die ('No direct script access.');
 
-class cl4_English {
+class cl4_Text extends Kohana_Text {
 	/**
 	*   Returns, based on $count, 's' or ''
 	*
