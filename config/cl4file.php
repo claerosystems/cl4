@@ -88,5 +88,7 @@ return array(
 		* all of these extensions must be defined in config/mimes.php so a proper error can be generated (instead of just the extension)
 		*/
 		'allowed_extensions' => array('pdf', 'gif', 'jpg', 'jpeg', 'png'),
+		// the view that's used in ORM_File::edit() to produce the formatting for the file input, remove and file link
+		'edit_view' => 'cl4/orm_file',
 	),
 );

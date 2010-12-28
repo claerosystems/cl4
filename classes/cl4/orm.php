@@ -1391,7 +1391,7 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	* Returns the full path for the column based on the file_options
 	*
-	* @param  mixed  $column_name
+	* @param   string  $column_name  The column name that you want the file path for
 	* @return  string  the path to the file
 	*/
 	public function get_file_path($column_name) {
@@ -1404,7 +1404,21 @@ class cl4_ORM extends Kohana_ORM {
 		} else {
 			throw new Kohana_Exception('The column name :column: does not exist in _table_columns', array(':column:' => $column_name));
 		}
-	} // function
+	} // function get_file_path
+
+	/**
+	* Returns the pull path to the file based on the file_options and the filename in the field
+	*
+	* @param   string  $column_name  The column name that you want the full path including file name for
+	* @return  string  The full file path including filename
+	*/
+	public function get_filename_with_path($column_name) {
+		if (isset($this->_table_columns[$column_name])) {
+			return $this->get_file_path($column_name) . '/' . $this->$column_name;
+		} else {
+			throw new Kohana_Exception('The column name :column: does not exist in _table_columns', array(':column:' => $column_name));
+		}
+	} // function get_filename_with_path
 
 	/**
 	* Run Request::send_file() for the file in a specific column for the current record
@@ -1415,7 +1429,7 @@ class cl4_ORM extends Kohana_ORM {
 	*/
 	public function send_file($column_name) {
 		if ( ! empty($this->$column_name)) {
-			$file_path = $this->get_file_path($column_name) . '/' . $this->$column_name;
+			$file_path = $this->get_filename_with_path($column_name);
 
 			$file_name = ORM_File::view($this->$column_name, $column_name, $this, $this->_table_columns[$column_name]['field_options']);
 
