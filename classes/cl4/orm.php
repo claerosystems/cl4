@@ -591,7 +591,7 @@ class cl4_ORM extends Kohana_ORM {
 							$view_html_options = $this->get_view_html_options($column_name);
 
 							// get the source if there is one
-							if (array_key_exists('field_options', $column_info) && is_array($column_info['field_options']) && array_key_exists('source', $column_info['field_options'])) {
+							if ( ! empty($column_info['field_options']) && is_array($column_info['field_options']) && array_key_exists('source', $column_info['field_options'])) {
 								// get the lookup data based on the source info
 								$source = $this->get_source_data($column_name, NULL);
 							} else {
