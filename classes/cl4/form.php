@@ -701,6 +701,46 @@ class cl4_Form extends Kohana_Form {
 	} // function
 
 	/**
+	 * Creates an HTML5 email form input.
+	 *
+	 * @param string $name       The name of this input.
+	 * @param string $value      The value to place in this input.
+	 * @param array  $attributes Attributes to apply to this input
+	 *
+	 * @uses Form::input
+	 *
+	 * @see Form::input()
+	 *
+	 * @return string
+	 */
+	public static function email($name, $value = NULL, array $attributes = NULL) {
+		// Set the type of this input to "email"
+		$attributes['type'] = 'email';
+
+		return Form::input($name, $value, $attributes);
+	}
+
+	/**
+	 * Creates an HTML5 URL form input.
+	 *
+	 * @param string $name       The name of this input.
+	 * @param string $value      The value to place in this input.
+	 * @param array  $attributes Attributes to apply to this input
+	 *
+	 * @uses Form::input
+	 *
+	 * @see Form::input()
+	 *
+	 * @return string
+	 */
+	public static function url($name, $value = NULL, array $attributes = NULL) {
+		// Set the type of this input to "url"
+		$attributes['type'] = 'url';
+
+		return Form::input($name, $value, $attributes);
+	}
+
+	/**
 	 * Creates a set of input fields to capture a structured phone number.
 	 * The database field needs to be 32 characters long to accomodate the entire phone number
 	 *
