@@ -43,7 +43,7 @@ class cl4_ModelCreate {
 		$model_code .= 'class Model_' . ModelCreate::make_class_name($table_name) . ' extends ORM {' . EOL;
 
 		if (empty($db_name)) {
-			$model_code .= TAB . '// protected $_db = \'default\'; // or any group in database configuration' . EOL;
+			$model_code .= TAB . '//protected $_db = \'default\'; // or any group in database configuration' . EOL;
 		} else {
 			$model_code .= TAB . 'protected $_db = \'' . $db_name . '\'; // or any group in database configuration' . EOL;
 		}
@@ -120,7 +120,6 @@ class cl4_ModelCreate {
 		$has_one_code = '';
 
 		// now create the column meta data lines
-		$display_order = 10;
 		foreach ($columns as $column_name => $column_data) {
 			// now that we know the field type, lets merge in some defaults
 			// global field type defaults
@@ -141,7 +140,8 @@ class cl4_ModelCreate {
 			if ($last_field_part == '_id') {
 				$meta_data['field_type'] = 'select';
 				$meta_data['field_options']['source']['source'] = 'model';
-				$meta_data['field_options']['source']['data'] = substr($column_name, 0, strpos($column_name, '_'));;
+				// the model name is determined as the everything but the last part of the column name (_id)
+				$meta_data['field_options']['source']['data'] = substr($column_name, 0, strrpos($column_name, '_'));
 			}
 			if ($column_data['data_type'] == 'datetime' || $column_data['data_type'] == 'timestamp') {
 				$meta_data['field_type'] = 'datetime';
@@ -241,11 +241,11 @@ class cl4_ModelCreate {
 
 			if (in_array($meta_data['field_type'], array('select', 'radios'))) {
 				// because the last part of the field is _id, add a select with a foreign key record
-				$column_name_wo_id = strtolower(substr($column_name, 0, -3)); // remove the last 3 characters to get the name of the field
+				// get the column name with the last bit (likely _id)
+				$column_name_wo_id = substr($column_name, 0, strrpos($column_name, '_'));
 
 				// look for a related table and generate the has_one relationship
 				$expire_sql = '';
-				$display_order_sql = 'name';
 				$tables = $_db->list_tables($column_name_wo_id);
 				if (count($tables) > 0) {
 					$has_one_code .= EOL;
@@ -261,14 +261,6 @@ class cl4_ModelCreate {
 			// add the cl4 meta data
 			$model_code .= TAB . TAB . '\'' . $column_name . '\' => array(' . EOL;
 			foreach ($meta_data as $key => $data) {
-				if ($key == 'display_order') {
-					if ($data !== FALSE) {
-						$data = $display_order;
-					} else {
-						break;
-					} // if
-				} // if
-
 				// filter out optional fields for now, just include required
 				if ( ! array_key_exists($key, $default_meta_data) || $data !== $default_meta_data[$key] || in_array($key, array('field_type', 'display_order'))) {
 					$model_code .= TAB . TAB . TAB . "'" . $key . "' => ";
@@ -306,8 +298,6 @@ class cl4_ModelCreate {
 			} // foreach
 
 			$model_code .= TAB . TAB . '),' . EOL;
-
-			$display_order += 10;
 		} // foreach
 		$model_code .= TAB . ');' . EOL;
 
@@ -352,6 +342,20 @@ class cl4_ModelCreate {
 		$model_code .= TAB . TAB . '\'default\'	=> 0,' . EOL;
 		$model_code .= TAB . ');' . EOL;
 		if ( ! isset($columns['expiry_date'])) $model_code .= TAB . '*/' . EOL;
+		$model_code .= EOL;
+
+		// Add display order property
+		$model_code .= TAB . '/**' . EOL;
+		$model_code .= TAB . ' * @var array $_display_order The order to display columns in, if different from as listed in $_table_columns.' . EOL;
+		$model_code .= TAB . ' * Columns not listed here will be added beneath these columns, in the order they are listed in $_table_columns.' . EOL;
+		$model_code .= TAB . ' */' . EOL;
+		$model_code .= TAB . '/*' . EOL;
+		$model_code .= TAB . 'protected $_display_order = array(' . EOL;
+		foreach ($columns as $column_name => $column_data) {
+			$model_code .= TAB . TAB . "'{$column_name}'," . EOL;
+		}
+		$model_code .= TAB . ');' . EOL;
+		$model_code .= TAB . '*/' . EOL;
 
 		$model_code .= '} // class';
 
@@ -359,7 +363,7 @@ class cl4_ModelCreate {
 	} // function
 
 	/**
-	* make a nice class name by capitalizing first letters of words and replacing spaces with underscores
+	* Make a nice class name by capitalizing first letters of words and replacing spaces with underscores
 	*
 	* @param mixed $name
 	* @return mixed
@@ -369,7 +373,11 @@ class cl4_ModelCreate {
 	} // function
 
 	/**
-	* @param mixed $data
+	* Returns a string base on the type of data in the variable
+	* For example, NULL will return "NULL"
+	*
+	* @param   mixed   $data  The variable to return the value of as a string
+	* @return  string  The string value of the variable
 	*/
 	public static function return_code_value($data) {
 		if ($data === NULL) {
@@ -385,5 +393,5 @@ class cl4_ModelCreate {
 		}
 
 		return $formatted_data;
-	} // function
+	} // function return_code_value
 } // class

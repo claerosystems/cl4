@@ -30,7 +30,7 @@ class cl4_ORM_Email extends cl4_ORM_Text {
 		);
 
 		$address = ORM_FieldType::view($value, $column_name, $orm_model, $options);
-		
+
 		return '<a href="mailto:' . $address . '">' . $address . '</a>';
 	} // function view_html
 } // class

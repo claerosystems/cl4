@@ -36,6 +36,12 @@ class cl4_MultiORM {
 	protected $_object_name;
 
 	/**
+	* The table name to display
+	* @var 	string
+	*/
+	public $_table_name_display;
+
+	/**
 	* this is the array of options
 	* @var    string
 	*/
@@ -57,7 +63,7 @@ class cl4_MultiORM {
 	protected $_lookup_data = array();
 
 	/**
-	* After load_records() is called, this will be populated with the results of find_all() likely an array of objects
+	* The ORM models will be loaded into this property using ORM::find_all()
 	* @var  array
 	*/
 	protected $_records;
@@ -69,11 +75,23 @@ class cl4_MultiORM {
 	protected $_num_rows;
 
 	/**
+	* The number of records saved in the last save_multiple()
+	* @var  int
+	*/
+	protected $_records_saved;
+
+	/**
 	* The current search as the post from the search form
 	* Passed into ORM::set_search(); set through MultiORM::set_search()
 	* @var array
 	*/
 	protected $_search;
+
+	/**
+	* Stores an array Validate objects from each record in _records after check() if any Models don't validate
+	* @var  Validate
+	*/
+	protected $_validate_objects;
 
 	/**
 	* Returns an instance of MultiORM
@@ -122,6 +140,7 @@ class cl4_MultiORM {
 
 		// this needs to be called here because it requires that the model be loaded
 		$this->_object_name = $this->_model->object_name();
+		$this->_table_name_display = $this->_model->_table_name_display;
 
 		if (empty($this->_options['form_id'])) {
 			$this->_options['form_id'] = substr(md5(time()), 0, 8) . '_' . $this->_object_name . '_form';
@@ -148,7 +167,7 @@ class cl4_MultiORM {
 		}
 
 		return $this;
-	} // function
+	} // function set_options
 
 	/**
 	* Generates an HTML record list with edit, delete, view and add similar links for the given object including add/edit/del, pagination, etc.
@@ -160,10 +179,13 @@ class cl4_MultiORM {
 		// update the options if passed
 		$this->set_options($options);
 
-		$column = array();
 		$target_route = Route::get($this->_options['target_route']);
 		$list_options = $this->_options['editable_list_options'];
 		$table_options = $list_options['table_options'];
+		$display_order = $this->_model->get_display_order();
+
+		// Find out how many words we limit textareas to
+		$textarea_word_limit = Kohana::config('cl4orm.default_options.editable_list_options.textarea_word_limit');
 
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
 
@@ -229,7 +251,6 @@ class cl4_MultiORM {
 		} else {
 			$table_options['heading'][] = '&nbsp;';
 		}
-		$column[] = '';
 
 		// create the form and table name and ids
 		$prefix = (empty($list_options['table_id_prefix']) ? substr(md5(time()), 0, 8) . '_' : $list_options['table_id_prefix']);
@@ -268,7 +289,13 @@ class cl4_MultiORM {
 
 		// set up the headings and sort links, etc. based on model
 		$i = -1;
-		foreach ($this->_table_columns[$this->_object_name] as $column_name => $column_data) {
+		foreach ($display_order as $column_name) {
+			try {
+				$column_data = $this->_table_columns[$this->_object_name][$column_name];
+			} catch (Exception $e) {
+				throw new Kohana_Exception('The column :column_name in _display_order is not defined in _table_columns', array(':column_name' => $column_name));
+			}
+
 			// only add the column if the list_flag is set to true
 			if ($column_data['list_flag']) {
 				++$i;
@@ -301,18 +328,20 @@ class cl4_MultiORM {
 		// add the top row of control buttons
 		$top_row_buttons = '';
 		if ( ! $this->_options['hide_top_row_buttons']) {
+			$button_class = ( ! empty($this->_options['button_class']) ? ' ' . $this->_options['button_class'] : '');
+
 			// set up SEARCH button
 			if ($list_options['top_bar_buttons']['search']) {
 				$top_row_buttons .= Form::submit(NULL, __('Search'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'search')),
-					'class' => 'cl4_button_link_form ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+					'class' => 'cl4_button_link_form ' . $button_class,
 				));
 
 				// set up CLEAR SEARCH button
 				if ($this->_options['in_search']) {
 					$top_row_buttons .= Form::submit(NULL, __('Clear Search/Sort'), array(
 						'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'cancel_search')),
-						'class' => 'cl4_button_link_form ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+						'class' => 'cl4_button_link_form ' . $button_class,
 					));
 				} // if
 			} // if
@@ -321,7 +350,7 @@ class cl4_MultiORM {
 			if ($list_options['top_bar_buttons']['add']) {
 				$top_row_buttons .= Form::submit(NULL, __('Add New'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'add')),
-					'class' => 'cl4_button_link_form ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+					'class' => 'cl4_button_link_form ' . $button_class,
 				));
 			} // if
 
@@ -330,7 +359,7 @@ class cl4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Edit Selected'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'edit_multiple')),
 					'disabled' => 'disabled',
-					'class' => 'cl4_button_link_form cl4_multiple_edit ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+					'class' => 'cl4_button_link_form cl4_multiple_edit' . $button_class,
 				));
 			} // if
 /* commented out for now, until implemented
@@ -338,7 +367,7 @@ class cl4_MultiORM {
 				$link = '';
 				$top_row_buttons .= Form::submit(NULL, __('Export All'), array(
 					'data-cl4_form_action' => '/' . $link,
-					'class' => 'cl4_button_link_form ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+					'class' => 'cl4_button_link_form ' . $button_class,
 				));
 			} // if
 
@@ -348,10 +377,29 @@ class cl4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Export Selected'), array(
 					'data-cl4_form_action' => '/' . $link,
 					'disabled' => 'disabled',
-					'class' => ' cl4_button_link_form cl4_export_selected ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+					'class' => ' cl4_button_link_form cl4_export_selected ' . $button_class,
 				));
 			} // if
 */
+			// set up ADD multiple button and count select
+			if ($list_options['top_bar_buttons']['add_multiple']) {
+				$add_multiple_uniqid = uniqid('cl4_add_multiple_button_');
+
+				$top_row_buttons .= Form::submit(NULL, __('Add:'), array(
+					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'add_multiple', 'id' => 1)),
+					'data-cl4_add_multiple_form_action_prefix' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'add_multiple')), // used to determine data-cl4_form_action when the selection is changed
+					'class' => 'cl4_button_link_form' . $button_class,
+					'id' => $add_multiple_uniqid,
+				));
+
+				// Set up multiple add dropdown
+				$add_count_array = array_combine(range(1, 10), range(1, 10));
+				$top_row_buttons .= Form::select(NULL, $add_count_array, 1, array(
+					'class' => 'cl4_add_multiple_count',
+					'data-cl4_add_multiple_related_button' => $add_multiple_uniqid,
+				));
+			} // if
+
 			// set up other actions
 			if ( ! empty($this->_options['top_bar_buttons_custom'])) {
 				if (is_array($this->_options['top_bar_buttons_custom'])) {
@@ -457,16 +505,27 @@ class cl4_MultiORM {
 			$no_replace_spaces_types = array('checkbox', 'textarea', 'file');
 
 			// todo: implement multiple tables
-			foreach ($this->_table_columns[$this->_object_name] as $column_name => $column_meta_data) {
+			foreach ($display_order as $column_name) {
+				try {
+					$column_data = $this->_table_columns[$this->_object_name][$column_name];
+				} catch (Exception $e) {
+					throw new Kohana_Exception('The column :column_name in _display_order is not defined in _table_columns', array(':column_name' => $column_name));
+				}
+
 				// only add the column if the list_flag is true
-				if ($column_meta_data['list_flag']) {
+				if ($column_data['list_flag']) {
 					++$i;
 
 					$source = (isset($this->_lookup_data[$this->_object_name][$column_name]) ? $this->_lookup_data[$this->_object_name][$column_name] : NULL);
 					$row_data[$i] = $record_model->get_view_html($column_name, $source);
 
+					// If this is a textarea check to see if we should limit the number of words
+					if ( ! empty($textarea_word_limit) && in_array($column_data['field_type'], $this->_options['field_types_treaded_as_textarea'])) {
+						$row_data[$i] = Text::limit_words($row_data[$i], $textarea_word_limit);
+					}
+
 					// implement option to replace spaces for better formatting
-					if ($this->_options['replace_spaces'] && ! in_array($column_meta_data['form_type'], $no_replace_spaces_types)) {
+					if ($this->_options['replace_spaces'] && ! in_array($column_data['form_type'], $no_replace_spaces_types)) {
 						// adds extra spaces for padding on right side of every column
 						$row_data[$i] = str_replace(' ', '&nbsp;', $row_data[$i]) . '&nbsp;&nbsp;';
 					} // if
@@ -490,7 +549,7 @@ class cl4_MultiORM {
 			'object_name_display' 	=> $this->_model->_table_name_display,
 			'form_open_tag' 		=> $form_open_tag,
 			'top_row_buttons' 		=> $top_row_buttons,
-			'hidden_fields' 		=> $this->_options['hidden'],
+			'hidden_fields' 		=> $list_options['hidden_fields'],
 			'data_table' 			=> $content_table->get_html(),
 			'nav_html' 				=> $nav_html,
 			'nav_right' 			=> $this->_options['nav_right'],
@@ -511,35 +570,71 @@ class cl4_MultiORM {
 		$this->_search = $post;
 
 		return $this;
-	} // function
+	} // function set_search
 
 	/**
-	* Returns a view for editing multiple records
+	* Returns a view for editing multiple records.
 	*
-	* @param mixed $ids
+	* @param  array  $ids  The record primary keys (IDs) to load.
+	*
 	* @return View
 	*/
 	public function get_edit_multiple($ids) {
-		if (empty($ids)) {
-			throw new Kohana_Exception('No IDs were received for the multiple edit');
+		if (empty($ids) && empty($this->_records)) {
+			throw new Kohana_Exception('No IDs were received and _records is empty for the multiple edit');
+		}
+
+		if (empty($this->_records)) {
+			// Attempt to order the records by the order they are received in
+			if ($this->_options['edit_multiple_options']['keep_record_order']) {
+				$this->_model->order_by(DB::expr('FIND_IN_SET(' . $this->_db->quote_identifier($this->_model->table_name() . '.' . $this->_model->primary_key()) . ', ' . $this->_db->escape(implode(',', $ids)) . ')'), 'ASC');
+			}
+
+			// Load the records
+			$this->_records = $this->_model->find_ids($ids);
+		}
+		$this->_num_rows = count($this->_records);
+
+		if ($this->_num_rows == 0) {
+			throw new Kohana_Exception('None of the passed records could be found');
+		}
+
+		return $this->get_record_edit_view();
+	} // function get_edit_multiple
+
+	/**
+	 * Returns a view for adding multiple records
+	 *
+	 * @param  integer  $count  The number of records to add.
+	 *
+	 * @return View
+	 */
+	public function get_add_multiple($count) {
+		if (empty($this->_records)) {
+			// Load blank records
+			for ($i = 0; $i < $count; $i++) {
+				$this->_records[] = ORM::factory($this->_model_name);
+			}
+		} // if
+
+		return $this->get_record_edit_view();
+	} // function get_add_multiple
+
+	/**
+	* Returns a view for editing multiple records
+	* A method to populdate _records must be called before this can be run
+	*
+	* @return View
+	*/
+	public function get_record_edit_view() {
+		if ($this->_records === NULL) {
+		    throw new Exception('_records must be set/populated before calling get_editable_list()');
 		}
 
 		$form_buttons = array();
 		$target_route = $this->_options['target_route'];
 		$edit_multiple_options = $this->_options['edit_multiple_options'];
-
-		// attempt to order the records by the order they are received in
-		if ($this->_options['edit_multiple_options']['keep_record_order']) {
-			$this->_model->order_by(DB::expr('FIND_IN_SET(' . $this->_db->quote_identifier($this->_model->table_name() . '.' . $this->_model->primary_key()) . ', ' . $this->_db->escape(implode(',', $ids)) . ')'), 'ASC');
-		}
-
-		// load the records
-		$this->_records = $this->_model->find_ids($ids);
-		$record_count = count($this->_records);
-
-		if ($record_count == 0) {
-			throw new Kohana_Exception('None of the passed IDs were found');
-		}
+		$display_order = $this->_model->get_display_order();
 
 		if ($this->_options['display_form_tag']) {
 			// generate the form name
@@ -581,8 +676,14 @@ class cl4_MultiORM {
 		$headings = array('');
 		$fields = array();
 		$i = 1;
-		foreach ($table_columns as $column_name => $column_info) {
-			if ($column_info['edit_flag'] && $column_info['field_type'] != 'hidden') {
+		foreach ($display_order as $column_name) {
+			try {
+				$column_info = $table_columns[$column_name];
+			} catch (Exception $e) {
+				throw new Kohana_Exception('The column :column_name in _display_order is not defined in $table_columns', array(':column_name' => $column_name));
+			}
+
+			if ($column_info['edit_flag'] && ! in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 				$headings[$i] = $labels[$column_name];
 				$fields[] = $column_name;
 				++$i;
@@ -593,10 +694,10 @@ class cl4_MultiORM {
 			'heading' => $headings,
 		);
 		$table_options += $edit_multiple_options['table_options'];
-
 		$table = new HTMLTable($table_options);
 
 		$hidden_fields = array();
+		$is_first_row = TRUE;
 
 		foreach ($this->_records as $num => $record_model) {
 			$display_row_num = $num + 1;
@@ -607,22 +708,45 @@ class cl4_MultiORM {
 				// the tab indexes will increase by 20 (starting at 20) so that columns with multiple fields don't screw things up (unless there are more than 20 fields in 1 column)
 				$table_column_options = array();
 				foreach ($fields as $field_num => $column_name) {
-					$table_column_options[$column_name]['field_attributes']['tabindex'] = (($record_count * $field_num) + $num + 1) * 20;
+					$table_column_options[$column_name]['field_attributes']['tabindex'] = (($this->_num_rows * $field_num) + $num + 1) * 20;
 				}
 				$record_model->set_column_defaults(array('table_columns' => $table_column_options));
 			} // if
 
+			// If this is the first row, then allow autofocus, otherwise don't
+			if ( ! $is_first_row) {
+				$record_model->set_option('add_autofocus', FALSE);
+			} else {
+				$is_first_row = FALSE;
+			}
+
 			// set the record number so the field name is correct and then prepare the fields (form)
-			$record_model->set_record_number($num)->prepare_form();
+			$record_model->set_record_number($num)
+				->prepare_form();
 
 			// create a hidden field for the primary key (ID)
-			$id_field_name = $record_model->get_field_html_name($record_model->primary_key());
-			$hidden_fields[] = ORM_Hidden::edit($record_model->primary_key(), $id_field_name, $record_model->pk());
+			if ($this->_mode != 'add') {
+				$id_field_name = $record_model->get_field_html_name($record_model->primary_key());
+				$hidden_fields[] = ORM_Hidden::edit($record_model->primary_key(), $id_field_name, $record_model->pk());
+			}
 
 			// add each of the fields to the row data array, except for fields that shouldn't be displayed (edit_flag) or are hidden
-			foreach ($table_columns as $column_name => $column_info) {
+			foreach ($display_order as $column_name) {
+				try {
+					$column_info = $table_columns[$column_name];
+				} catch (Exception $e) {
+					throw new Kohana_Exception('The column :column_name in _display_order is not defined in $table_columns', array(':column_name' => $column_name));
+				}
+
+				$show_field = FALSE;
 				if ($column_info['edit_flag']) {
-					if ($column_info['field_type'] != 'hidden') {
+					if ( ! ($this->_mode == 'add' && $column_name == $record_model->primary_key())) {
+						$show_field = TRUE;
+					}
+				}
+
+				if ($show_field) {
+					if ( ! in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 						$row_data[] = $record_model->get_field($column_name);
 					} else {
 						$hidden_fields[] = $record_model->get_field($column_name);
@@ -639,7 +763,7 @@ class cl4_MultiORM {
 				$table->set_attribute($row_num, 0, 'class', 'nowrap');
 				$col = 1;
 				foreach ($table_columns as $column_name => $column_info) {
-					if ($column_info['edit_flag'] && $column_info['field_type'] != 'hidden') {
+					if ($column_info['edit_flag'] && ! in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 						if (in_array($column_info['field_type'], $this->_options['edit_multiple_options']['column_type_no_wrap'])) {
 							$table->set_attribute($row_num, $col, 'class', 'nowrap');
 						}
@@ -656,9 +780,9 @@ class cl4_MultiORM {
 			'form_buttons' => $form_buttons,
 			'form_open_tag' => $form_open_tag,
 			'form_close_tag' => $form_close_tag,
-			'items' => $record_count,
+			'items' => $this->_num_rows,
 		));
-	} // function
+	} // function get_record_edit_view
 
 	/**
 	* get a table with data from the specified model
@@ -682,8 +806,7 @@ class cl4_MultiORM {
 			// get the data
 			foreach($this->find_all()->as_array() AS $id => $record_model) {
 				$row_data = array();
-				//$returnHtml .= kohana::debug($record_model->as_array());
-				foreach ($record_model->as_array() AS $column => $value) {
+				foreach ($record_model->as_array() as $column => $value) {
 					// todo: check options / meta to see if/how the data should be displayed?
 
 					$row_data[] = $value;
@@ -715,18 +838,20 @@ class cl4_MultiORM {
 	} // function get_list
 
 	/**
-	* Loops through the post values, setting them in the model and saving them through the model
+	* Loops through the post values, setting them in the model
+	* By default it will use $_POST if nothing is passed
 	*
 	* @chainable
-	* @param mixed $post
-	* @return MultiORM
+	* @param  array  $post  The values from the post or a custom array
+	* @return  MultiORM
 	*/
-	public function save_edit_multiple($post = NULL) {
+	public function save_values($post = NULL) {
 		if ($post === NULL) {
 			$post = $_POST;
 		}
 
 		$table_name = $this->_model->table_name();
+		$this->_records_saved = 0;
 
 		// deal with post arrays, as c_record[table_name][{record_number}][column_name]
 		if (isset($post[$this->_options['field_name_prefix']])) {
@@ -736,22 +861,86 @@ class cl4_MultiORM {
 
 				foreach ($table_records as $num => $record_data) {
 					try {
-						$model = ORM::factory($this->_model_name, NULL, $this->_options)->set_record_number($num)
-							->save_values($record_data)
-							->save();
+						$this->_records[$num] = ORM::factory($this->_model_name, NULL, $this->_options)
+							->set_record_number($num)
+							->save_values($record_data);
 					} catch (Exception $e) {
 						throw $e;
 					}
 				} // foreach
 			} // if
 
-		// we don't have a post array, so just save the record normally
 		} else {
 			throw new Kohana_Exception('Cannot save multiple records without a post array');
 		} // if
 
 		return $this;
-	} // function
+	} // function save_multiple
+
+	/**
+	* Loops through all of the records validating them
+	* If any object doesn't valid, the Validate object will be stored in _validate_objects
+	* Will return false if any record doesn't validate
+	* This will empty the _validate_object first
+	*
+	* @return  boolean
+	*/
+	public function check() {
+		$this->_validate_objects = array();
+
+		foreach ($this->_records as $num => $record_model) {
+			if ( ! $record_model->check()) {
+				$this->_validate_objects[$num] = $record_model->validate();
+			}
+		}
+
+		return empty($this->_validate_objects);
+	} // function check
+
+	/**
+	* Returns all of the validate objects in the object
+	* If there are none, FALSE will be returned
+	*
+	* @return  array
+	*/
+	public function validate_objects() {
+		if (empty($this->_validate_objects)) {
+			return FALSE;
+		}
+
+		return $this->_validate_objects;
+	} // function validate_objects
+
+	/**
+	* Saves all of the records within the object
+	* _records_saved will be incremented for each Model successfully saved
+	*
+	* @return  MultiOrm
+	*/
+	public function save() {
+		foreach ($this->_records as $num => $record_model) {
+			try {
+				$record_model->save();
+
+				if ($record_model->saved()) {
+					++ $this->_records_saved;
+				}
+			} catch (Exception $e) {
+				throw $e;
+			}
+		} // foreach
+
+		return $this;
+	} // function save
+
+	/**
+	* Returns the number of records saved in the last save_multiple()
+	*
+	* @return  int
+	*/
+	public function records_saved() {
+		return $this->_records_saved;
+	}
 
 	/**
 	* Returns an array of the values for a column for the current model

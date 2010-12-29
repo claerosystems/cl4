@@ -53,14 +53,12 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* holds all status messages to be displayed to the user
-	*
 	* @var mixed
 	*/
 	protected $_message = array();
 
 	/**
 	* a cache for any lookups we do for select or relationship data
-	*
 	* @var mixed
 	*/
 	protected $_lookup_data = array();
@@ -82,6 +80,12 @@ class cl4_ORM extends Kohana_ORM {
 	public $_table_name_display;
 
 	/**
+	 * @var array $_display_order The order to display columns in, if different from as listed in $_table_columns.
+	 * Columns not listed here will be added beneath these columns, in the order they are listed in $_table_columns.
+	 */
+	protected $_display_order = array();
+
+	/**
 	* An array of values that should be merged with the properties
 	* This is meant to be used when you are extending a class and don't want to recreate the whole array of values, for things like _table_columns
 	* This is merged during _initialize()
@@ -89,33 +93,6 @@ class cl4_ORM extends Kohana_ORM {
 	* @var 	array
 	*/
 	protected $_override_properties = array();
-
-	/**
-	 * Checks to see if any fields in this model are visible in this context.
-	 *
-	 * @param string $context The context this model is being viewed in. (list, search, edit, view)
-	 */
-	public function any_visible($context) {
-		// Ensure a valid context
-		assert("in_array('$context', array('list', 'search', 'edit', 'view'))");
-
-		$any_visible = false;
-
-		foreach ($this->_table_columns as $column_name => $data) {
-			// If this is the add case, we might be adding a record based on another, in which case the primary key field is not visible
-			if ('add' === $context && $column_name === $this->_primary_key) {
-				continue;
-			}
-
-			// If this field is visible
-			if ($data[$context . '_flag']) {
-				$any_visible = true;
-				break;
-			}
-		}
-
-		return $any_visible;
-	}
 
 	/**
 	 * Instructs builder to include expired rows in select queries.
@@ -287,12 +264,31 @@ class cl4_ORM extends Kohana_ORM {
 	} // function
 
 	/**
+	* Allows setting of a specific option using a path
+	* Becareful when using this: check what done in set_options() to ensure there isn't special functionality for an option
+	*
+	* @uses  Arr::set_deep()
+	*
+	* @chainable
+	* @param  string  $option_path  The path to the option
+	* @param  mixed   $value        The option to set
+	* @param  string  $deliminator  The deliminator (if not passed, will use the default one in Arr)
+	* @return  ORM
+	*/
+	public function set_option($option_path, $value, $deliminator = NULL) {
+		$this->_options = Arr::set_deep($this->_options, $option_path, $value, $deliminator);
+
+		return $this;
+	} // function set_option
+
+	/**
 	* Sets the all the column defaults in _table_columns, including merging defaults for specific field types and records the table columns in the order based on display_order
 	* The options higher up this list will take precedence:
 	*   model
 	*   defaults for field type
 	*   defaults for all field types
 	* For file, the options found in config/cl4file.options will also be merged in
+	* Also ensures all the columns are in the display order array
 	*
 	* @chainable
 	* @param array $options
@@ -356,25 +352,19 @@ class cl4_ORM extends Kohana_ORM {
 			$this->_table_columns[$column_name] = $merged_column_options;
 		} // foreach
 
-		// now record the meta data based on display_order
-		$meta_data_display_order = array();
-		$has_display_order = FALSE;
-		foreach ($this->_table_columns as $column_name => $meta_data) {
-			if ($meta_data['display_order'] != 0) $has_display_order;
-			$meta_data_display_order[$column_name] = $meta_data['display_order'];
-		}
-
-		// only do the following if one of the columns has a display order other than 0
-		if ($has_display_order) {
-			asort($meta_data_display_order);
-
-			$ordered_meta_data = array();
-			foreach ($meta_data_display_order as $column_name => $display_order) {
-				$ordered_meta_data[$column_name] = $this->_table_columns[$column_name];
+		// Loop through all columns ensuring they are in the display order array
+		foreach ($this->_table_columns as $column => $data) {
+			// If this column isn't already ordered and isn't hidden
+			if ( ! in_array($column, $this->_display_order) && ! in_array($data['field_type'], $this->_options['field_types_treated_as_hidden'])) {
+				// Add it to the end of the our order
+				$this->_display_order[] = $column;
 			}
+		} // foreach
 
-			$this->_table_columns = $ordered_meta_data;
-		} // if
+		if ( ! empty($this->_display_order)) {
+			// Order display order by the keys as it will be used in order
+			ksort($this->_display_order);
+		}
 
 		return $this;
 	} // function
@@ -392,6 +382,15 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function set_mode
+
+	/**
+	 * Gets the display order of the table columns.
+	 *
+	 * @return array
+	 */
+	public function get_display_order() {
+		return $this->_display_order;
+	}
 
 	/**
 	* get a formatted value of a model column
@@ -577,7 +576,7 @@ class cl4_ORM extends Kohana_ORM {
 						$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 
 					} else {
-						if ($first_field_autofocus) {
+						if ($first_field_autofocus && $this->_options['add_autofocus']) {
 							// this is the first visible field, so add the autofocus attribute
 							$first_field_autofocus = FALSE;
 							$field_attributes = HTML::merge_attributes($field_attributes, array('autofocus' => 'autofocus'));
@@ -592,7 +591,7 @@ class cl4_ORM extends Kohana_ORM {
 							$view_html_options = $this->get_view_html_options($column_name);
 
 							// get the source if there is one
-							if (array_key_exists('field_options', $column_info) && is_array($column_info['field_options']) && array_key_exists('source', $column_info['field_options'])) {
+							if ( ! empty($column_info['field_options']) && is_array($column_info['field_options']) && array_key_exists('source', $column_info['field_options'])) {
 								// get the lookup data based on the source info
 								$source = $this->get_source_data($column_name, NULL);
 							} else {
@@ -653,6 +652,36 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function prepare_form
+
+	/**
+	 * Checks to see if any fields in this model are visible in this context.
+	 *
+	 * @param  string  $mode  The context this model is being viewed in. (list, search, edit, view)
+	 * @return  bool  TRUE if a field is visible, FALSE otherwise
+	 */
+	public function any_visible($mode) {
+		// ensure the mode is valid (because we will be using it to check for flags later)
+		if ( ! in_array($mode, array('list', 'search', 'edit', 'view'))) {
+			throw new Kohana_Exception('The mode passed is not valid');
+		}
+
+		$any_visible = FALSE;
+
+		foreach ($this->_table_columns as $column_name => $data) {
+			// If this is the add case, we might be adding a record based on another, in which case the primary key field is not visible
+			if ($mode == 'add' && $column_name == $this->_primary_key) {
+				continue;
+			}
+
+			// If this field is visible
+			if ($data[$mode . '_flag']) {
+				$any_visible = TRUE;
+				break;
+			}
+		} // foreach
+
+		return $any_visible;
+	} // function any_visible
 
 	/**
 	* Returns the name of the field for HTML
@@ -846,6 +875,7 @@ class cl4_ORM extends Kohana_ORM {
 			'mode' 					=> $this->_mode,
 			'search_type_html' 		=> $search_type_html,
 			'like_type_html' 		=> $like_type_html,
+			'display_order'			=> $this->_display_order,
 		));
 	} // function
 
@@ -877,16 +907,17 @@ class cl4_ORM extends Kohana_ORM {
 			'form_options' 		=> $this->_options,
 			'form_field_html' 	=> $this->_field_html,
 			'form_buttons' 		=> $this->_form_buttons,
+			'display_order'		=> $this->_display_order,
 		));
 	} // function
 
 	/**
 	 * Generate and return the formatted HTML for the given field
 	 *
-	 * @param 		string		the name of the field in the model
-	 * @return  	string		the HTML for the given fieldname, based on the model
+	 * @param   string  $column_name  the name of the field in the model
+	 * @return  string  the HTML for the given fieldname, based on the model
 	 */
-	public function get_field($column_name = null) {
+	public function get_field($column_name = NULL) {
 		if ( ! isset($this->_field_html[$column_name]['field']) && ! isset($this->_form_fields_hidden[$column_name])) {
 			$this->prepare_form($column_name);
 		}
@@ -896,7 +927,7 @@ class cl4_ORM extends Kohana_ORM {
 		} else if (isset($this->_form_fields_hidden[$column_name])) {
 			return $this->_form_fields_hidden[$column_name];
 		} else {
-			throw new Kohana_Exception('Prepare form was unable to prepare the field therefore there is no field available');
+			throw new Kohana_Exception('Prepare form was unable to prepare the field therefore there is no field available: :column_name', array(':column_name' => $column_name));
 		} // if
 
 		return $field_html;
@@ -1252,7 +1283,7 @@ class cl4_ORM extends Kohana_ORM {
 		$post = $this->get_table_records_from_post($post);
 
 		// get the id from the post and set it in the object (if there is one, won't be one in 'add' case)
-		if (isset($post[$this->_primary_key])) {
+		if ( ! empty($post[$this->_primary_key])) {
 			$this->find($post[$this->_primary_key]);
 			// remove the id as we don't want to risk changing it
 			unset($post[$this->_primary_key]);
@@ -1360,7 +1391,7 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	* Returns the full path for the column based on the file_options
 	*
-	* @param  mixed  $column_name
+	* @param   string  $column_name  The column name that you want the file path for
 	* @return  string  the path to the file
 	*/
 	public function get_file_path($column_name) {
@@ -1373,7 +1404,21 @@ class cl4_ORM extends Kohana_ORM {
 		} else {
 			throw new Kohana_Exception('The column name :column: does not exist in _table_columns', array(':column:' => $column_name));
 		}
-	} // function
+	} // function get_file_path
+
+	/**
+	* Returns the pull path to the file based on the file_options and the filename in the field
+	*
+	* @param   string  $column_name  The column name that you want the full path including file name for
+	* @return  string  The full file path including filename
+	*/
+	public function get_filename_with_path($column_name) {
+		if (isset($this->_table_columns[$column_name])) {
+			return $this->get_file_path($column_name) . '/' . $this->$column_name;
+		} else {
+			throw new Kohana_Exception('The column name :column: does not exist in _table_columns', array(':column:' => $column_name));
+		}
+	} // function get_filename_with_path
 
 	/**
 	* Run Request::send_file() for the file in a specific column for the current record
@@ -1384,7 +1429,7 @@ class cl4_ORM extends Kohana_ORM {
 	*/
 	public function send_file($column_name) {
 		if ( ! empty($this->$column_name)) {
-			$file_path = $this->get_file_path($column_name) . '/' . $this->$column_name;
+			$file_path = $this->get_filename_with_path($column_name);
 
 			$file_name = ORM_File::view($this->$column_name, $column_name, $this, $this->_table_columns[$column_name]['field_options']);
 
@@ -1551,13 +1596,14 @@ class cl4_ORM extends Kohana_ORM {
 	* Properties currently allowed to be merged: _table_columns, _belongs_to, _rules, _has_many, _has_one, _labels, _sorting
 	* For these it will replace each key within the property (no merge): _table_columns, _belongs_to, _rules, _has_many, _has_one
 	* For these it will merge the property with the override: _labels, _sorting
+	* For display_order it will check to see if the column exists in the display order array already (removing it first) before adding a new one
 	*
 	* @chainable
 	* @return ORM
 	*/
 	protected function merge_override_properties() {
 		if ( ! empty($this->_override_properties)) {
-			$allowed_override_properties = array('_db', '_table_name', '_table_columns', '_belongs_to', '_rules', '_callbacks', '_has_many', '_has_one', '_labels', '_sorting');
+			$allowed_override_properties = array('_db', '_table_name', '_table_columns', '_belongs_to', '_rules', '_callbacks', '_has_many', '_has_one', '_labels', '_sorting', '_display_order');
 
 			foreach ($allowed_override_properties as $property) {
 				if ( ! empty($this->_override_properties[$property])) {
@@ -1578,6 +1624,16 @@ class cl4_ORM extends Kohana_ORM {
 						case '_sorting' :
 							// merge the 2 arrays, as they are only key/value pairs and it doesn't matter if we have extras we aren't using
 							$this->{$property} = Arr::merge($this->{$property}, $this->_override_properties[$property]);
+							break;
+						case '_display_order' :
+							foreach ($this->_override_properties[$property] as $display_order => $column_name) {
+								$current_display_order = array_search($column_name, $this->_display_order);
+								// if the column is found in the display order array, then remove it so it can be added with it's new order
+								if ($current_display_order !== FALSE) {
+									unset($this->_display_order[$current_display_order]);
+								}
+								$this->_display_order[$display_order] = $column_name;
+							}
 							break;
 						case '_db' :
 						case '_table_name' :

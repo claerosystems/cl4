@@ -16,11 +16,22 @@ if ($mode == 'search') { ?>
 
 // If any fields are visible
 if ($any_visible) {
-	// generate the table
-	$table = new HTMLTable(array('table_attributes' => array('class' => 'cl4_form')));
+	if ($form_options['display_buttons'] && $form_options['display_buttons_at_top']) {
+		// the buttons
+		echo '<div class="cl4_buttons cl4_buttons_top">' . implode('', $form_buttons) . '</div>' . EOL;
+	}
 
-	foreach ($form_field_html as $column_name => $field_html) {
-		$table->add_row(array($field_html['label'], $field_html['field']));
+	// generate the table
+	$table = new HTMLTable(array(
+		'table_attributes' => array(
+			'class' => 'cl4_form'
+		)
+	));
+
+	foreach ($display_order as $column) {
+		if (isset($form_field_html[$column])) {
+			$table->add_row(array($form_field_html[$column]['label'], $form_field_html[$column]['field']));
+		}
 	} // foreach
 
 	// the table html
@@ -31,10 +42,9 @@ if ($any_visible) {
 		echo '<div class="cl4_buttons">' . implode('', $form_buttons) . '</div>' . EOL;
 	}
 
-}
 // If no fields are visible
-else {
-	echo "<p>No fields in this model are visible.</p>";
+} else {
+	echo '<p>No fields are visible.</p>';
 }
 
 // the form close tag

@@ -16,7 +16,6 @@ return array(
 		'edit_flag' => FALSE,      // displays this field in any edit forms and allows the user to save new values
 		'search_flag' => FALSE,    // displays this field in the search mode (search form)
 		'view_flag' => FALSE,      // displays this field in the view mode
-		'display_order' => 0,      // the order in which to display the columns
 		/**
 		* determines if the field can be set to NULL; TRUE means that it can be set to NULL; FALSE means that it can't
 		* this is used most often in situations where the field is not received in the post because the field wasn't display although still editable
@@ -146,7 +145,8 @@ return array(
 			'class' => 'cl4_form',
 		),
 		'field_name_prefix' => 'c_record', // for all fields, default is c_record
-		'field_name_include_array' => TRUE, // if set to true, then a post array will be use, example: c_record[table_name][0][column_name]
+		'field_name_include_array' => TRUE, // if set to TRUE, then a post array will be use, example: c_record[table_name][0][column_name]
+		'add_autofocus' => TRUE, // if TRUE, the first field in the model will have the autofocus attribute added to it
 		/**
 		* The prefix to add to all the ids of all the fields in the form
 		* The end result will be something like [field_id_prefix]_[field_name_prefix]_table_name_[record number]_column_name
@@ -155,13 +155,14 @@ return array(
 		*/
 		'field_id_prefix' => NULL,
 		'display_form_tag' => TRUE, // whether or not to display a form tag
-		'display_buttons' => TRUE, // whether ot not to display the sub, reset and cancel buttons including the surrounding div
+		'display_buttons' => TRUE, // whether or not to display the sub, reset and cancel buttons including the surrounding div
+		'display_buttons_at_top' => FALSE, // whether or not the save, cancel, search, etc buttons should also be displays at the top of the form
 		'display_submit' => TRUE, // whether or not to display a submit button on the form
 		'display_reset' => TRUE, // whether or not to display the clear button on the form
 		'display_cancel' => TRUE, // whether or not to display the cancel button on the form
 		'display_back_to_list' => TRUE, // display the return to list when in view mode
 		'cancel_url' => null,   // If provided, a URL to return to if a form in cancelled
-		'hidden_fields' => array(), // extra hidden fields to be added to the form, '0' => '<input type...'
+		'hidden_fields' => array(), // extra hidden fields to be added to the form, 0 => '<input type...'
 		// todo: 'enable_post_array' => TRUE, // todo: don't use record[table][0][column]... just use column name (also for save?)
 		// todo: 'multiple_edit_layout' => 'horizontal', // 'horizontal' or 'vertical'
 		// todo: 'user_action' => FALSE, // include the user action hidden field instead of action on the submit button
@@ -179,8 +180,6 @@ return array(
 				'class' => 'cl4_form',
 			),
 		),
-
-		'hidden' => array(), // extra hidden fields to add to the form, done for admin
 
 		// formatting for views
 		'nbsp' => FALSE, // replace spaces with &nbsp; in the data to avoid wrapping in view_html()
@@ -240,6 +239,7 @@ return array(
 			// top bar buttons
 			'top_bar_buttons' => array(
 				'add' => TRUE,             // add (add new) button
+				'add_multiple' => TRUE,    // add multiple button and count select
 				'edit' => TRUE,            // edit (edit selected) button
 				'export_selected' => TRUE, // export selected button
 				'export_all' => TRUE,      // export all button
@@ -264,6 +264,9 @@ return array(
 			* )
 			*/
 			'sort_url' => NULL,
+			// Limit textareas to 20 words when displayed in a list (NULL for no limit).
+			'textarea_word_limit' => 50,
+			'hidden_fields' => array(), // extra hidden fields to be added to the form, 0 => '<input type...'
 		),
 
 		// options for editing multiple records
@@ -321,5 +324,7 @@ return array(
 		'row_id_prefix' => '', // when generate_row_id is true, then this will be used as the prefix to the row id
 		// these fields will be added to the hidden fields array when generating the form and will not be included in the _field_html array and therefore will not get a row in an edit form
 		'field_types_treated_as_hidden' => array('hidden'),
+		// these fields will be treated as textareas, such that the will limited based on editable_list_options.textarea_word_limit
+		'field_types_treaded_as_textarea' => array('textarea'),
 	),
 );

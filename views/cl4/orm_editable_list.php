@@ -33,7 +33,7 @@
 
 		<?php echo $nav_html; ?>
 	<?php } else { ?>
-		<p>No fields in this model are visible.</p>
+		<p>There are no fields to display.</p>
 	<?php } // if ?>
 
 	<?php echo Form::close(); ?>

@@ -2,12 +2,21 @@
 
 class cl4_ORM_File extends ORM_FieldType {
 	public static function edit($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
-		$view_options = array();
+		$options += array(
+			'file_options' => array(
+				'edit_view' => 'cl4/orm_file',
+			),
+		);
+
+		$file_name = ORM_File::view($value, $column_name, $orm_model, $options);
+
+		$view_options = array(
+			'record_pk' => $orm_model->pk(),
+			'file_name' => $file_name,
+		);
 
 		// there is an existing file
 		if ( ! empty($value)) {
-			$file_name = ORM_File::view($value, $column_name, $orm_model, $options);
-
 			$view_options['link'] = ORM_File::download_link($column_name, $value, $file_name, $options['file_options'], $orm_model);
 
 			$checkbox_attributes = array();
@@ -20,7 +29,7 @@ class cl4_ORM_File extends ORM_FieldType {
 
 		$view_options['file_input'] = Form::file($html_name, $attributes);
 
-		return View::factory('cl4/orm_file', $view_options);
+		return View::factory($options['file_options']['edit_view'], $view_options);
 	} // function
 
 	public static function save($post, $column_name, array $options = array(), ORM $orm_model = NULL) {
@@ -154,7 +163,7 @@ class cl4_ORM_File extends ORM_FieldType {
 	* @return   string
 	*/
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-		$file_options = $options['file_options'];
+		$file_options = ! empty($options['file_options']) ? $options['file_options'] : array();
 
 		// if there is an existing file, determine the name of the file based on the original_filename column
 		if ( ! empty($value) && ! empty($file_options['original_filename_column'])) {
@@ -172,6 +181,8 @@ class cl4_ORM_File extends ORM_FieldType {
 	* @return   string
 	*/
 	public static function view_html($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
+		$options['file_options'] = ! empty($options['file_options']) ? $options['file_options'] : array();
+
 		$file_name = ORM_File::view($value, $column_name, $orm_model, $options);
 
 		return ORM_File::download_link($column_name, $value, $file_name, $options['file_options'], $orm_model);
