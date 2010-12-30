@@ -1316,6 +1316,49 @@ class cl4_ORM extends Kohana_ORM {
 	} // function save_values
 
 	/**
+	 * After saving a record, changes on-disk filenames for file fields to TIMESTAMP_ID.EXTENSION.
+	 */
+	private function update_file_fields() {
+		$any_changed = false;
+
+		foreach ($this->_table_columns as $column_name => $column_meta) {
+			// If this is a file field
+			if ('file' === $column_meta['field_type']) {
+				// If a file was uploaded
+				if (null !== $this->$column_name) {
+					$directory = DOCROOT . $column_meta['field_options']['file_options']['file_download_url'] . DIRECTORY_SEPARATOR;
+
+					// Figure out what the old filename was
+					$old_name = $this->$column_name;
+
+					// Get information about this file
+					$info = pathinfo($old_name);
+
+					// Figure out the new filename
+					$new_name = time()
+							  . "_"
+							  . $this->{$this->_primary_key}
+							  . "."
+							  . $info['extension'];
+
+					// Move the file
+					rename($directory . $old_name, $directory . $new_name);
+
+					// Update the filename in the DB
+					$this->$column_name = $new_name;
+
+					$any_changed = true;
+				}
+			}
+		}
+
+		// If any file fields have changed, save this record again.
+		if ($any_changed) {
+			parent::save();
+		}
+	}
+
+	/**
 	* Adds to Kohana_ORM::save() adding functionality for related tables
 	*
 	* @todo: probably not a good idea to use the additional table functionality because it may cause problems (for example, it's using and modifying $_POST directly)
@@ -1326,6 +1369,8 @@ class cl4_ORM extends Kohana_ORM {
 	public function save() {
 		// save the primary object record
 		parent::save();
+
+		$this->update_file_fields();
 
 		if ($this->_saved) {
 			// check for has_many relationships and associated changes (adds / deletes)
