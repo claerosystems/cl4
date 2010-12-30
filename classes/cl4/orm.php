@@ -1322,7 +1322,7 @@ class cl4_ORM extends Kohana_ORM {
 	*
 	* @chainable
 	* @return ORM
-	*/
+	*//*
 	public function save() {
 		// save the primary object record
 		parent::save();
@@ -1387,7 +1387,7 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function save
-
+*/
 	/**
 	* Returns the full path for the column based on the file_options
 	*
