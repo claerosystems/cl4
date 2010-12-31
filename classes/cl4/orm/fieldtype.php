@@ -27,7 +27,7 @@ class cl4_ORM_FieldType {
 	* @return string
 	*/
 	public static function edit($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
-		return Form::input($html_column_name, $value, $attributes, $options);
+		return Form::input($html_name, $value, $attributes, $options);
 	}
 
 	/**
