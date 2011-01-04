@@ -1741,6 +1741,20 @@ class cl4_ORM extends Kohana_ORM {
 					->where($this->_primary_key, '=', $id)
 					->execute($this->_db);
 
+					// add the change log record if _log is true and record_changes is true
+					if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
+						$change_log = ORM::factory('change_log')
+							->add_change_log(array(
+								'table_name' => $this->_table_name,
+								// send the original pk so the change to the pk can be tracked when doing an update
+								'record_pk' => $id,
+								'query_type' => 'UPDATE',
+								'row_count' => $num_affected,
+								'sql' => $this->last_query(),
+								'changed' => array($this->_expires_column['column'] => DB::expr('NOW()')),
+							));
+					} // if log
+
 			// If this model just deletes rows
 			} else {
 				// delete the files associated with the record
@@ -1750,8 +1764,22 @@ class cl4_ORM extends Kohana_ORM {
 				$num_affected = DB::delete($this->_table_name)
 					->where($this->_primary_key, '=', $id)
 					->execute($this->_db);
+
+				// add the change log record if _log is true and record_changes is true
+				if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
+					$change_log = ORM::factory('change_log')
+						->add_change_log(array(
+							'table_name' => $this->_table_name,
+							'record_pk' => $id,
+							'query_type' => 'DELETE',
+							'row_count' => $num_affected,
+							'sql' => $this->last_query(),
+						));
+				} // if log
 			} // if
 		} // if
+
+		$this->_log_next_query = TRUE;
 
 		return $num_affected;
 	} // function
