@@ -180,7 +180,7 @@ class cl4_File {
 			'filename_no_ext' => $this->options['lowercase_filename'] ? strtolower($path_info['filename']) : $path_info['filename'],
 			'ext' => $this->options['lowercase_filename'] ? strtolower($path_info['extension']) : $path_info['extension'],
 			'size' => $file_data['size'],
-			'record_pk' => ( ! empty($options['record_pk']) ? $options['record_pk'] : NULL),
+			'record_pk' => ( ! empty($this->options['record_pk']) ? $this->options['record_pk'] : NULL),
 		);
 		$return['user_file'] = $file_info['user_file'];
 		$return['size'] = $file_info['size'];
