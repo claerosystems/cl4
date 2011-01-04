@@ -3,7 +3,7 @@
 /**
  * Effectively a text input with the type = "url"
  */
-class cl4_ORM_Url extends cl4_ORM_Text {
+class cl4_ORM_URL extends cl4_ORM_Text {
 	public static function edit($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
         return Form::url($html_name, $value, $attributes);
 	}
@@ -31,6 +31,6 @@ class cl4_ORM_Url extends cl4_ORM_Text {
 
 		$url = ORM_FieldType::view($value, $column_name, $orm_model, $options);
 
-		return '<a href="' . $url . '">' . ORM_FieldType::prepare_html($url, $options['nbsp']) . '</a>';
+		return HTML::anchor($url, ORM_FieldType::prepare_html($url, $options['nbsp']));
 	} // function view_html
 } // class
