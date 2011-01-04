@@ -121,6 +121,19 @@ class cl4_ORM_File extends ORM_FieldType {
 				$post_file_name = cl4File::get_files_array_value($path_to_file, 'name');
 
 				if ( ! empty($post_file_name)) {
+					// special functionality to name change method id
+					if ($file_options['name_change_method'] == 'id' || $file_options['name_change_method'] == 'pk') {
+						$pk = $orm_model->pk();
+						// if the primary key is empty, use a temporary random file name (new record/insert)
+						if (empty($pk)) {
+							// because we don't know the ID yet,
+							$file_options['name_change_method'] = 'random';
+						// if the primary key is not empty, pass in the primary key (existing record/update)
+						} else {
+							$file_options['record_pk'] = $pk;
+						}
+					} // if
+
 					// create a new file object to handle the upload
 					$file = new cl4File($file_options);
 					$file_data = $file->upload($path_to_file, $destination_folder);

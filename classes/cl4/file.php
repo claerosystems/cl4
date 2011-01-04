@@ -180,6 +180,7 @@ class cl4_File {
 			'filename_no_ext' => $this->options['lowercase_filename'] ? strtolower($path_info['filename']) : $path_info['filename'],
 			'ext' => $this->options['lowercase_filename'] ? strtolower($path_info['extension']) : $path_info['extension'],
 			'size' => $file_data['size'],
+			'record_pk' => ( ! empty($options['record_pk']) ? $options['record_pk'] : NULL),
 		);
 		$return['user_file'] = $file_info['user_file'];
 		$return['size'] = $file_info['size'];
@@ -348,6 +349,7 @@ class cl4_File {
 	*   overwrite_all: removes everything (including extension)
 	*   timestamp: adds the current unix timestamp plus _ before the file name (default)
 	*   random: uses a uniqid() prefixed with time()
+	*   id or pk: [id or pk]_[timestamp].[ext]
 	*
 	* @param string $file_info               array of file data to be used to determine the destination file name; values required are different per name change method
 	* @param string $name_change_method      the type of name change to do: 'keep', 'timestamp', 'random', 'prepend', 'append', 'overwrite', 'overwrite_all'
@@ -365,7 +367,7 @@ class cl4_File {
 
 		$name_change_method = strtolower($name_change_method);
 
-		// ensure we have destination file name if we are going to be changing the file name using: prepend, append, overwrite or overwrite_all
+		// ensure we have the name change text if we are going to be changing the file name using: prepend, append, overwrite or overwrite_all
 		$dest_required = array('prepend', 'append', 'overwrite', 'overwrite_all');
 		if (in_array($name_change_method, $dest_required) && empty($options['name_change_text'])) {
 			throw new cl4_Exception_File('Input Error: No destination filename received, defaulting to keep the original: "' . $file_info['orig_file'] . '"');
@@ -405,8 +407,13 @@ class cl4_File {
 				break;
 
 			case 'id' :
-				// result: [id]_[timestamp].[ext]
-				$dest_file = $file_info['record_id'] . '_' . time() . '.' . $file_info['ext'];
+			case 'pk' :
+				if ( ! empty($file_info['record_pk'])) {
+					// result: [id]_[timestamp].[ext]
+					$dest_file = $file_info['record_pk'] . '_' . time() . '.' . $file_info['ext'];
+				} else {
+					throw new Kohana_Exception('No record primary key (pk) was received for id/pk name change so the destination file name could not be retrieved');
+				}
 				break;
 
 			case 'keep' :
@@ -425,6 +432,32 @@ class cl4_File {
 
 		return $dest_file;
 	} // function
+
+	/**
+	* Renames the file to the destination folder with a filename based on the id/primary key
+	* Returns the file name and full path including filename
+	* For use after an insert to move an existing file
+	*
+	* @param   string   $original_file       The original file including path
+	* @param   integer  $record_pk           The record primary key
+	* @param   string   $destination_folder  The destination folder
+	* @return  array    Array with 2 keys: dest_file and dest_file_path
+	*/
+	public static function move_to_id_path($original_file_path, $record_pk, $destination_folder) {
+		$ext = pathinfo($original_file_path, PATHINFO_EXTENSION);
+
+		$destination_file = cl4File::get_destination_filename(array(
+			'record_pk' => $record_pk,
+			'ext' => $ext
+		), 'id');
+
+		cl4File::move($original_file_path, $destination_folder . '/' . $destination_file);
+
+		return array(
+			'dest_file' => $destination_file,
+			'dest_file_path' => $destination_folder . '/' . $destination_file,
+		);
+	} // function move_file_to_id_path
 
 	/**
 	* Returns the path possibly based on the on the table name and column name, depending on the parameters

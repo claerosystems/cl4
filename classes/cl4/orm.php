@@ -1359,45 +1359,6 @@ class cl4_ORM extends Kohana_ORM {
 	} // function save_values
 
 	/**
-	 * After saving a record, changes on-disk filenames for file fields to TIMESTAMP_ID.EXTENSION.
-	 *//*
-	private function update_file_fields() {
-		$any_changed = FALSE;
-
-		foreach ($this->_table_columns as $column_name => $column_meta) {
-			// If this is a file field
-			if ($column_meta['field_type'] == 'file') {
-				// If a file was uploaded
-				if ($this->$column_name !== NULL) {
-					$directory = DOCROOT . $column_meta['field_options']['file_options']['file_download_url'] . DIRECTORY_SEPARATOR;
-
-					// Figure out what the old filename was
-					$old_name = $this->$column_name;
-
-					// Get information about this file
-					$info = pathinfo($old_name);
-
-					// Figure out the new filename
-					$new_name = time() . '_' . $this->{$this->_primary_key} . '.' . $info['extension'];
-
-					// Move the file
-					rename($directory . $old_name, $directory . $new_name);
-
-					// Update the filename in the DB
-					$this->$column_name = $new_name;
-
-					$any_changed = TRUE;
-				}
-			}
-		}
-
-		// If any file fields have changed, save this record again.
-		if ($any_changed) {
-			parent::save();
-		}
-	}*/
-
-	/**
 	 * Finds and loads a single database row into the object.
 	 * Also stores the record in _original incase a save is run later
 	 *
@@ -1525,12 +1486,52 @@ class cl4_ORM extends Kohana_ORM {
 							'record_pk' => ($query_type == 'UPDATE' ? $this->_original[$this->_primary_key] : $this->pk()),
 							'query_type' => $query_type,
 							'row_count' => ($query_type == 'UPDATE' ? $query : $result[1]), // @todo determine if it's always 1 or if there's a way to determine how many
-							'sql' => $this->_db->last_query,
+							'sql' => $this->last_query(),
 							'changed' => $changed,
 						));
-
-					$this->_log_next_query = TRUE;
 				} // if log
+
+				// if it was an insert, do some special functionality for file columns with name change method "id"
+				if ($this->_was_insert) {
+					$files_moved = array();
+					// now check for file columns that have changed and have name change method of id
+					foreach ($this->_table_columns as $column_name => $column_info) {
+						if (array_key_exists($column_name, $changed) && $column_info['field_type'] == 'file') {
+							$file_options = $column_info['field_options']['file_options'];
+							if ($file_options['name_change_method'] == 'id' || $file_options['name_change_method'] == 'pk') {
+								// move the file to it's id based filename and set the value in the model
+								$dest_file_data = cl4File::move_to_id_path($this->get_filename_with_path($column_name), $this->pk(), $file_options['destination_folder']);
+								$this->$column_name = $dest_file_data['dest_file'];
+								$files_moved[$column_name] = $this->$column_name;
+							}
+						}
+					} // foreach
+
+					if ( ! empty($files_moved)) {
+						// files have been moved, so do a manual update of only the file columns
+						$filename_query = DB::update($this->_table_name)
+							->set($files_moved)
+							->where($this->_primary_key, '=', $this->pk())
+							->execute($this->_db);
+
+						$this->_saved = TRUE;
+
+						// add the change log record if _log is true and record_changes is true
+						if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
+							$change_log = ORM::factory('change_log')
+								->add_change_log(array(
+									'table_name' => $this->_table_name,
+									'record_pk' => $this->pk(),
+									'query_type' => 'UPDATE',
+									'row_count' => $filename_query,
+									'sql' => $this->last_query(),
+									'changed' => $files_moved,
+								));
+						} // if log
+					} // if
+				} // if
+
+				$this->_log_next_query = TRUE;
 
 			// no there have not been records saved, but still set the object as saved and empty the changed array because it's exactly the same as what's in the DB
 			} else {
