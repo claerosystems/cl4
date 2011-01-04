@@ -134,4 +134,8 @@ class cl4_ORM_Date extends ORM_FieldType {
 
 		return ORM_Date::prepare_html(ORM_Date::view($value, $column_name, $orm_model, $options), $options['nbsp']);
 	}
+
+	public static function has_changed($original_value, $new_value) {
+		return ! ($original_value == '0000-00-00' && $new_value == '');
+	}
 } // class

@@ -197,4 +197,17 @@ class cl4_ORM_FieldType {
 	public static function get_sql_table_name($orm_model) {
 		return $orm_model !== NULL ? $orm_model->table_name() . '.' : '';
 	}
+
+	/**
+	* By default, will compare the new value and the old value
+	* FALSE when the values are the same (it hasn't changed)
+	* TRUE when the values are different (it has changed)
+	*
+	* @param   mixed  $original_value  The original value
+	* @param   mixed  $new_value       The new value
+	* @return  bool   TRUE if the value has changed
+	*/
+	public static function has_changed($original_value, $new_value) {
+		return ! ($original_value === $new_value);
+	}
 } // class

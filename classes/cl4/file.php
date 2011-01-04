@@ -404,6 +404,11 @@ class cl4_File {
 				$dest_file = $options['name_change_text'];
 				break;
 
+			case 'id' :
+				// result: [id]_[timestamp].[ext]
+				$dest_file = $file_info['record_id'] . '_' . time() . '.' . $file_info['ext'];
+				break;
+
 			case 'keep' :
 			default :
 				// keep original src filename (no changes)

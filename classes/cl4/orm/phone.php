@@ -78,4 +78,9 @@ class cl4_ORM_Phone extends ORM_FieldType {
 		// return the phone number with the parts separated by dashes for storage in the DB
 		return sprintf('%s-%s-%s-%s-%s', $value['country_code'], $value['area_code'], $value['exchange'], $value['line'], $value['extension']);
 	}
+
+	public static function has_changed($original_value, $new_value) {
+		// original was empty (never set) and the value in the object the dashes returned by ORM_Phone
+		return ! ($original_value == '' && $new_value == '----');
+	}
 } // class

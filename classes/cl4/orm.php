@@ -94,6 +94,49 @@ class cl4_ORM extends Kohana_ORM {
 	*/
 	protected $_override_properties = array();
 
+	//
+	/**
+	* Contains the original record, populate during find()
+	* @var  array
+	*/
+	protected $_original = array();
+
+	/**
+	* Records if the record was updated
+	* Set during save()
+	* no save run: NULL
+	* no save needed: FALSE
+	* save run: TRUE
+	* @var  bool
+	*/
+	protected $_was_updated;
+
+	/**
+	* Disables/enables logging the any updates (insert, update, delete) for the object
+	* By default, all changes will be logged
+	* @var  bool
+	*/
+	protected $_log = TRUE;
+
+	/**
+	* If set to false, logging will be disabled for the next query only (when _log is TRUE)
+	* All following queries will be based on _log again
+	* @var  bool
+	*/
+	protected $_log_next_query = TRUE;
+
+	/**
+	* If the last save() was an insert (vs update)
+	* @var  bool
+	*/
+	public $_was_insert;
+
+	/**
+	* If the last save() was an update (vs insert)
+	* @var  bool
+	*/
+	public $_was_update;
+
 	/**
 	 * Instructs builder to include expired rows in select queries.
 	 *
@@ -511,7 +554,7 @@ class cl4_ORM extends Kohana_ORM {
 
 		// loop through and create all of the form field HTML snippets and store in $this->_field_html[$column_name] as ['label'] and ['field']
 		foreach ($process_columns as $column_name) {
-			if ( ! array_key_exists($column_name, $this->_table_columns)) {
+			if ( ! $this->table_column_exists($column_name)) {
 				throw new Kohana_Exception('The column name :column_name: to prepare is not in _table_columns', array(':column_name:' => $column_name));
 			}
 
@@ -939,7 +982,7 @@ class cl4_ORM extends Kohana_ORM {
 	* @param mixed $column_name
 	*/
 	public function get_meta_data($column_name) {
-		return isset($this->_table_columns[$column_name]) ? $this->_table_columns[$column_name] : array();
+		return $this->table_column_exists($column_name) ? $this->_table_columns[$column_name] : array();
 	} // function get_meta_data
 
 	/**
@@ -1317,15 +1360,15 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	 * After saving a record, changes on-disk filenames for file fields to TIMESTAMP_ID.EXTENSION.
-	 */
+	 *//*
 	private function update_file_fields() {
-		$any_changed = false;
+		$any_changed = FALSE;
 
 		foreach ($this->_table_columns as $column_name => $column_meta) {
 			// If this is a file field
-			if ('file' === $column_meta['field_type']) {
+			if ($column_meta['field_type'] == 'file') {
 				// If a file was uploaded
-				if (null !== $this->$column_name) {
+				if ($this->$column_name !== NULL) {
 					$directory = DOCROOT . $column_meta['field_options']['file_options']['file_download_url'] . DIRECTORY_SEPARATOR;
 
 					// Figure out what the old filename was
@@ -1335,11 +1378,7 @@ class cl4_ORM extends Kohana_ORM {
 					$info = pathinfo($old_name);
 
 					// Figure out the new filename
-					$new_name = time()
-							  . "_"
-							  . $this->{$this->_primary_key}
-							  . "."
-							  . $info['extension'];
+					$new_name = time() . '_' . $this->{$this->_primary_key} . '.' . $info['extension'];
 
 					// Move the file
 					rename($directory . $old_name, $directory . $new_name);
@@ -1347,7 +1386,7 @@ class cl4_ORM extends Kohana_ORM {
 					// Update the filename in the DB
 					$this->$column_name = $new_name;
 
-					$any_changed = true;
+					$any_changed = TRUE;
 				}
 			}
 		}
@@ -1356,22 +1395,156 @@ class cl4_ORM extends Kohana_ORM {
 		if ($any_changed) {
 			parent::save();
 		}
-	}
+	}*/
 
 	/**
-	* Adds to Kohana_ORM::save() adding functionality for related tables
-	*
-	* @todo: probably not a good idea to use the additional table functionality because it may cause problems (for example, it's using and modifying $_POST directly)
-	*
-	* @chainable
-	* @return ORM
-	*//*
+	 * Finds and loads a single database row into the object.
+	 * Also stores the record in _original incase a save is run later
+	 *
+	 * @chainable
+	 * @param   mixed  primary key
+	 * @return  ORM
+	 */
+	public function find($id = NULL) {
+		$find_return = parent::find($id);
+
+		// store the original record
+		$this->_original = $this->_object;
+
+		return $find_return;
+	} // function find
+
+	/**
+	 * Saves the current object.
+	 * Checks to see if an columns have actually changed values before saving
+	 * and records any changes that were made in change_log using Model_Change_Log
+	 *
+	 * @chainable
+	 * @return  ORM
+	 */
 	public function save() {
-		// save the primary object record
-		parent::save();
+		if ( ! $this->_options['only_update_changed']) {
+			parent::save();
 
-		$this->update_file_fields();
+		} else {
+			$this->_was_updated = FALSE;
 
+			// make sure the record is loaded, if it can be
+			$this->loaded();
+
+			// will contain an array of the fields and the new values
+			$changed = array();
+
+			// is update?
+			if ( ! $this->empty_pk()) {
+				// loop through the changed array comparing it to the original array to check for changed fields
+				foreach ($this->_changed as $column) {
+					// determine if the column has changed
+					if ($this->column_changed($column)) {
+						// value has changed
+						$changed[$column] = $this->_object[$column];
+					}
+				} // foreach
+
+			// not update, so must be insert
+			} else {
+				// everything is considered new/changed
+				foreach ($this->_changed as $column) {
+					$changed[$column] = $this->_object[$column];
+				}
+			} // if
+
+			// have there been fields changed?
+			if ( ! empty($changed)) {
+				// yes, so run save functionality
+				if ( ! $this->empty_pk() AND ! isset($this->_changed[$this->_primary_key])) {
+					// Primary key isn't empty and hasn't been changed so do an update
+					$query_type = 'UPDATE';
+					$this->_was_insert = FALSE;
+					$this->_was_update = TRUE;
+
+					if (is_array($this->_updated_column)) {
+						// Fill the updated column
+						$column = $this->_updated_column['column'];
+						$format = $this->_updated_column['format'];
+
+						$data[$column] = $this->_object[$column] = ($format === TRUE) ? time() : date($format);
+					} // if
+
+					$query = DB::update($this->_table_name)
+						->set($changed)
+						->where($this->_primary_key, '=', $this->pk())
+						->execute($this->_db);
+
+					// Object has been saved
+					$this->_saved = TRUE;
+
+				} else {
+					// primary key isn't set and hasn't changed, so insert
+					$query_type = 'INSERT';
+					$this->_was_insert = TRUE;
+					$this->_was_update = FALSE;
+
+					if (is_array($this->_created_column)) {
+						// Fill the created column
+						$column = $this->_created_column['column'];
+						$format = $this->_created_column['format'];
+
+						$data[$column] = $this->_object[$column] = ($format === TRUE) ? time() : date($format);
+					}
+
+					$result = DB::insert($this->_table_name)
+						->columns(array_keys($changed))
+						->values(array_values($changed))
+						->execute($this->_db);
+
+					if ($result) {
+						if ($this->empty_pk()) {
+							// Load the insert id as the primary key
+							// $result is array(insert_id, total_rows)
+							$this->_object[$this->_primary_key] = $result[0];
+						}
+
+						// Object is now loaded and saved
+						$this->_loaded = $this->_saved = TRUE;
+					} // if
+				} // if
+
+				if ($this->_saved === TRUE) {
+					// All changes have been saved
+					$this->_changed = array();
+					$this->_was_updated = TRUE;
+				}
+
+				// add the change log record if _log is true and record_changes is true
+				if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
+					$change_log = ORM::factory('change_log')
+						->add_change_log(array(
+							'table_name' => $this->_table_name,
+							// send the original pk so the change to the pk can be tracked when doing an update
+							'record_pk' => ($query_type == 'UPDATE' ? $this->_original[$this->_primary_key] : $this->pk()),
+							'query_type' => $query_type,
+							'row_count' => ($query_type == 'UPDATE' ? $query : $result[1]), // @todo determine if it's always 1 or if there's a way to determine how many
+							'sql' => $this->_db->last_query,
+							'changed' => $changed,
+						));
+
+					$this->_log_next_query = TRUE;
+				} // if log
+
+			// no there have not been records saved, but still set the object as saved and empty the changed array because it's exactly the same as what's in the DB
+			} else {
+				$this->_saved = TRUE;
+
+				// All changes have been saved
+				$this->_changed = array();
+
+				// since changes as empty, we can assume that we didn't add a new record and it must have been a existing record that didn't need an update
+				$this->_was_insert = FALSE;
+				$this->_was_update = TRUE;
+			}
+		} // if
+/* @todo: This is commented out because at the moment is causes problems. Should probably be moved to a separate function that is called manually (unless the Model is extended to include the saving the related records in save()).
 		if ($this->_saved) {
 			// check for has_many relationships and associated changes (adds / deletes)
 			// todo: should we add some of this to check() ?
@@ -1429,10 +1602,44 @@ class cl4_ORM extends Kohana_ORM {
 				} // if
 			} // foreach
 		} // if
-
+*/
 		return $this;
 	} // function save
-*/
+
+	/**
+	* Returns true or false if the column has changed
+	*
+	* @param   string  $column_name  The column name
+	* @return  bool    true if the value has changed
+	*/
+	protected function column_changed($column_name) {
+		// if the column does not existing in the original record
+		$changed = ( ! array_key_exists($column_name, $this->_original)
+			// or the original value is NULL and the new value is NULL
+			|| ($this->_original[$column_name] === NULL && $this->_object[$column_name] !== NULL)
+			// or the value does not match the original
+			|| $this->_original[$column_name] != $this->_object[$column_name]);
+
+		if ($changed && $this->table_column_exists($column_name)) {
+			$field_type_class_name = ORM_FieldType::get_field_type_class_name($this->_table_columns[$column_name]['field_type']);
+			if ( ! call_user_func($field_type_class_name . '::has_changed', $this->_original[$column_name], $this->_object[$column_name])) {
+				$changed = FALSE;
+			}
+		} // if
+
+		return $changed;
+	} // function column_changed
+
+	/**
+	* Checks to see if the column name exists in the _table_columns array
+	*
+	* @param   string  $column_name  The column to check for
+	* @return  bool    TRUE when the column exists, FALSE otherwise
+	*/
+	public function table_column_exists($column_name) {
+		return array_key_exists($column_name, $this->_table_columns);
+	}
+
 	/**
 	* Returns the full path for the column based on the file_options
 	*
@@ -1440,7 +1647,7 @@ class cl4_ORM extends Kohana_ORM {
 	* @return  string  the path to the file
 	*/
 	public function get_file_path($column_name) {
-		if (isset($this->_table_columns[$column_name])) {
+		if ($this->table_column_exists($column_name)) {
 			$file_options = $this->_table_columns[$column_name]['field_options']['file_options'];
 
 			// use the function inside cl4File to get the path to the file (possibly based on table and column name depending on option)
@@ -1458,7 +1665,7 @@ class cl4_ORM extends Kohana_ORM {
 	* @return  string  The full file path including filename
 	*/
 	public function get_filename_with_path($column_name) {
-		if (isset($this->_table_columns[$column_name])) {
+		if ($this->table_column_exists($column_name)) {
 			return $this->get_file_path($column_name) . '/' . $this->$column_name;
 		} else {
 			throw new Kohana_Exception('The column name :column: does not exist in _table_columns', array(':column:' => $column_name));
@@ -1574,7 +1781,7 @@ class cl4_ORM extends Kohana_ORM {
 	* @return ORM
 	*/
 	public function delete_file($column_name) {
-		if (isset($this->_table_columns[$column_name]) && $this->_table_columns[$column_name]['field_type'] == 'file') {
+		if ($this->table_column_exists($column_name) && $this->_table_columns[$column_name]['field_type'] == 'file') {
 			try {
 				$file_options = $this->_table_columns[$column_name]['field_options']['file_options'];
 
@@ -1722,7 +1929,7 @@ class cl4_ORM extends Kohana_ORM {
 		$post = $this->get_table_records_from_post($post);
 
 		foreach ($post as $column_name => $value) {
-			if (isset($this->_table_columns[$column_name]) && ($skip_search_flag || $this->_table_columns[$column_name]['search_flag'])) {
+			if ($this->table_column_exists($column_name) && ($skip_search_flag || $this->_table_columns[$column_name]['search_flag'])) {
 				$methods = call_user_func(ORM_FieldType::get_field_type_class_name($this->_table_columns[$column_name]['field_type']) . '::search_prepare', $column_name, $value, $search_options, $this);
 
 				// now loop through the methods passed in and add them to _db_pending (they will get added to the query in _build())

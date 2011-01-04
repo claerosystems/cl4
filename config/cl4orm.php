@@ -326,5 +326,7 @@ return array(
 		'field_types_treated_as_hidden' => array('hidden'),
 		// these fields will be treated as textareas, such that the will limited based on editable_list_options.textarea_word_limit
 		'field_types_treaded_as_textarea' => array('textarea'),
+		'only_update_changed' => TRUE, // if set to TRUE, then only the fields that have been changed (according to ORM::column_changed()) will be updated
+		'record_changes' => TRUE, // if set to TRUE, Model_Change_Log will be used to record changes; only_update_changed must be set to TRUE for this to work
 	),
 );

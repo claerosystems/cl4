@@ -34,7 +34,7 @@ return array(
 		/**
 		* the type of name change that should occur when the file is moved into it's final location
 		* keep will use the filename
-		* 'keep', 'timestamp', 'random', 'prepend', 'append', 'overwrite', 'overwrite_all'
+		* 'keep', 'timestamp', 'random', 'prepend', 'append', 'overwrite', 'overwrite_all', 'id'
 		*  if the original_filename_column is found, then the user will still see their filename
 		*/
 		'name_change_method' => 'keep',
