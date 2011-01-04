@@ -83,7 +83,7 @@ class cl4_ORM_DateDrop extends cl4_ORM_Date {
 		}
 
 		// First, fix date so it's searchable
-		$value['date'] = $value['date']['year'] . "-" . $value['date']['month'] . "-" . $value['date']['day'] . " 00:00:00";
+		$value['date'] = $value['date']['year'] . '-' . $value['date']['month'] . '-' . $value['date']['day'] . ' 00:00:00';
 
 		$sql_table_name = ORM_Select::get_sql_table_name($orm_model);
 
@@ -154,7 +154,7 @@ class cl4_ORM_DateDrop extends cl4_ORM_Date {
 		$value = Arr::get($post, $column_name, $options['default_value']);
 
 		if ($value !== NULL || $options['is_nullable']) {
-			$orm_model->$column_name = $value['year'] . "-" . $value['month'] . "-" . $value['day'] . " 00:00:00";
+			$orm_model->$column_name = $value['year'] . '-' . $value['month'] . '-' . $value['day'] . ' 00:00:00';
 		}
 	} // function save
 } // class

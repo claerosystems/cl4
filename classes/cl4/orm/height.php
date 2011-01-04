@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_Height extends ORM_FieldType {
+class cl4_ORM_Height extends ORM_Select {
 	/**
 	 * Displays this column in an edit context.
 	 *
@@ -17,47 +17,6 @@ class cl4_ORM_Height extends ORM_FieldType {
 	}
 
 	/**
-	* Returns a formatted string based on the value passed
-	* This output is not ready for HTML. It's made for other output methods or for use within code
-	* By default this will return the same value as passed
-	* If this is overridden, then view_html() also needs to be overridden
-	*
-	* @param   mixed   $value        The value from the database
-	* @param   string  $column_name  The column name in the database and ORM Model
-	* @param   ORM     $orm_model    The ORM Model (can be used to retrieve other field values)
-	* @param   array   $options      Options from _table_columns[column_name][field_options];
-	* @param   array   $source       Array of data for fields like a select or radios
-	* @return  mixed
-	*/
-	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-        return floor($value / 12). '\'' . ($value % 12 > 0 ? $value % 12 . '"' : '') . __(' or ') . round($value * 2.54, 0) . __('cm');;
-	}
-
-	/**
-	* Does the same thing as view() but returns a string formtted for use in HTML
-	* The values from this function are escaped in ORM_FieldType::prepare_html()
-	* and optionally have their spaces replaced with no breaking spaces
-	*
-	* @see  ORM_FieldType::view()
-	* @see  ORM_FieldType::prepare_html()
-	*
-	* @param   mixed   $value        The value from the database
-	* @param   string  $column_name  The column name in the database and ORM Model
-	* @param   ORM     $orm_model    The ORM Model (can be used to retrieve other field values)
-	* @param   array   $options      Options from _table_columns[column_name][field_options];
-	* @param   array   $source       Array of data for fields like a select or radios
-	* @return  string
-	*/
-	public static function view_html($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-		// ensure the nbps option is set
-		$options += array(
-			'nbsp' => FALSE,
-		);
-
-		return cl4_ORM_Height::prepare_html(cl4_ORM_Height::view($value, $column_name, $orm_model, $options), $options['nbsp']);
-	} // function view_html
-
-	/**
 	* Generates the HTML for a search form field
 	* Should return HTML and the HTML should not be escaped after
 	* This function works very similar to edit()
@@ -71,21 +30,17 @@ class cl4_ORM_Height extends ORM_FieldType {
 	* @return  string
 	*/
 	public static function search($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
-		if ( ! is_array($value)) {
+		if ( ! is_array($value) && ! empty($value)) {
 			// if the value is not an array then use the value as the height and set height_option to NULL
 			$value = array(
 				'height_operand' => NULL,
 				'height' => $value,
 			);
-		}
-
-		if ( ! array_key_exists('height', $value)) {
-			// the height is not set in the array so set it to an empty string
-			$value['height'] = '';
-		}
-		if ( ! array_key_exists('height_operand', $value)) {
-			// the height_option is not set so set it to NULL
-			$value['height_option'] = NULL;
+		} else {
+			$value += array(
+				'height_operand' => NULL,
+				'height' => '',
+			);
 		}
 
 		$height_option_html = Form::select($html_name . '[height_operand]', array(
@@ -170,4 +125,45 @@ class cl4_ORM_Height extends ORM_FieldType {
 
 		return $methods;
 	} // function
+
+	/**
+	* Returns a formatted string based on the value passed
+	* This output is not ready for HTML. It's made for other output methods or for use within code
+	* By default this will return the same value as passed
+	* If this is overridden, then view_html() also needs to be overridden
+	*
+	* @param   mixed   $value        The value from the database
+	* @param   string  $column_name  The column name in the database and ORM Model
+	* @param   ORM     $orm_model    The ORM Model (can be used to retrieve other field values)
+	* @param   array   $options      Options from _table_columns[column_name][field_options];
+	* @param   array   $source       Array of data for fields like a select or radios
+	* @return  mixed
+	*/
+	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
+		return floor($value / 12). '\'' . ($value % 12 > 0 ? $value % 12 . '"' : '') . __(' or ') . round($value * 2.54, 0) . __('cm');;
+	}
+
+	/**
+	* Does the same thing as view() but returns a string formtted for use in HTML
+	* The values from this function are escaped in ORM_FieldType::prepare_html()
+	* and optionally have their spaces replaced with no breaking spaces
+	*
+	* @see  ORM_FieldType::view()
+	* @see  ORM_FieldType::prepare_html()
+	*
+	* @param   mixed   $value        The value from the database
+	* @param   string  $column_name  The column name in the database and ORM Model
+	* @param   ORM     $orm_model    The ORM Model (can be used to retrieve other field values)
+	* @param   array   $options      Options from _table_columns[column_name][field_options];
+	* @param   array   $source       Array of data for fields like a select or radios
+	* @return  string
+	*/
+	public static function view_html($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
+		// ensure the nbps option is set
+		$options += array(
+			'nbsp' => FALSE,
+		);
+
+		return cl4_ORM_Height::prepare_html(cl4_ORM_Height::view($value, $column_name, $orm_model, $options), $options['nbsp']);
+	} // function view_html
 }
