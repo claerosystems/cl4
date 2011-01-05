@@ -43,26 +43,6 @@ class cl4_Arr extends Kohana_Arr {
 	} // function set_deep
 
 	/**
-	* Returns all values for the given key in the given array.
-	*
-	* @param  mixed  $key    The key to pluck from the array.
-	* @param  array  $array  The array to pluck from.
-	*
-	* @return array
-	*/
-	public static function pluck($key, $array) {
-		if (is_array($key) || !is_array($array)) return array();
-
-		$plucked = array();
-
-		foreach($array as $v) {
-			if(array_key_exists($key, $v)) $plucked[]=$v[$key];
-		}
-
-		return $plucked;
-	} // function pluck
-
-	/**
 	* Explodes a string on 2 or more strings
 	* Useful when you have a strings such as:
 	*
