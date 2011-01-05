@@ -144,10 +144,10 @@ echo '</body></html>';
 				echo Kohana::exception_text($e), "\n";
 
 				// Exit with an error status
-				// exit(1);
+				exit(1);
 			} // if
 		} // catch
-	} // function
+	} // function exception_handler
 
 	/**
 	* Returns the email address the error messages should be sent to
