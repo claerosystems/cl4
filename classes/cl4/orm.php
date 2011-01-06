@@ -1359,21 +1359,63 @@ class cl4_ORM extends Kohana_ORM {
 	} // function save_values
 
 	/**
-	 * Finds and loads a single database row into the object.
-	 * Also stores the record in _original incase a save is run later
+	 * Loads a database result, either as a new object for this model, or as
+	 * an iterator for multiple rows.
+	 * Also stores the record in _original incase a save is run later for single records.
 	 *
 	 * @chainable
-	 * @param   mixed  primary key
-	 * @return  ORM
+	 * @param   boolean       return an iterator or load a single row
+	 * @return  ORM           for single rows
+	 * @return  ORM_Iterator  for multiple rows
 	 */
-	public function find($id = NULL) {
-		$find_return = parent::find($id);
+	protected function _load_result($multiple = FALSE) {
+		$this->_db_builder->from($this->_table_name);
 
-		// store the original record
-		$this->_original = $this->_object;
+		if ($multiple === FALSE) {
+			// Only fetch 1 record
+			$this->_db_builder->limit(1);
+		}
 
-		return $find_return;
-	} // function find
+		// Select all columns by default
+		$this->_db_builder->select($this->_table_name.'.*');
+
+		if ( ! isset($this->_db_applied['order_by']) AND ! empty($this->_sorting)) {
+			foreach ($this->_sorting as $column => $direction) {
+				if (strpos($column, '.') === FALSE) {
+					// Sorting column for use in JOINs
+					$column = $this->_table_name.'.'.$column;
+				}
+
+				$this->_db_builder->order_by($column, $direction);
+			}
+		}
+
+		if ($multiple === TRUE) {
+			// Return database iterator casting to this object type
+			$result = $this->_db_builder->as_object(get_class($this))->execute($this->_db);
+
+			$this->reset();
+
+			return $result;
+		} else {
+			// Load the result as an associative array
+			$result = $this->_db_builder->as_assoc()->execute($this->_db);
+
+			$this->reset();
+
+			if ($result->count() === 1) {
+				// store the database record in the original param
+				$this->_original = $result->current();
+				// Load object values
+				$this->_load_values($result->current());
+			} else {
+				// Clear the object, nothing was found
+				$this->clear();
+			}
+
+			return $this;
+		}
+	}
 
 	/**
 	 * Saves the current object.
@@ -1620,7 +1662,7 @@ class cl4_ORM extends Kohana_ORM {
 			|| ($this->_original[$column_name] === NULL && $this->_object[$column_name] !== NULL)
 			// or the value does not match the original
 			|| $this->_original[$column_name] != $this->_object[$column_name]);
-
+echo Kohana::debug($column_name, $changed);
 		if ($changed && $this->table_column_exists($column_name)) {
 			$field_type_class_name = ORM_FieldType::get_field_type_class_name($this->_table_columns[$column_name]['field_type']);
 			if ( ! call_user_func($field_type_class_name . '::has_changed', $this->_original[$column_name], $this->_object[$column_name])) {

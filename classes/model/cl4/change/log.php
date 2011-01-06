@@ -162,7 +162,7 @@ class Model_cl4_Change_Log extends ORM {
 	protected function get_user_id() {
 		$user = Auth::instance()->get_user();
 		if ( ! empty($user)) {
-			return $user->id;
+			return $user->pk();
 		} else {
 			return 0;
 		}
