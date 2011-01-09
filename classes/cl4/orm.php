@@ -1662,7 +1662,7 @@ class cl4_ORM extends Kohana_ORM {
 			|| ($this->_original[$column_name] === NULL && $this->_object[$column_name] !== NULL)
 			// or the value does not match the original
 			|| $this->_original[$column_name] != $this->_object[$column_name]);
-echo Kohana::debug($column_name, $changed);
+
 		if ($changed && $this->table_column_exists($column_name)) {
 			$field_type_class_name = ORM_FieldType::get_field_type_class_name($this->_table_columns[$column_name]['field_type']);
 			if ( ! call_user_func($field_type_class_name . '::has_changed', $this->_original[$column_name], $this->_object[$column_name])) {

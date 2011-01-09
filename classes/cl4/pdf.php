@@ -600,7 +600,6 @@ class cl4_PDF extends FPDI {
 
 		// first draw the horizontal ruler
 		for ($i = 0; $i <= parent::getPageHeight(); $i += 5) {
-			//echo $this->GetY() . HEOL;
 			$this->Line(0, $this->GetY(), ($i % 10 ? 2 : 4), $this->GetY());
 			if ($fullLine) {
 				$this->Line(0, $this->GetY(), parent::getPageHeight(), $this->GetY(), $fullLineStyle);
@@ -620,7 +619,6 @@ class cl4_PDF extends FPDI {
 
 		// now the vertical ruler
 		for ($i = 0; $i <= parent::getPageWidth(); $i += 5) {
-			//echo $this->GetX() . HEOL;
 			$this->Line($this->GetX(), 0, $this->GetX(), ($i % 10 ? 2 : 4));
 			if ($fullLine) {
 				$this->Line($this->GetX(), 0, $this->GetX(), parent::getPageHeight(), $fullLineStyle);
