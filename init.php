@@ -21,7 +21,7 @@ if ($routes['login']) {
 		->defaults(array(
 			'lang' => DEFAULT_LANG,
 			'controller' => 'login',
-			'action' => 'index',
+			'action' => '',
 	));
 }
 
