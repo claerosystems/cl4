@@ -505,6 +505,44 @@ class cl4_ORM extends Kohana_ORM {
 	} // function empty_fields
 
 	/**
+	* Return TRUE if the column exists in _table_columns
+	*
+	* @param  string  $column_name  The column name
+	* @return  boolean
+	*/
+	public function show_field($column_name) {
+		if ( ! $this->table_column_exists($column_name)) {
+			throw new Kohana_Exception('The column name :column_name: cannot be found in _table_columns', array(':column_name:' => $column_name));
+		}
+
+		$column_info = $this->_table_columns[$column_name];
+
+		switch($this->_mode) {
+			case 'search':
+				$show_field = $column_info['search_flag'];
+				break;
+			case 'view':
+				$show_field = $column_info['view_flag'];
+				break;
+			case 'edit':
+			case 'add':
+			default:
+				// invalid mode received, just use edit
+				$show_field = $column_info['edit_flag'];
+				break;
+		} // switch
+
+		// if this is the add case, we might be adding a record based on another, in which case we must remove the primary key field
+		// todo: this should be moved into the switch above
+		// todo: not sure if this makes sense in all cases
+		if ($show_field && $this->_mode == 'add' && $column_name == $this->_primary_key) {
+			$show_field = FALSE;
+		} //if
+
+		return $show_field;
+	} // function show_field
+
+	/**
 	 * Loop through all of the columns in the model and generates the form label and field HTML for each one and stores
 	 * the results in $this->_field_html['label'] and $this->_field_html['field'].  For now, this function will
 	 * erase and replace any existing data in $this->_field_html;
@@ -523,8 +561,8 @@ class cl4_ORM extends Kohana_ORM {
 			} // foreach
 		} // if
 
-		// flag used to determine if the field is the first field
-		$first_field_autofocus = FALSE;
+		// there is no first field
+		$first_field = NULL;
 
 		// do some columns, 1 column or all columns
 		if (is_array($column_name)) {
@@ -534,9 +572,14 @@ class cl4_ORM extends Kohana_ORM {
 		} else {
 			$process_columns = array_keys($this->_table_columns);
 
-			// as we are processing all of the table columns, allow the first column to be autofocused
-			$first_field_autofocus = TRUE;
-		}
+			// determine which field is the first one
+			foreach ($this->_display_order as $column_name) {
+				if ($this->show_field($column_name)) {
+					$first_field = $column_name;
+					break;
+				}
+			} // foreach
+		} // if
 
 		$field_type_class_function = 'view';
 		switch ($this->_mode) {
@@ -555,38 +598,13 @@ class cl4_ORM extends Kohana_ORM {
 		// loop through and create all of the form field HTML snippets and store in $this->_field_html[$column_name] as ['label'] and ['field']
 		foreach ($process_columns as $column_name) {
 			if ( ! $this->table_column_exists($column_name)) {
-				throw new Kohana_Exception('The column name :column_name: to prepare is not in _table_columns', array(':column_name:' => $column_name));
+				throw new Kohana_Exception('The column name :column_name: sent to prepare is not in _table_columns', array(':column_name:' => $column_name));
 			}
 
 			$column_info = $this->_table_columns[$column_name];
 
-			// default to always hide the field
-			$show_field = FALSE;
-
 			try {
-				// see if we should display this field based on the cl4 flags (always display if no flag) - depends on mode
-				switch($this->_mode) {
-					case 'search':
-						$show_field = $column_info['search_flag'];
-						break;
-					case 'view':
-						$show_field = $column_info['view_flag'];
-						break;
-					case 'edit':
-					case 'add':
-					default:
-						// invalid mode received, just use edit
-						$show_field = $column_info['edit_flag'];
-						break;
-				} // switch
-
-				// if this is the add case, we might be adding a record based on another, in which case we must remove the primary key field
-				// todo: this should be moved into the switch above
-				if ($this->_mode == 'add' && $column_name == $this->_primary_key) {
-					$show_field = FALSE;
-				} //if
-
-				if ($show_field) {
+				if ($this->show_field($column_name)) {
 					// look for the attributes and set them
 					$field_attributes = $column_info['field_attributes'];
 					$label_attributes = array();
@@ -619,9 +637,8 @@ class cl4_ORM extends Kohana_ORM {
 						$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 
 					} else {
-						if ($first_field_autofocus && $this->_options['add_autofocus']) {
+						if ($first_field == $column_name && $this->_options['add_autofocus']) {
 							// this is the first visible field, so add the autofocus attribute
-							$first_field_autofocus = FALSE;
 							$field_attributes = HTML::merge_attributes($field_attributes, array('autofocus' => 'autofocus'));
 						}
 
