@@ -1550,6 +1550,10 @@ class cl4_ORM extends Kohana_ORM {
 						));
 				} // if log
 
+				// replace the original record with the now saved one
+				// this is useful when a second save is called (possibly after changing a value)
+				$this->_original = $this->_object;
+
 				// if it was an insert, do some special functionality for file columns with name change method "id"
 				if ($this->_was_insert) {
 					$files_moved = array();
