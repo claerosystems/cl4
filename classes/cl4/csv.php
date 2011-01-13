@@ -8,32 +8,39 @@ class cl4_CSV {
 	* the current mode (read or write)
 	* @var  string
 	*/
-	private $mode = 'write';
+	protected $mode = 'write';
 
 	/**
 	* the filepointer to the csv we are reading or writing
 	* @var  resource
 	*/
-	private $fp;
+	protected $fp;
 
 	/**
 	* the path of the csv file, including the filename
 	* @var  string
 	*/
-	private $filename;
+	protected $filename;
 
 	/**
 	* stores the current row number of adding or reading
 	* @var  int
 	*/
-	private $row_num;
+	protected $row_num;
 
 	/**
 	* Bool to use to determine if PHP has the escape parameter in the fgetcsv
 	* Only in PHP >=5.3.0
 	* @var  boolean
 	*/
-	private $php_has_escape_option = FALSE;
+	protected $php_has_escape_option = FALSE;
+
+	/**
+	* Array containing column names
+	* array([column_num] => 'name')
+	* @var  array
+	*/
+	protected $column_names;
 
 	/**
 	* Prepares the object for csv creation or reading
@@ -74,22 +81,20 @@ class cl4_CSV {
 		} // if
 
 		// Open the file for reading or writing
-		if ($this->status) {
-			try {
-				if ($this->mode == 'write') {
-					$this->fp = fopen($this->filename, 'w+');
-					$this->row_num = 0;
-				} else {
-					$this->row_num = -1;
-					$this->fp = fopen($this->filename, 'r');
-				} // if
-			} catch (Exception $e) {
-				throw new Kohana_Exception('There was a problem opening the file for ' . ($this->mode == 'write' ? 'writing' : 'reading') . ': ' . ($this->filename ? $this->filename : 'temp file'));
-			}
-
-			if ($this->fp === FALSE) {
-				throw new Kohana_Exception('There was a problem opening the file for ' . ($this->mode == 'write' ? 'writing' : 'reading') . ': ' . ($this->filename ? $this->filename : 'temp file'));
+		try {
+			if ($this->mode == 'write') {
+				$this->fp = fopen($this->filename, 'w+');
+				$this->row_num = 0;
+			} else {
+				$this->row_num = -1;
+				$this->fp = fopen($this->filename, 'r');
 			} // if
+		} catch (Exception $e) {
+			throw new Kohana_Exception('There was a problem opening the file for ' . ($this->mode == 'write' ? 'writing' : 'reading') . ': ' . ($this->filename ? $this->filename : 'temp file') . ': ' . Kohana::exception_text($e));
+		}
+
+		if ($this->fp === FALSE) {
+			throw new Kohana_Exception('There was a problem opening the file for ' . ($this->mode == 'write' ? 'writing' : 'reading') . ': ' . ($this->filename ? $this->filename : 'temp file'));
 		} // if
     } // function __construct
 
@@ -109,6 +114,7 @@ class cl4_CSV {
 	* @param   string  $delimnator  the string to put between each field
 	* @param   string  $enclosure   the string to put at the beginning and end of each field
 	*
+	* @chainable
 	* @return  CSV
 	*
 	* @see  fputcsv()
@@ -132,7 +138,8 @@ class cl4_CSV {
 	*
 	* @param   int   $count  The number of rows to add
 	*
-	* @return  bool  The status of the add/the object
+	* @chainable
+	* @return  CSV
 	*/
 	public function add_blank_row($count = 1) {
 		for ($i = 1; $i <= $count; $i++) {
@@ -149,6 +156,7 @@ class cl4_CSV {
 	/**
 	* Closes the CSV
 	*
+	* @chainable
 	* @return  CSV
 	*/
 	public function close_csv() {
@@ -190,16 +198,22 @@ class cl4_CSV {
 	* Gets the current row number
 	* This is the row we are current reading or writing
 	*
-	* @return  int  the current row number
+	* @param   boolean  $human_readable  If set to true, the the row number as in Excel will be return instead of the 0 based row number
+	* @return  int      the current row number
 	*/
-	public function get_row_num() {
-		return $this->row_num;
+	public function get_row_num($human_readable = FALSE) {
+		if ($human_readable) {
+			return ($this->row_num + 1);
+		} else {
+			return $this->row_num;
+		}
 	} // function get_row_num
 
 	/**
 	* Resets the current row number to 0
 	* Good to use when checking if the first row has the headers in it and if it doesn't then set the current row back to the start and start looping
 	*
+	* @chainable
 	* @return  CSV
 	*/
 	public function reset_row_num() {
@@ -217,13 +231,50 @@ class cl4_CSV {
 	} // function reset_row_num
 
 	/**
+	* Sets the column names in the object for use with get_row()
+	* The array can not be an associated array (it must have numeric keys)
+	*
+	* @param  array  $names  The column names
+	*
+	* @chainable
+	* @return CSV
+	*/
+	public function set_column_names($names) {
+		if (Arr::is_assoc($names)) {
+			throw new Kohana_Exception('The column names array passed is an associate array. It should be a non-associate array (numeric keys)');
+		}
+
+		$this->column_names = $names;
+
+		return $this;
+	} // function set_column_names
+
+	/**
 	* Gets the next row from the CSV or false if error or end of file
+	* By default this will will return an array with the column numbers as keys.
+	* For example:
+	*
+	*      array(
+	*          0 => 'foo',
+	*          1 => 'bar'
+	*      )
+	*
+	* If $column_names is not enoty, it will return an array with both the column numbers and values as well as the column names and values.
+	* This makes it easier to work with the resulting array
+	* For example:
+	*
+	*      array(
+	*          0 => 'foo',
+	*          1 => 'bar'
+	*          'first_name' => 'foo',
+	*          'last_name' => 'bar',
+	*      )
 	*
 	* @param   string   $delimiter  The character separating fields.
 	* @param   string   $enclosure  The string to put at the beginning and end of each field.
 	* @param   string   $escape     Only in PHP >5.3, the string used to escape the delimiter.
 	*
-	* @return  array       the row as an array or false if end of file or error
+	* @return  array    the row as an array or false if end of file or error
 	*/
 	public function get_row($delimiter = ',', $enclosure = '"', $escape = '\\') {
 		if ($this->mode != 'read') {
@@ -255,6 +306,16 @@ class cl4_CSV {
 			return FALSE;
 		} else {
 			++ $this->row_num;
+
+			if ( ! empty($this->column_names)) {
+				// we have column names, so set the keys in the return array with the correct values and keys
+				foreach ($this->column_names as $column_number => $name) {
+					if (array_key_exists($column_number, $return)) {
+						$return[$name] = $return[$column_number];
+					}
+				}
+			}
+
 			return $return;
 		}
 	} // function get_row
