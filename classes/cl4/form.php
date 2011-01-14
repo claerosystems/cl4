@@ -260,29 +260,32 @@ class cl4_Form extends Kohana_Form {
 				$col = 1; // restart back at column 1
 
 				foreach ($label as $sub_checkbox_value => $sub_label) {
-					$this_attributes = Arr::overwrite($attributes, array(
+					$_attributes = Arr::overwrite($attributes, array(
 						'id' => $attributes['id'] . '-' . $sub_checkbox_value,
 						'first_checkbox' => $first_checkbox,
 					));
+					$_options = $options;
+					$_options['first_checkbox'] = $first_checkbox;
 
 					if ($options['orientation'] == 'table') {
-						$html .= Form::checkbox_layout_table($name, $col, $sub_label, $sub_checkbox_value, in_array($sub_checkbox_value, $checked), $this_attributes, $options);
+						$html .= Form::checkbox_layout_table($name, $col, $sub_label, $sub_checkbox_value, in_array($sub_checkbox_value, $checked), $_attributes, $_options);
 					} else {
-						$html .= Form::checkbox_layout($name, $sub_label, $sub_checkbox_value, in_array($sub_checkbox_value, $checked), $this_attributes, $options);
+						$html .= Form::checkbox_layout($name, $sub_label, $sub_checkbox_value, in_array($sub_checkbox_value, $checked), $_attributes, $_options);
 					}
 					$first_checkbox = FALSE;
 				}
 
 			} else { // only 1 level of checkboxes
-				$this_attributes = Arr::overwrite($attributes, array(
+				$_attributes = Arr::overwrite($attributes, array(
 					'id' => $attributes['id'] . '-' . $checkbox_value,
-					'first_checkbox' => $first_checkbox,
 				));
+				$_options = $options;
+				$_options['first_checkbox'] = $first_checkbox;
 
 				if ($options['orientation'] == 'table') {
-					$html .= Form::checkbox_layout_table($name, $col, $label, $checkbox_value, in_array($checkbox_value, $checked), $this_attributes, $options);
+					$html .= Form::checkbox_layout_table($name, $col, $label, $checkbox_value, in_array($checkbox_value, $checked), $_attributes, $_options);
 				} else {
-					$html .= Form::checkbox_layout($name, $label, $checkbox_value, in_array($checkbox_value, $checked), $this_attributes, $options);
+					$html .= Form::checkbox_layout($name, $label, $checkbox_value, in_array($checkbox_value, $checked), $_attributes, $_options);
 				}
 				$first_checkbox = FALSE;
 			}
@@ -312,15 +315,17 @@ class cl4_Form extends Kohana_Form {
 			$attributes['id'] = uniqid();
 		}
 
-		if ($options['first_checkbox']) {
+		if ( ! $options['first_checkbox']) {
 			if ($options['orientation'] == 'vertical') {
 				$html .= HEOL;
 			} else if ($options['orientation'] == 'horitzonal') {
 				$html .= '&nbsp;&nbsp;&nbsp;';
+			} else {
+				$html .= EOL;
 			}
 		}
 
-		$html .= EOL . Form::checkbox($name, $value, $checked, $attributes) . '<label' . HTML::attributes(array('for' => $attributes['id'])) . '>' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label>';
+		$html .= Form::checkbox($name, $value, $checked, $attributes) . '<label' . HTML::attributes(array('for' => $attributes['id'])) . '>' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label>';
 
 		return $html;
 	} // function
