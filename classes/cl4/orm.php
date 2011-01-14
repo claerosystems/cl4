@@ -902,7 +902,7 @@ class cl4_ORM extends Kohana_ORM {
 			$search_type_html = Form::radios(
 				$this->_options['request_search_type_name'],
 				array(
-					'where' => '<em>all</em> of the following',
+					'where'    => '<em>all</em> of the following',
 					'or_where' => '<em>any</em> of the following'
 				),
 				$this->_options['request_search_type_default'],
@@ -914,7 +914,7 @@ class cl4_ORM extends Kohana_ORM {
 				$this->_options['request_search_like_name'],
 				array(
 					'beginning' => '<em>beginning</em> of the field',
-					'exact' => '<em>exact</em>',
+					'exact'     => '<em>exact</em>',
 					'full_text' => '<em>full text</em>',
 				),
 				$this->_options['request_search_like_default'],
@@ -925,17 +925,18 @@ class cl4_ORM extends Kohana_ORM {
 
 		// return the generated view
 		return View::factory($this->_options['get_form_view_file'], array(
-			'any_visible'			=> $this->any_visible('edit'),
-			'form_options' 			=> $this->_options,
-			'form_field_html' 		=> $this->_field_html,
-			'form_fields_hidden' 	=> $this->_form_fields_hidden,
-			'form_buttons' 			=> $this->_form_buttons,
-			'form_open_tag' 		=> $form_open_tag,
-			'form_close_tag' 		=> $form_close_tag,
-			'mode' 					=> $this->_mode,
-			'search_type_html' 		=> $search_type_html,
-			'like_type_html' 		=> $like_type_html,
-			'display_order'			=> $this->_display_order,
+			'model'                 => $this,
+			'any_visible'           => $this->any_visible('edit'),
+			'form_options'          => $this->_options,
+			'form_field_html'       => $this->_field_html,
+			'form_fields_hidden'    => $this->_form_fields_hidden,
+			'form_buttons'          => $this->_form_buttons,
+			'form_open_tag'         => $form_open_tag,
+			'form_close_tag'        => $form_close_tag,
+			'mode'                  => $this->_mode,
+			'search_type_html'      => $search_type_html,
+			'like_type_html'        => $like_type_html,
+			'display_order'         => $this->_display_order,
 		));
 	} // function
 
@@ -963,11 +964,12 @@ class cl4_ORM extends Kohana_ORM {
 
 		// return the generated view
 		return View::factory($this->_options['get_view_view_file'], array(
-			'any_visible'		=> $this->any_visible('view'),
-			'form_options' 		=> $this->_options,
-			'form_field_html' 	=> $this->_field_html,
-			'form_buttons' 		=> $this->_form_buttons,
-			'display_order'		=> $this->_display_order,
+			'model'             => $this,
+			'any_visible'       => $this->any_visible('view'),
+			'form_options'      => $this->_options,
+			'form_field_html'   => $this->_field_html,
+			'form_buttons'      => $this->_form_buttons,
+			'display_order'     => $this->_display_order,
 		));
 	} // function
 
