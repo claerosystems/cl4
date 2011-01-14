@@ -170,6 +170,27 @@ class cl4_MultiORM {
 	} // function set_options
 
 	/**
+	* Sets the target_route option within the model
+	* The target route is used to generate all links
+	* Should have model, action, id parameters
+	* This same method is in ORM
+	*
+	* @param  string  $route_name  The route name
+	*
+	* @chainable
+	* @return  ORM
+	*/
+	public function set_target_route($route_name = NULL) {
+		if ( ! empty($route_name)) {
+			$this->_options['target_route'] = Route::name($route_name);
+		} else if ($this->_options['target_route'] === NULL) {
+			$this->_options['target_route'] = Route::name(Request::instance()->route);
+		}
+
+		return $this;
+	} // function set_target_route
+
+	/**
 	* Generates an HTML record list with edit, delete, view and add similar links for the given object including add/edit/del, pagination, etc.
 	*
 	* @param  array  $options
@@ -179,6 +200,7 @@ class cl4_MultiORM {
 		// update the options if passed
 		$this->set_options($options);
 
+		$this->set_target_route();
 		$target_route = Route::get($this->_options['target_route']);
 		$list_options = $this->_options['editable_list_options'];
 		$table_options = $list_options['table_options'];
@@ -328,6 +350,7 @@ class cl4_MultiORM {
 		// add the top row of control buttons
 		$top_row_buttons = '';
 		if ( ! $this->_options['hide_top_row_buttons']) {
+			$this->set_target_route();
 			$button_class = ( ! empty($this->_options['button_class']) ? ' ' . $this->_options['button_class'] : '');
 
 			// set up SEARCH button
@@ -632,6 +655,7 @@ class cl4_MultiORM {
 		}
 
 		$form_buttons = array();
+		$this->set_target_route();
 		$target_route = $this->_options['target_route'];
 		$edit_multiple_options = $this->_options['edit_multiple_options'];
 		$display_order = $this->_model->get_display_order();

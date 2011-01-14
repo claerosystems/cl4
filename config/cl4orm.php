@@ -121,7 +121,11 @@ return array(
 		'request_confirm_delete_name' => 'c_confirm_delete',
 		'request_current_search' => 'c_current_search',
 
-		'target_route' => Route::name(Request::instance()->route), // used to generate all links, should have model, action, id parameters; defaults to the current route
+		// used to generate all links, should have model, action, id parameters
+		// defaults to the current route
+		// the default is set in cl4ORM::set_target_route() of this is NULL
+		// don't use Route::instance() to set it within the config because you can't use ORM before doing the main request
+		'target_route' => NULL,
 
 		'text_field_max_size' => 100,
 		'text_field_max_length' => 7000,

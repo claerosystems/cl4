@@ -433,7 +433,28 @@ class cl4_ORM extends Kohana_ORM {
 	 */
 	public function get_display_order() {
 		return $this->_display_order;
-	}
+	} // function get_display_order
+
+	/**
+	* Sets the target_route option within the model
+	* The target route is used to generate all links
+	* Should have model, action, id parameters
+	* This same method is in MultiORM
+	*
+	* @param  string  $route_name  The route name
+	*
+	* @chainable
+	* @return  ORM
+	*/
+	public function set_target_route($route_name = NULL) {
+		if ( ! empty($route_name)) {
+			$this->_options['target_route'] = Route::name($route_name);
+		} else if ($this->_options['target_route'] === NULL) {
+			$this->_options['target_route'] = Route::name(Request::instance()->route);
+		}
+
+		return $this;
+	} // function set_target_route
 
 	/**
 	* get a formatted value of a model column
@@ -844,6 +865,7 @@ class cl4_ORM extends Kohana_ORM {
 		if ( ! empty($options)) $this->set_options($options);
 
 		$this->_form_buttons = array();
+		$this->set_target_route();
 		$target_route = $this->_options['target_route'];
 
 		// generate the form field html (this also gets the default data)
@@ -956,6 +978,7 @@ class cl4_ORM extends Kohana_ORM {
 
 		// set up the buttons
 		if ($this->_options['display_buttons'] && $this->_options['display_back_to_list']) {
+			$this->set_target_route();
 			$this->_form_buttons[] = Form::submit(NULL, __('Return to List'), array(
 				'data-cl4_link' => '/' . Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name, 'action' => 'cancel')),
 				'class' => 'cl4_button_link ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
