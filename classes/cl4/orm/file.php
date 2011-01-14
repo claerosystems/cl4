@@ -198,7 +198,11 @@ class cl4_ORM_File extends ORM_FieldType {
 
 		$file_name = ORM_File::view($value, $column_name, $orm_model, $options);
 
-		return ORM_File::download_link($column_name, $value, $file_name, $options['file_options'], $orm_model);
+		if ( ! empty($file_name)) {
+			return ORM_File::download_link($column_name, $value, $file_name, $options['file_options'], $orm_model);
+		} else {
+			return '';
+		}
 	} // function
 
 	public static function download_link($column_name, $value, $file_name, $file_options, ORM $orm_model) {
