@@ -1564,6 +1564,7 @@ class cl4_ORM extends Kohana_ORM {
 				// add the change log record if _log is true and record_changes is true
 				if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
 					$change_log = ORM::factory('change_log')
+						->set_db($this->_db)
 						->add_change_log(array(
 							'table_name' => $this->_table_name,
 							// send the original pk so the change to the pk can be tracked when doing an update
@@ -1607,6 +1608,7 @@ class cl4_ORM extends Kohana_ORM {
 						// add the change log record if _log is true and record_changes is true
 						if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
 							$change_log = ORM::factory('change_log')
+								->set_db($this->_db)
 								->add_change_log(array(
 									'table_name' => $this->_table_name,
 									'record_pk' => $this->pk(),
@@ -1832,6 +1834,7 @@ class cl4_ORM extends Kohana_ORM {
 					// add the change log record if _log is true and record_changes is true
 					if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
 						$change_log = ORM::factory('change_log')
+							->set_db($this->_db)
 							->add_change_log(array(
 								'table_name' => $this->_table_name,
 								// send the original pk so the change to the pk can be tracked when doing an update
@@ -1856,6 +1859,7 @@ class cl4_ORM extends Kohana_ORM {
 				// add the change log record if _log is true and record_changes is true
 				if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
 					$change_log = ORM::factory('change_log')
+						->set_db($this->_db)
 						->add_change_log(array(
 							'table_name' => $this->_table_name,
 							'record_pk' => $id,
@@ -2100,7 +2104,7 @@ class cl4_ORM extends Kohana_ORM {
 		$view_html_options = $this->get_view_html_options($column_name);
 
 		return call_user_func(ORM_FieldType::get_field_type_class_name($field_type) . '::view_html', $this->$column_name, $column_name, $this, $view_html_options, $source);
-	} // if
+	} // function get_view_html
 
 	/**
 	 * Unloads the current object and clears the status.
@@ -2114,4 +2118,22 @@ class cl4_ORM extends Kohana_ORM {
 
 		$this->empty_fields();
 	}
+
+	/**
+	* Sets the db instance within the object
+	*
+	* @param  string  $db_group  The name of the db instance or the db instance
+	*
+	* @chainable
+	* @return  ORM
+	*/
+	public function set_db($db_group) {
+		if (is_object($db_group)) {
+			$db_group = (string) $db_group;
+		}
+
+		$this->_db = Database::instance($db_group);
+
+		return $this;
+	} // function set_db
 } // class
