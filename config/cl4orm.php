@@ -28,6 +28,19 @@ return array(
 		'field_options' => array(
 			'default_value' => NULL, // the default value for the field when there is nothing else
 		),
+		/**
+		* help (tips) to be displayed below each field
+		* use 'all' to display the same help for all the fields or customize it for each mode using the appropriate key
+		* see the view cl4/field_help for the layout of these
+		* use JavaScript to move these into a tool tip or only show when that field is focused
+		*/
+		'field_help' => array(
+			'all' => NULL,
+			'edit' => NULL,
+			'add' => NULL,
+			'view' => NULL,
+			'search' => NULL,
+		),
 	),
 	// this should contain arrays of field type specific meta data; if the field type or key is not set in here, the default_meta_data will be used
 	'default_meta_data_field_type' => array(
@@ -332,5 +345,6 @@ return array(
 		'field_types_treaded_as_textarea' => array('textarea'),
 		'only_update_changed' => TRUE, // if set to TRUE, then only the fields that have been changed (according to ORM::column_changed()) will be updated
 		'record_changes' => TRUE, // if set to TRUE, Model_Change_Log will be used to record changes; only_update_changed must be set to TRUE for this to work
+		'field_help_view' => 'cl4/field_help', // the view used to generate the help for the field
 	),
 );

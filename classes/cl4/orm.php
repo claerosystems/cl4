@@ -684,6 +684,9 @@ class cl4_ORM extends Kohana_ORM {
 							$field_html = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 						}
 
+						// append the field help to the field html
+						$field_html .= $this->get_field_help($column_name, $field_html_name);
+
 						// add the field label and data in the object
 						$this->_field_html[$column_name] = array(
 							'label' => $label_html,
@@ -733,6 +736,41 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function prepare_form
+
+	/**
+	* Returns the View (by default cl4/field_help) for the field help
+	* If there is no help available for the field and the mode, it will return NULL
+	*
+	* @param  string  $column_name      The column to retrieve the help for
+	* @param  string  $field_html_name  The input name that the help is for; If left as NULL, not data attribute will be added to the div
+	*
+	* @return  View
+	*/
+	public function get_field_help($column_name, $field_html_name = NULL) {
+		if ( ! $this->table_column_exists($column_name)) {
+			throw new Kohana_Exception('The column name :column_name: cannot be found in _table_columns', array(':column_name:' => $column_name));
+		}
+
+		$column_info = $this->_table_columns[$column_name];
+
+		if ( ! empty($column_info['field_help'][$this->_mode])) {
+			$field_help = $column_info['field_help'][$this->_mode];
+		} else if ( ! empty($column_info['field_help']['all'])) {
+			$field_help = $column_info['field_help']['all'];
+		} else {
+			$field_help = NULL;
+		}
+
+		if ( ! empty($field_help)) {
+			return View::factory($this->_options['field_help_view'], array(
+				'mode' => $this->_mode,
+				'field_html_name' => $field_html_name,
+				'field_help' => $field_help,
+			));
+		} else {
+			return NULL;
+		}
+	} // function get_field_help
 
 	/**
 	 * Checks to see if any fields in this model are visible in this context.
