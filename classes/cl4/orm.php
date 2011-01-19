@@ -653,9 +653,15 @@ class cl4_ORM extends Kohana_ORM {
 						$field_value = $this->$column_name;
 					}
 
+					if ($this->_mode == 'edit' && $column_info['view_in_edit_mode']) {
+						$_field_type_class_function = 'view_html';
+					} else {
+						$_field_type_class_function = $field_type_class_function;
+					}
+
 					if ($this->_mode != 'view' && in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 						// hidden (or other fields) are a special case because they don't get a column or row in a table and they will not be displayed
-						$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
+						$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $_field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 
 					} else {
 						if ($first_field == $column_name && $this->_options['add_autofocus']) {
@@ -667,7 +673,7 @@ class cl4_ORM extends Kohana_ORM {
 						$field_label = $this->get_field_label($column_name);
 						$label_html = Form::label($field_attributes['id'], $field_label, $label_attributes);
 
-						if ($field_type_class_function == 'view_html') {
+						if ($_field_type_class_function == 'view_html') {
 							// create an array of the options that need to be passed to view html
 							$view_html_options = $this->get_view_html_options($column_name);
 
@@ -681,7 +687,7 @@ class cl4_ORM extends Kohana_ORM {
 
 							$field_html = call_user_func($field_type_class_name . '::view_html', $this->$column_name, $column_name, $this, $view_html_options, $source);
 						} else {
-							$field_html = call_user_func($field_type_class_name . '::' . $field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
+							$field_html = call_user_func($field_type_class_name . '::' . $_field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 						}
 
 						// append the field help to the field html
@@ -1422,9 +1428,19 @@ class cl4_ORM extends Kohana_ORM {
 		try {
 			// loop through the columns in the model
 			foreach ($this->_table_columns as $column_name => $column_meta) {
+				// don't save, if:
 				// skip the primary key as we've delt with above
-				// make sure the edit flag is set or we have an ignored column
-				if ($column_name != $this->_primary_key && ($column_meta['edit_flag'] || in_array($column_name, $this->_ignored_columns))) {
+				if (($column_name == $this->_primary_key)
+				// if the edit flag it set to false and the column is not in ignored columns
+				|| ( ! $column_meta['edit_flag'] && ! in_array($column_name, $this->_ignored_columns))
+				// if the mode is edit and view in edit mode is true
+				|| ($this->_mode == 'edit' && $column_meta['view_in_edit_mode'])) {
+					$save_field = FALSE;
+				} else {
+					$save_field = TRUE;
+				}
+
+				if ($save_field) {
 					$save_options = $this->get_save_options($column_name);
 
 					// this will set the value in the passed ORM model

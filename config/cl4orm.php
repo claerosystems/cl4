@@ -16,6 +16,10 @@ return array(
 		'edit_flag' => FALSE,      // displays this field in any edit forms and allows the user to save new values
 		'search_flag' => FALSE,    // displays this field in the search mode (search form)
 		'view_flag' => FALSE,      // displays this field in the view mode
+		// if set to TRUE, then the field will be displayed in view mode when the model is in edit mode
+		// this can be used for fields that aren't editable but should still be displayed in edit mode
+		// fields that have this flag set to TRUE, it will also not be set through save_values() when in edit mode
+		'view_in_edit_mode' => FALSE,
 		/**
 		* determines if the field can be set to NULL; TRUE means that it can be set to NULL; FALSE means that it can't
 		* this is used most often in situations where the field is not received in the post because the field wasn't display although still editable
