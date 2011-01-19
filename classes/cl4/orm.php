@@ -690,8 +690,10 @@ class cl4_ORM extends Kohana_ORM {
 							$field_html = call_user_func($field_type_class_name . '::' . $_field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
 						}
 
-						// append the field help to the field html
-						$field_html .= $this->get_field_help($column_name, $field_html_name);
+						if ($this->_options['add_field_help']) {
+							// append the field help to the field html
+							$field_html .= $this->get_field_help($column_name, $field_html_name);
+						}
 
 						// add the field label and data in the object
 						$this->_field_html[$column_name] = array(

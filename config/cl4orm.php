@@ -349,6 +349,7 @@ return array(
 		'field_types_treaded_as_textarea' => array('textarea'),
 		'only_update_changed' => TRUE, // if set to TRUE, then only the fields that have been changed (according to ORM::column_changed()) will be updated
 		'record_changes' => TRUE, // if set to TRUE, Model_Change_Log will be used to record changes; only_update_changed must be set to TRUE for this to work
+		'add_field_help' => FALSE, // enabling this will display the field help
 		'field_help_view' => 'cl4/field_help', // the view used to generate the help for the field
 	),
 );
