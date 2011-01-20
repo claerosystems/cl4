@@ -11,6 +11,11 @@ class Model_cl4_Change_Log extends ORM {
 	public $_table_name_display = 'Change Log'; // cl4-specific
 	protected $_log = FALSE; // don't log changes (will create loop)
 
+	protected $_options = array(
+		// this will disable the change checking that is done in save() as we don't really care for the change_log
+		'only_update_changed' => FALSE,
+	);
+
 	// column labels
 	protected $_labels = array(
 		'id' => 'ID',
