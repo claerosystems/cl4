@@ -210,13 +210,8 @@ class cl4_File {
 			}
 		} // if
 
-		$destination_filename_options = array(
-			'clean_filename' => $this->options['clean_filename'],
-			'lowercase_filename' => $this->options['lowercase_filename'],
-			'name_change_text' => $this->options['name_change_text'],
-		);
 		// generate the new file name and extension
-		$file_info['dest_file'] = cl4File::get_destination_filename($file_info, $this->options['name_change_method'], $destination_filename_options);
+		$file_info['dest_file'] = cl4File::get_destination_filename($file_info, $this->options['name_change_method'], $this->options);
 
 		// add the file path to the destination file
 		$file_info['dest_file_path'] = $destination_folder . '/' . $file_info['dest_file'];
