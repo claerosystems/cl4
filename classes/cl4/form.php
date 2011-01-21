@@ -360,7 +360,7 @@ class cl4_Form extends Kohana_Form {
 	} // function
 
 	/**
-	* Pass empty (string), FALSE (bool), 0000-00-00 (string), 0000-00-00 00:00:00 (string) or an invalid date to get a blank field
+	* Pass an empty (string), FALSE (bool), 0000-00-00 (string), 0000-00-00 00:00:00 (string) or an invalid date to get a blank field
 	*
 	* @param mixed $name
 	* @param string $value

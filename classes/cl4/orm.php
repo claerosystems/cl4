@@ -1645,7 +1645,7 @@ class cl4_ORM extends Kohana_ORM {
 							$file_options = $column_info['field_options']['file_options'];
 							if ($file_options['name_change_method'] == 'id' || $file_options['name_change_method'] == 'pk') {
 								// move the file to it's id based filename and set the value in the model
-								$dest_file_data = cl4File::move_to_id_path($this->get_filename_with_path($column_name), $this->pk(), $file_options['destination_folder']);
+								$dest_file_data = cl4File::move_to_id_path($this->get_filename_with_path($column_name), $this->pk(), $file_options['destination_folder'], $file_options);
 								$this->$column_name = $dest_file_data['dest_file'];
 								$files_moved[$column_name] = $this->$column_name;
 							}
@@ -1830,11 +1830,11 @@ class cl4_ORM extends Kohana_ORM {
 		if ( ! empty($this->$column_name)) {
 			$file_path = $this->get_filename_with_path($column_name);
 
-			$file_name = ORM_File::view($this->$column_name, $column_name, $this, $this->_table_columns[$column_name]['field_options']);
-
 			if ( ! file_exists($file_path)) {
 				throw new cl4_Exception_File('The file that was attempted to be sent to the browser does not exist: :file:', array(':file:' => $file_path), cl4_Exception_File::FILE_DOES_NOT_EXIST);
 			}
+
+			$file_name = ORM_File::view($this->$column_name, $column_name, $this, $this->_table_columns[$column_name]['field_options']);
 
 			Request::instance()->send_file($file_path, $file_name);
 		} // if

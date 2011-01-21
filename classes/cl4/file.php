@@ -72,12 +72,13 @@ class cl4_File {
 	/**
 	*   Validates uploaded file and then moves it to the destination if specified
 	*
-	*   @param	  mixed	  $files_array_loc      The name of the field within the $_FILES array; Can also be an array where the values are the location of the file in the $_FILES array when using a post array
-	*                 So $_FILES[c_record][name][table_name][0][column_name] would be array('c_record', 'table_name', 0, 'column_name')
-	*                 When using an array, the keys can't have periods because it uses Arr::path() to find the value
-	*   @param	  string	  $destination	The destination file name (minus path) (can be null if there isn't going to be a name change or using timestamp)
+	* @param   mixed   $files_array_loc  The name of the field within the $_FILES array; Can also be an array where the values are the location of the file in the $_FILES array when using a post array
+	*                                    So $_FILES[c_record][name][table_name][0][column_name] would be array('c_record', 'table_name', 0, 'column_name')
+	*                                    When using an array, the keys can't have periods because it uses Arr::path() to find the value
+	* @param   string  $destination      The destination file name (minus path) (can be null if there isn't going to be a name change or using timestamp)
+	* @param   array   $options          Options as found in config/cl4file
 	*
-	*   @return	 array
+	* @return  array
 	*/
 	public function upload($files_array_loc, $destination_folder, array $options = array()) {
 		$return = array(
@@ -216,6 +217,17 @@ class cl4_File {
 		// add the file path to the destination file
 		$file_info['dest_file_path'] = $destination_folder . '/' . $file_info['dest_file'];
 
+		// the destination folder may have changed within cl4File::get_destination_filename() so determine if we need to make the directory
+		if ($this->options['make_dir']) {
+			$new_destination_folder = pathinfo($file_info['dest_file_path'], PATHINFO_DIRNAME);
+			if ($new_destination_folder != $destination_folder && ! file_exists($new_destination_folder)) {
+				// option is set to make the dir and it doesn't exist
+				if ( ! mkdir($new_destination_folder, 0755, TRUE)) {
+					throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana::exception_text($e)), cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
+				}
+			}
+		}
+
 		// if overrite is false, make sure the destination file does not already exist
 		if (file_exists($file_info['dest_file_path'])) {
 			if ( ! $this->options['overwrite']) {
@@ -240,13 +252,14 @@ class cl4_File {
 		}
 
 		return $return;
-	} // function
+	} // function upload
 
 	/**
 	* If $html is TRUE, this returns an HTML formatted string prefixed with with a message regarding allowed file types based on config/mime_description
 	* If $html is FALSE, this returns an array of file type names based on config/mime_description
 	* This can be run from the object or statically which will then merge the default options in config/cl4file.options with the passed options
 	*
+	* @return  string  HTML string for output
 	*/
 	private static function get_mime_type_error_msg($html = TRUE, array $options = NULL) {
 		if (isset($this) && $options === NULL) {
@@ -331,7 +344,7 @@ class cl4_File {
 		}
 
 		return $msg;
-	} // function
+	} // function get_mime_type_error_msg
 
 	/**
 	* generates the destination filename and other paramters based on the file info, name change method and options and returns the updated file_info array
@@ -426,7 +439,7 @@ class cl4_File {
 		}
 
 		return $dest_file;
-	} // function
+	} // function get_destination_filename
 
 	/**
 	* Renames the file to the destination folder with a filename based on the id/primary key
@@ -436,15 +449,17 @@ class cl4_File {
 	* @param   string   $original_file       The original file including path
 	* @param   integer  $record_pk           The record primary key
 	* @param   string   $destination_folder  The destination folder
+	* @param   array    $options             The file options, passed directly to cl4File::get_destination_filename()
+	*
 	* @return  array    Array with 2 keys: dest_file and dest_file_path
 	*/
-	public static function move_to_id_path($original_file_path, $record_pk, $destination_folder) {
+	public static function move_to_id_path($original_file_path, $record_pk, $destination_folder, $options) {
 		$ext = pathinfo($original_file_path, PATHINFO_EXTENSION);
 
 		$destination_file = cl4File::get_destination_filename(array(
 			'record_pk' => $record_pk,
 			'ext' => $ext
-		), 'id');
+		), 'id', $options);
 
 		cl4File::move($original_file_path, $destination_folder . '/' . $destination_file);
 
