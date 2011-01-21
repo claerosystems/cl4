@@ -214,6 +214,7 @@ class cl4_Form extends Kohana_Form {
 		$default_options = array(
 			'orientation' => 'table',
 			'table_tag' => TRUE,
+			'table_attributes' => array(),
 			'columns' => 2,
 			'escape_label' => TRUE,
 			'checkbox_hidden' => TRUE,
@@ -241,7 +242,7 @@ class cl4_Form extends Kohana_Form {
 		}
 
 		if ($options['orientation'] == 'table' && $options['table_tag']) {
-			$html .= '<table border="0" cellpadding="1" cellspacing="1">' . EOL;
+			$html .= '<table' . HTML::attributes($options['table_attributes']) . '>' . EOL;
 		}
 
 		$first_checkbox = TRUE;
