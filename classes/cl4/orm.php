@@ -1054,14 +1054,12 @@ class cl4_ORM extends Kohana_ORM {
 		}
 
 		if (isset($this->_field_html[$column_name]['field'])) {
-			$field_html =  $this->_field_html[$column_name]['field'];
+			return $this->_field_html[$column_name]['field'];
 		} else if (isset($this->_form_fields_hidden[$column_name])) {
 			return $this->_form_fields_hidden[$column_name];
 		} else {
 			throw new Kohana_Exception('Prepare form was unable to prepare the field therefore there is no field available: :column_name', array(':column_name' => $column_name));
 		} // if
-
-		return $field_html;
 	} // function
 
 	/**
