@@ -422,6 +422,7 @@ class cl4_ORM extends Kohana_ORM {
 	*/
 	public function set_mode($mode) {
 		$this->_mode = $mode;
+		$this->_options['mode'] = $mode;
 
 		return $this;
 	} // function set_mode
@@ -629,7 +630,7 @@ class cl4_ORM extends Kohana_ORM {
 					// look for the attributes and set them
 					$field_attributes = $column_info['field_attributes'];
 					$label_attributes = array();
-					if ($this->_options['mode'] == 'edit' && isset($this->_rules[$column_name]['not_empty'])) {
+					if ($this->_mode == 'edit' && isset($this->_rules[$column_name]['not_empty'])) {
 						$field_attributes = HTML::set_class_attribute($field_attributes, 'cl4_required');
 						$label_attributes['class'] = 'cl4_required';
 					}
