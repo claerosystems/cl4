@@ -1027,7 +1027,7 @@ class cl4_ORM extends Kohana_ORM {
 		if ($this->_options['display_buttons'] && $this->_options['display_back_to_list']) {
 			$this->set_target_route();
 			$this->_form_buttons[] = Form::submit(NULL, __('Return to List'), array(
-				'data-cl4_link' => '/' . Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name, 'action' => 'cancel')),
+				'data-cl4_link' => '/' . Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name)),
 				'class' => 'cl4_button_link ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
 			));
 		} // if
