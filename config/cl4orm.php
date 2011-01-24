@@ -182,7 +182,6 @@ return array(
 		'display_reset' => TRUE, // whether or not to display the clear button on the form
 		'display_cancel' => TRUE, // whether or not to display the cancel button on the form
 		'display_back_to_list' => TRUE, // display the return to list when in view mode
-		'cancel_url' => null,   // If provided, a URL to return to if a form in cancelled
 		'hidden_fields' => array(), // extra hidden fields to be added to the form, 0 => '<input type...'
 		// todo: 'enable_post_array' => TRUE, // todo: don't use record[table][0][column]... just use column name (also for save?)
 		// todo: 'multiple_edit_layout' => 'horizontal', // 'horizontal' or 'vertical'
