@@ -910,22 +910,23 @@ class cl4_Form extends Kohana_Form {
 	* Adds the suffix to the field name as: [suffix]
 	* This is just reduces the code as it's a common case
 	*
-	* @param mixed $name
-	* @param mixed $data
-	* @param mixed $attributes
-	* @param mixed $class_prefix
-	* @param mixed $suffix
-	* @param mixed $size
-	* @param mixed $max_length
-	* @return string
+	* @param  string  $name          The name of the input
+	* @param  mixed   $value         The input value
+	* @param  array   $attributes    The input attributes (class and id maybe modified)
+	* @param  string  $class_prefix  Prefix to the CSS class
+	* @param  string  $suffix        Suffix for the field. Used in the CSS class, ID and field name (in square brackets for field name)
+	* @param  int     $size          The size of the input
+	* @param  int     $max_length    The max length of the input
+	*
+	* @return  string  HTML output
 	*/
 	public static function input_with_suffix_size($name, $value, $attributes, $class_prefix, $suffix, $size = 10, $max_length = 10) {
 		$attributes = HTML::set_class_attribute($attributes, $class_prefix . '-' . $suffix);
 		if ( ! empty($attributes['id'])) $attributes['id'] .= '-' . $suffix;
-		$attributes += array(
-			'size' => $size,
-			'maxlength' => $max_length,
-		);
+
+		// force setting the size and max length attributes
+		$attributes['size'] = $size;
+		$attributes['maxlength'] = $max_length;
 
 		return Form::input($name . '[' . $suffix . ']', $value, $attributes);
 	} // function input_with_suffix_size
