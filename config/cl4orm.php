@@ -183,9 +183,7 @@ return array(
 		'display_cancel' => TRUE, // whether or not to display the cancel button on the form
 		'display_back_to_list' => TRUE, // display the return to list when in view mode
 		'hidden_fields' => array(), // extra hidden fields to be added to the form, 0 => '<input type...'
-		// todo: 'enable_post_array' => TRUE, // todo: don't use record[table][0][column]... just use column name (also for save?)
 		// todo: 'multiple_edit_layout' => 'horizontal', // 'horizontal' or 'vertical'
-		// todo: 'user_action' => FALSE, // include the user action hidden field instead of action on the submit button
 		// todo: 'prepare_fields_without_values' => FALSE, // always should the form fields for an associated table even if no records yet exist (in multiple table case)
 		// todo: 'additional_multiple' => array(),	// how many to add
 
