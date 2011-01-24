@@ -210,7 +210,7 @@ class cl4_HTMLTable {
 	*   @param	  int	 $count		  The number of columns to span (defualt 2)
 	*/
 	public function set_col_span($row_number, $column_number, $count = 2) {
-		$this->set_attribute($row_number, $column_number, 'col_span', $count);
+		$this->set_attribute($row_number, $column_number, 'colspan', $count);
 
 		$this->col_span[$row_number][$column_number] = $count;
 	} // function set_col_span
