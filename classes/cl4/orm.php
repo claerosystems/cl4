@@ -559,7 +559,7 @@ class cl4_ORM extends Kohana_ORM {
 		// todo: not sure if this makes sense in all cases
 		if ($show_field && $this->_mode == 'add' && $column_name == $this->_primary_key) {
 			$show_field = FALSE;
-		} //if
+		} // if
 
 		return $show_field;
 	} // function show_field
@@ -594,9 +594,9 @@ class cl4_ORM extends Kohana_ORM {
 		} else {
 			$process_columns = array_keys($this->_table_columns);
 
-			// determine which field is the first one
+			// determine which field is the first one that is visible and not a hidden field
 			foreach ($this->_display_order as $column_name) {
-				if ($this->show_field($column_name)) {
+				if ($this->show_field($column_name) && ! in_array($this->_table_columns[$column_name]['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 					$first_field = $column_name;
 					break;
 				}
