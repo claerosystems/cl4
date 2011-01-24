@@ -911,10 +911,6 @@ class cl4_ORM extends Kohana_ORM {
 		// set options if passed
 		if ( ! empty($options)) $this->set_options($options);
 
-		$this->_form_buttons = array();
-		$this->set_target_route();
-		$target_route = $this->_options['target_route'];
-
 		// generate the form field html (this also gets the default data)
 		$this->prepare_form();
 
@@ -938,10 +934,16 @@ class cl4_ORM extends Kohana_ORM {
 		} // if
 
 		if ($this->_options['display_buttons']) {
+			$this->set_target_route();
+			$target_route = $this->_options['target_route'];
+
 			// set up the buttons
-			// todo: add ability to override button attributes properly through options
 			if ($this->_options['display_submit']) {
-				$this->_form_buttons[] = Form::submit('cl4_submit', ($this->_mode == 'search' ? __('Search') : __('Save')));
+				$submit_button_options = array();
+				if ( ! empty($this->_options['submit_button_options'])) {
+					$submit_button_options = HTML::merge_attributes($submit_button_options, $this->_options['submit_button_options']);
+				}
+				$this->_form_buttons[] = Form::submit('cl4_submit', ($this->_mode == 'search' ? __('Search') : __('Save')), $submit_button_options);
 			}
 			if ($this->_options['display_reset']) {
 				if ($this->_mode == 'search') {
@@ -949,18 +951,26 @@ class cl4_ORM extends Kohana_ORM {
 				} else {
 					$action = 'edit';
 				}
-				$this->_form_buttons[] = Form::input('cl4_reset', __('Reset'), array(
+				$reset_button_options = array(
 					'type' => 'button',
 					'class' => 'cl4_button_link',
-					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => $action, 'id' => $this->pk())),
-				));
+					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => $action, 'id' => $this->pk()))),
+				);
+				if ( ! empty($this->_options['reset_button_attributes'])) {
+					$reset_button_options = HTML::merge_attributes($reset_button_options, $this->_options['reset_button_attributes']);
+				}
+				$this->_form_buttons[] = Form::input('cl4_reset', __('Reset'), $reset_button_options);
 			}
 			if ($this->_options['display_cancel']) {
-				$this->_form_buttons[] = Form::input('cl4_cancel', __('Cancel'), array(
+				$cancel_button_options = array(
 					'type' => 'button',
 					'class' => 'cl4_button_link',
-					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'cancel')),
-				));
+					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'cancel'))),
+				);
+				if ( ! empty($this->_options['cancel_button_attributes'])) {
+					$cancel_button_options = HTML::merge_attributes($cancel_button_options, $this->_options['cancel_button_attributes']);
+				}
+				$this->_form_buttons[] = Form::input('cl4_cancel', __('Cancel'), $cancel_button_options);
 			}
 		} // if
 
@@ -1026,10 +1036,15 @@ class cl4_ORM extends Kohana_ORM {
 		// set up the buttons
 		if ($this->_options['display_buttons'] && $this->_options['display_back_to_list']) {
 			$this->set_target_route();
-			$this->_form_buttons[] = Form::submit(NULL, __('Return to List'), array(
-				'data-cl4_link' => '/' . Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name)),
+
+			$submit_button_options = array(
 				'class' => 'cl4_button_link ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
-			));
+				'data-cl4_link' => URL::site(Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name))),
+			);
+			if ( ! empty($this->_options['submit_button_options'])) {
+				$submit_button_options = HTML::merge_attributes($submit_button_options, $this->_options['submit_button_options']);
+			}
+			$this->_form_buttons[] = Form::submit(NULL, __('Return to List'), $submit_button_options);
 		} // if
 
 		// return the generated view

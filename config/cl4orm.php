@@ -182,6 +182,11 @@ return array(
 		'display_reset' => TRUE, // whether or not to display the clear button on the form
 		'display_cancel' => TRUE, // whether or not to display the cancel button on the form
 		'display_back_to_list' => TRUE, // display the return to list when in view mode
+		// the following arrays are merged with the default attributes in ORM; anything in these arrays will override the defaults
+		'submit_button_options' => array(),
+		'reset_button_attributes' => array(),
+		'cancel_button_attributes' => array(),
+
 		'hidden_fields' => array(), // extra hidden fields to be added to the form, 0 => '<input type...'
 		// todo: 'multiple_edit_layout' => 'horizontal', // 'horizontal' or 'vertical'
 		// todo: 'prepare_fields_without_values' => FALSE, // always should the form fields for an associated table even if no records yet exist (in multiple table case)
