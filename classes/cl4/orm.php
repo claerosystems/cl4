@@ -1583,7 +1583,7 @@ class cl4_ORM extends Kohana_ORM {
 						$column = $this->_updated_column['column'];
 						$format = $this->_updated_column['format'];
 
-						$data[$column] = $this->_object[$column] = ($format === TRUE) ? time() : date($format);
+						$changed[$column] = $this->_object[$column] = ($format === TRUE) ? time() : date($format);
 					} // if
 
 					$query = DB::update($this->_table_name)
@@ -1605,7 +1605,7 @@ class cl4_ORM extends Kohana_ORM {
 						$column = $this->_created_column['column'];
 						$format = $this->_created_column['format'];
 
-						$data[$column] = $this->_object[$column] = ($format === TRUE) ? time() : date($format);
+						$changed[$column] = $this->_object[$column] = ($format === TRUE) ? time() : date($format);
 					}
 
 					$result = DB::insert($this->_table_name)
