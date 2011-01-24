@@ -363,12 +363,18 @@ class cl4_Form extends Kohana_Form {
 	/**
 	* Pass an empty (string), FALSE (bool), 0000-00-00 (string), 0000-00-00 00:00:00 (string) or an invalid date to get a blank field
 	*
-	* @param mixed $name
+	* @param string $name
 	* @param string $value
-	* @param mixed $attributes
+	* @param array $attributes
+	* @param array $options
 	*/
-	public static function date($name, $value = FALSE, array $attributes = NULL) {
+	public static function date($name, $value = FALSE, array $attributes = NULL, array $options = array()) {
 		$html = '';
+
+		$default_options = array(
+			'clean_date' => FALSE,
+		);
+		$options += $default_options;
 
 		if ($attributes === NULL) $attributes = array();
 		$attributes += array(
@@ -381,6 +387,9 @@ class cl4_Form extends Kohana_Form {
 		// check if the value of the date is actually empty
 		if (Form::check_date_empty_value($value)) {
 			$value = '';
+		} else if ($options['clean_date']) {
+			$unix = strtotime($value);
+			$value = date(Form::DATE_FORMAT, $unix);
 		}
 
 		$html .= Form::input($name, $value, $attributes);

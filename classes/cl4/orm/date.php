@@ -7,7 +7,7 @@ class cl4_ORM_Date extends ORM_FieldType {
 	const TIMESTAMP_FORMAT = 'M j, Y';
 
 	public static function edit($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
-		return Form::date($html_name, $value, $attributes);
+		return Form::date($html_name, $value, $attributes, $options);
 	}
 
 	public static function search($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
@@ -37,7 +37,7 @@ class cl4_ORM_Date extends ORM_FieldType {
 			'class' => 'cl4_date_operand',
 		));
 
-		return $date_option_html . Form::date($html_name . '[date]', $value['date'], $attributes);
+		return $date_option_html . Form::date($html_name . '[date]', $value['date'], $attributes, $options);
 	} // function
 
 	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
