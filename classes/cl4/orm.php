@@ -86,16 +86,6 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_display_order = array();
 
 	/**
-	* An array of values that should be merged with the properties
-	* This is meant to be used when you are extending a class and don't want to recreate the whole array of values, for things like _table_columns
-	* This is merged during _initialize()
-	*
-	* @var 	array
-	*/
-	protected $_override_properties = array();
-
-	//
-	/**
 	* Contains the original record, populate during find()
 	* @var  array
 	*/
@@ -204,23 +194,6 @@ class cl4_ORM extends Kohana_ORM {
 				throw $e;
 			}
 		} // if
-	} // function
-
-	/**
-	* Prepares the model database connection, determines the table name, and loads column information.
-	* Runs the parent after merging the _override_settings with the properties
-	*
-	* @return  void
-	*
-	* @see Kohana_ORM::_initialize()
-	* @see cl4_ORM::merge_override_properties()
-	*/
-	protected function _initialize() {
-		if ( ! empty($this->_override_properties)) {
-			$this->merge_override_properties();
-		}
-
-		parent::_initialize();
 	} // function
 
 	/**
@@ -2090,62 +2063,6 @@ class cl4_ORM extends Kohana_ORM {
 				$this->$key = $from[$key];
 			}
 		} // foreach
-
-		return $this;
-	} // function
-
-	/**
-	* Merges $this->_override_properties with the properties
-	* It won't do a full merge, but will do different things based on the property
-	* Properties currently allowed to be merged: _table_columns, _belongs_to, _rules, _has_many, _has_one, _labels, _sorting
-	* For these it will replace each key within the property (no merge): _table_columns, _belongs_to, _rules, _has_many, _has_one
-	* For these it will merge the property with the override: _labels, _sorting
-	* For display_order it will check to see if the column exists in the display order array already (removing it first) before adding a new one
-	*
-	* @chainable
-	* @return ORM
-	*/
-	protected function merge_override_properties() {
-		if ( ! empty($this->_override_properties)) {
-			$allowed_override_properties = array('_db', '_table_name', '_table_columns', '_belongs_to', '_rules', '_callbacks', '_has_many', '_has_one', '_labels', '_sorting', '_display_order');
-
-			foreach ($allowed_override_properties as $property) {
-				if ( ! empty($this->_override_properties[$property])) {
-					switch ($property) {
-						case '_table_columns' :
-						case '_belongs_to' :
-						case '_rules' :
-						case '_callbacks' :
-						case '_has_many' :
-						case '_has_one' :
-							// replace each key in the array with the array in _override_properties
-							// exmaple: for _table_columns it will replace or add the entire array for each field
-							foreach ($this->_override_properties[$property] as $key => $value) {
-								$this->{$property}[$key] = $value;
-							}
-							break;
-						case '_labels' :
-						case '_sorting' :
-							// merge the 2 arrays, as they are only key/value pairs and it doesn't matter if we have extras we aren't using
-							$this->{$property} = Arr::merge($this->{$property}, $this->_override_properties[$property]);
-							break;
-						case '_display_order' :
-							foreach ($this->_override_properties[$property] as $display_order => $column_name) {
-								$current_display_order = array_search($column_name, $this->_display_order);
-								// if the column is found in the display order array, then remove it so it can be added with it's new order
-								if ($current_display_order !== FALSE) {
-									unset($this->_display_order[$current_display_order]);
-								}
-								$this->_display_order[$display_order] = $column_name;
-							}
-							break;
-						case '_db' :
-						case '_table_name' :
-							$this->{$property} = $this->_override_properties[$property];
-					} // switch
-				} // if
-			} // foreach
-		} // if
 
 		return $this;
 	} // function
