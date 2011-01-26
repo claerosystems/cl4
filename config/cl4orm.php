@@ -353,5 +353,6 @@ return array(
 		'record_changes' => TRUE, // if set to TRUE, Model_Change_Log will be used to record changes; only_update_changed must be set to TRUE for this to work
 		'add_field_help' => FALSE, // enabling this will display the field help
 		'field_help_view' => 'cl4/field_help', // the view used to generate the help for the field
+		'additional_view_data' => NULL, // additional data to be passed to the edit or view Views; the option is passed exactly as is
 	),
 );

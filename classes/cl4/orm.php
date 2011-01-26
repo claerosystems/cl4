@@ -989,6 +989,7 @@ class cl4_ORM extends Kohana_ORM {
 			'search_type_html'      => $search_type_html,
 			'like_type_html'        => $like_type_html,
 			'display_order'         => $this->_display_order,
+			'additional_view_data'  => $this->_options['additional_view_data'],
 		));
 	} // function
 
@@ -1028,6 +1029,7 @@ class cl4_ORM extends Kohana_ORM {
 			'form_field_html'   => $this->_field_html,
 			'form_buttons'      => $this->_form_buttons,
 			'display_order'     => $this->_display_order,
+			'additional_view_data' => $this->_options['additional_view_data'],
 		));
 	} // function
 
