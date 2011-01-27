@@ -223,7 +223,6 @@ class cl4_Form extends Kohana_Form {
 			'add_nbsp' => TRUE,
 			'group_header_open' => '<strong>',
 			'group_header_close' => '</strong>',
-			'add_ids' => TRUE,
 		);
 		$options += $default_options;
 
