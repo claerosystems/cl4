@@ -128,6 +128,11 @@ class cl4_ORM extends Kohana_ORM {
 	public $_was_update;
 
 	/**
+	* @var  array  Array of field help: array('column_name' => array('mode' => [text], ... 'all' => [text]))
+	*/
+	protected $_field_help = array();
+
+	/**
 	 * Instructs builder to include expired rows in select queries.
 	 *
 	 * @chainable
@@ -738,16 +743,10 @@ class cl4_ORM extends Kohana_ORM {
 	* @return  View
 	*/
 	public function get_field_help($column_name, $field_html_name = NULL) {
-		if ( ! $this->table_column_exists($column_name)) {
-			throw new Kohana_Exception('The column name :column_name: cannot be found in _table_columns', array(':column_name:' => $column_name));
-		}
-
-		$column_info = $this->_table_columns[$column_name];
-
-		if ( ! empty($column_info['field_help'][$this->_mode])) {
-			$field_help = $column_info['field_help'][$this->_mode];
-		} else if ( ! empty($column_info['field_help']['all'])) {
-			$field_help = $column_info['field_help']['all'];
+		if ( ! empty($this->_field_help[$column_name][$this->_mode])) {
+			$field_help = $this->_field_help[$column_name][$this->_mode];
+		} else if ( ! empty($this->_field_help[$column_name]['all'])) {
+			$field_help = $this->_field_help[$column_name]['all'];
 		} else {
 			$field_help = NULL;
 		}
