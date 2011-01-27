@@ -102,7 +102,7 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_was_updated;
 
 	/**
-	* Disables/enables logging the any updates (insert, update, delete) for the object
+	* Disables/enables logging updates (insert, update, delete) for the object
 	* By default, all changes will be logged
 	* @var  bool
 	*/
@@ -429,6 +429,15 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function set_target_route
+
+	/**
+	* sets the log property to FALSE in order to disable the changelog
+	*
+	* @param mixed $setting true or false
+	*/
+	public function set_log($setting = FALSE) {
+		$this->_log = $setting;
+	}
 
 	/**
 	* get a formatted value of a model column
@@ -1998,6 +2007,7 @@ class cl4_ORM extends Kohana_ORM {
 	 *
 	 * @return object This model.
 	 */
+/*
 	public function set($from, $keys = null) {
 		$keys = (isset($keys) && is_array($keys) ? $keys : array_keys($from));
 
@@ -2009,7 +2019,7 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function
-
+*/
 	/**
 	* Takes an array of values from a search form and adds them to _db_pending to be applied the next time the model is retrieved
 	*

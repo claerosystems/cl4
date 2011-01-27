@@ -17,7 +17,7 @@ $routes = Kohana::config('cl4.routes');
 
 if ($routes['login']) {
 	// login page
-	Route::set('login', '(<lang>/)login(/<action>)', array('lang' => $lang_options, 'action' => '[a-z_]{0,}',))
+	Route::set('cl4_login', '(<lang>/)login(/<action>)', array('lang' => $lang_options, 'action' => '[a-z_]{0,}',))
 		->defaults(array(
 			'lang' => DEFAULT_LANG,
 			'controller' => 'login',
@@ -27,7 +27,7 @@ if ($routes['login']) {
 
 if ($routes['account']) {
 	// account: profile, change password, forgot, register
-	Route::set('account', '(<lang>/)account(/<action>)', array('lang' => $lang_options, 'action' => '[a-z_]{0,}',))
+	Route::set('cl4_account', '(<lang>/)account(/<action>)', array('lang' => $lang_options, 'action' => '[a-z_]{0,}',))
 	->defaults(array(
 		'controller' => 'account',
 		'lang' => DEFAULT_LANG,
@@ -40,7 +40,7 @@ if ($routes['cl4admin']) {
 	// Most cases: /dbadmin/user/edit/2
 	// Special case for download: /dbadmin/demo/download/2/public_filename
 	// Special case for add_multiple: /dbadmin/demo/add_mulitple/5 (where 5 is the number of records to add)
-	Route::set('cl4admin', '(<lang>/)dbadmin(/<model>(/<action>(/<id>(/<column_name>))))', array(
+	Route::set('cl4_admin', '(<lang>/)dbadmin(/<model>(/<action>(/<id>(/<column_name>))))', array(
 		'lang' => $lang_options,
 		'model' => '[a-z_]{0,}',
 		'action' => '[a-z_]+',
