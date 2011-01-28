@@ -130,6 +130,7 @@ return array(
 	// default options for relationships, merged in during set_options()
 	'default_relation_options' => array(
 		'edit_flag'   => FALSE, // disables editing of this field when editing the model it's apart of
+		'view_flag'   => FALSE, // disables showing the list of vlaues when viewing a record
 		'field_label' => NULL, // the label to display beside the field values
 		'through_model' => NULL, // the model for the through/pivot table, used to add() or delete()
 		/* commented out so that it will use the model instead of using this source data

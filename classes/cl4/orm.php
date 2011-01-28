@@ -729,41 +729,55 @@ class cl4_ORM extends Kohana_ORM {
 
 		// now check for has_many relationships and add the fields
 		// @todo: handle case where we have a belongs to and has many but we only want to display the associated records (eg. atttach a file to a record)
-		foreach ($this->_has_many as $alias => $relation_data) {
-			// only deal with relationships that have the edit_flag set as true
-			if ( ! empty($relation_data['edit_flag']) && $relation_data['edit_flag']) {
-				// retrieve all the related values in the related table
-				$source_values = $this->get_source_data($alias);
+		if ($this->_mode != 'search') {
+			foreach ($this->_has_many as $alias => $relation_data) {
+				switch($this->_mode) {
+					case 'view':
+						$show_field = $relation_data['view_flag'];
+						break;
+					case 'edit':
+					case 'add':
+					default:
+						// invalid mode received, just use edit
+						$show_field = $relation_data['edit_flag'];
+						break;
+				} // switch
 
-				if ($this->_mode == 'view') {
-					$field_html = $source_values;
-				} else {
-					$related_model = ORM::factory($relation_data['model']);
-					$related_table = $related_model->table_name();
-					$related_pk = $related_model->primary_key();
-					$related_label = $related_model->primary_val();
+				// only deal with relationships that have the edit_flag set as true
+				if ($show_field) {
+					// retrieve all the related values in the related table
+					$source_values = $this->get_source_data($alias);
 
-					// get the current source values
-					$current_values = $this->$alias->select($related_table . '.' . $related_pk)->find_all()->as_array(NULL, $related_pk);
+					if ($this->_mode == 'view') {
+						$field_html = $source_values;
+					} else {
+						$related_model = ORM::factory($relation_data['model']);
+						$related_table = $related_model->table_name();
+						$related_pk = $related_model->primary_key();
+						$related_label = $related_model->primary_val();
 
-					// note: never disable the hidden checkbox or save_values() will not initiate the saving of the related data
-					$checkbox_options = array(
-						'orientation' => 'vertical',
-						'source_value' => $related_pk,
-						'source_label' => $related_label,
+						// get the current source values
+						$current_values = $this->$alias->select($related_table . '.' . $related_pk)->find_all()->as_array(NULL, $related_pk);
+
+						// note: never disable the hidden checkbox or save_values() will not initiate the saving of the related data
+						$checkbox_options = array(
+							'orientation' => 'vertical',
+							'source_value' => $related_pk,
+							'source_label' => $related_label,
+						);
+
+						$field_html_name = $this->_options['field_name_prefix'] . '[' . $alias . '][]';
+						$field_html = Form::checkboxes($field_html_name, $source_values, $current_values, array(), $checkbox_options);
+					} // if
+
+					// add the field label and html
+					$this->_field_html[$alias] = array(
+						'label' => $relation_data['field_label'],
+						'field' => $field_html,
 					);
-
-					$field_html_name = $this->_options['field_name_prefix'] . '[' . $alias . '][]';
-					$field_html = Form::checkboxes($field_html_name, $source_values, $current_values, array(), $checkbox_options);
 				} // if
-
-				// add the field label and html
-				$this->_field_html[$alias] = array(
-					'label' => $relation_data['field_label'],
-					'field' => $field_html,
-				);
-			} // if
-		} // foreach
+			} // foreach
+		}
 
 		return $this;
 	} // function prepare_form
@@ -1529,7 +1543,7 @@ class cl4_ORM extends Kohana_ORM {
 	* Adds the data from the post in to _related_save_data based on the options in the relationship
 	* Only deals with _has_many relationships
 	*
-	* @param  array  $post
+	* @param  array  $post  The post data
 	*
 	* @chainable
 	* @return  ORM
@@ -1543,7 +1557,7 @@ class cl4_ORM extends Kohana_ORM {
 		// now deal with any data for has_many relationships where the edit flag is true
 		foreach ($this->_has_many as $alias => $relation_data) {
 			// only deal with relationships that have the edit_flag set as true
-			if ( ! empty($relation_data['edit_flag']) && $relation_data['edit_flag'] && ! empty($post[$this->_options['field_name_prefix']][$alias])) {
+			if ($relation_data['edit_flag'] && ! empty($post[$this->_options['field_name_prefix']][$alias])) {
 				// add an empty array so save() will include it while saving
 				$this->_related_save_data[$alias] = array();
 				foreach ($post[$this->_options['field_name_prefix']][$alias] as $related_value) {
