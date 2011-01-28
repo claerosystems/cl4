@@ -312,11 +312,11 @@ class cl4_MultiORM {
 		// set up the headings and sort links, etc. based on model
 		$i = -1;
 		foreach ($display_order as $column_name) {
-			try {
-				$column_data = $this->_table_columns[$this->_object_name][$column_name];
-			} catch (Exception $e) {
-				throw new Kohana_Exception('The column :column_name in _display_order is not defined in _table_columns', array(':column_name' => $column_name));
+			if ( ! isset($this->_table_columns[$this->_object_name][$column_name])) {
+				continue;
 			}
+
+			$column_data = $this->_table_columns[$this->_object_name][$column_name];
 
 			// only add the column if the list_flag is set to true
 			if ($column_data['list_flag']) {
@@ -529,11 +529,11 @@ class cl4_MultiORM {
 
 			// todo: implement multiple tables
 			foreach ($display_order as $column_name) {
-				try {
-					$column_data = $this->_table_columns[$this->_object_name][$column_name];
-				} catch (Exception $e) {
-					throw new Kohana_Exception('The column :column_name in _display_order is not defined in _table_columns', array(':column_name' => $column_name));
+				if ( ! isset($this->_table_columns[$this->_object_name][$column_name])) {
+					continue;
 				}
+
+				$column_data = $this->_table_columns[$this->_object_name][$column_name];
 
 				// only add the column if the list_flag is true
 				if ($column_data['list_flag']) {

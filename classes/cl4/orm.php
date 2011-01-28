@@ -133,6 +133,11 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_field_help = array();
 
 	/**
+	* @var  array  Array of aliases and their related data to be saved during save() and save_related()
+	*/
+	protected $_related_save_data = array();
+
+	/**
 	 * Instructs builder to include expired rows in select queries.
 	 *
 	 * @chainable
@@ -228,6 +233,7 @@ class cl4_ORM extends Kohana_ORM {
 		// set up the options
 		$this->set_options($options);
 		$this->set_column_defaults($options);
+		$this->set_relationship_defaults($options);
 
 		// set the table display name to the object name if table display name is empty
 		if (empty($this->_table_name_display)) {
@@ -311,17 +317,15 @@ class cl4_ORM extends Kohana_ORM {
 	* For file, the options found in config/cl4file.options will also be merged in
 	* Also ensures all the columns are in the display order array
 	*
+	* @param  array  $options
+	*
 	* @chainable
-	* @param array $options
-	* @return ORM
+	* @return  ORM
 	*/
 	public function set_column_defaults(array $options = array()) {
 		// get the default meta data from the config file
-		$default_meta_data = Kohana::config('cl4orm.default_meta_data');
-		if ( ! is_array($default_meta_data)) $default_meta_data = (array) $default_meta_data;
-
-		$default_meta_data_field_type = Kohana::config('cl4orm.default_meta_data_field_type');
-		if ( ! is_array($default_meta_data_field_type)) $default_meta_data_field_type = (array) $default_meta_data_field_type;
+		$default_meta_data = (array) Kohana::config('cl4orm.default_meta_data');
+		$default_meta_data_field_type = (array) Kohana::config('cl4orm.default_meta_data_field_type');
 
 		// if there is field type specific meta data for file, then get the cl4file options and merge them with the file field type ones
 		if ( ! empty($default_meta_data_field_type['file'])) {
@@ -388,7 +392,35 @@ class cl4_ORM extends Kohana_ORM {
 		}
 
 		return $this;
-	} // function
+	} // function set_column_defaults
+
+	/**
+	* Sets the defaults for the relationships
+	* Only does _has_many
+	* Uses the defaults found in config/cl4orm.default_relation_options
+	*
+	* @param  array  $options  Options as passed into _construct()
+	*
+	* @chainable
+	* @return  ORM
+	*/
+	public function set_relationship_defaults(array $options = array()) {
+		// get the config options
+		$default_relation_options = (array) Kohana::config('cl4orm.default_relation_options');
+
+		// get the options for has_many from the passed in options
+		$has_many_options = Arr::get($options, 'has_many', array());
+
+		foreach ($this->_has_many as $alias => $relationship_options) {
+			// get the options for this alias
+			$_has_many_options = Arr::get($has_many_options, $alias, array());
+
+			// merge the options overriding the existing options for the alias
+			$this->_has_many[$alias] = Arr::merge($default_relation_options, $relationship_options, $_has_many_options);
+		}
+
+		return $this;
+	} // function set_relationship_defaults
 
 	/**
 	* Sets the current mode of the model
@@ -696,37 +728,40 @@ class cl4_ORM extends Kohana_ORM {
 		} // foreach
 
 		// now check for has_many relationships and add the fields
-		foreach ($this->_has_many as $foreign_object => $relation_data) {
-			// todo: handle case where we have a belongs to and has many but we only want to display the associated records (eg. atttach a file to a record)
-			// todo: need to fix ids for the case where multiple forms for the same object on the same page, right now ids will be duplicated and will mess up labels, etc.
-
+		// @todo: handle case where we have a belongs to and has many but we only want to display the associated records (eg. atttach a file to a record)
+		foreach ($this->_has_many as $alias => $relation_data) {
+			// only deal with relationships that have the edit_flag set as true
 			if ( ! empty($relation_data['edit_flag']) && $relation_data['edit_flag']) {
-				// set up the parameters for the field generation
-				$through_table = $relation_data['through'];
-				$source_table = $relation_data['source_data']; // todo: should not need 'source_data' since we have the relationship via the model
-				$attributes = array();
-				$options = array(
-					'db_instance' => $this->_db,
-					'orientation' => 'horizontal',
-					'table_tag' => TRUE,
-					'columns' => 2,
-					'checkbox_hidden' => TRUE,
-					'source_value' => $relation_data['source_value'],
-					'source_label' => $relation_data['source_label'],
-					'add_nbsp' => TRUE,
-					'add_ids' => FALSE,
-				);
+				// retrieve all the related values in the related table
+				$source_values = $this->get_source_data($alias);
 
-				// create the sql to get the full list of source data
-				// todo: fix this to use parameters
-				$source_sql = "SELECT {$relation_data['source_value']}, {$relation_data['source_label']} FROM {$source_table} ORDER BY {$relation_data['source_label']}";
-				// get the source values
-				$source_values = $this->_db->query(Database::SELECT, $source_sql, false)->as_array($relation_data['source_value'], $relation_data['source_label']);
-				// get the checked source values
-				$value = $this->get_foreign_values($through_table, $relation_data);
+				if ($this->_mode == 'view') {
+					$field_html = $source_values;
+				} else {
+					$related_model = ORM::factory($relation_data['model']);
+					$related_table = $related_model->table_name();
+					$related_pk = $related_model->primary_key();
+					$related_label = $related_model->primary_val();
+
+					// get the current source values
+					$current_values = $this->$alias->select($related_table . '.' . $related_pk)->find_all()->as_array(NULL, $related_pk);
+
+					// note: never disable the hidden checkbox or save_values() will not initiate the saving of the related data
+					$checkbox_options = array(
+						'orientation' => 'vertical',
+						'source_value' => $related_pk,
+						'source_label' => $related_label,
+					);
+
+					$field_html_name = $this->_options['field_name_prefix'] . '[' . $alias . '][]';
+					$field_html = Form::checkboxes($field_html_name, $source_values, $current_values, array(), $checkbox_options);
+				} // if
+
 				// add the field label and html
-				$this->_field_html[$source_table]['label'] = $relation_data['field_label'];
-				$this->_field_html[$source_table]['field'] = Form::checkboxes($through_table . '[]', $source_values, $value, array(), $options);
+				$this->_field_html[$alias] = array(
+					'label' => $relation_data['field_label'],
+					'field' => $field_html,
+				);
 			} // if
 		} // foreach
 
@@ -1096,7 +1131,7 @@ class cl4_ORM extends Kohana_ORM {
 	*
 	* This function is very similar to ORMMultiple::get_source_data() such that changes here may also need to be changed there.
 	*
-	* @param string $column_name
+	* @param string $column_name the column name or alias
 	* @param mixed $value
 	* @return mixed
 	*/
@@ -1105,6 +1140,19 @@ class cl4_ORM extends Kohana_ORM {
 		if ( ! array_key_exists($column_name, $this->_lookup_data)) {
 			if (isset($this->_table_columns[$column_name]['field_options']['source'])) {
 				$options = $this->_table_columns[$column_name]['field_options']['source'];
+			} else if (isset($this->_has_many[$column_name])) {
+				if (isset($this->_has_many[$column_name]['source'])) {
+					$options = $this->_has_many[$column_name]['source'];
+				} else {
+					$source_model = ORM::factory($this->_has_many[$column_name]['model']);
+					$options = array(
+						'source' => 'model',
+						'data' => $this->_has_many[$column_name]['model'],
+						'value' => $source_model->primary_key(),
+						'label' => $source_model->primary_val(),
+						'order_by' => NULL,
+					);
+				}
 			} else {
 				// no options found, use defaults set below
 				$options = array();
@@ -1180,9 +1228,13 @@ class cl4_ORM extends Kohana_ORM {
 						try {
 							// filter the results by the ones used when in view mode (other modes require all the values)
 							if ($this->_mode == 'view') {
-								if ($this->$column_name !== NULL) {
+								// it's a column and the column is not NULL
+								if ($this->table_column_exists($column_name) && $this->$column_name !== NULL) {
 									$model = ORM::factory($source_model, $this->$column_name);
 									$this->_lookup_data[$column_name] = array($model->$options['value'] => $model->$options['label']);
+								// the column is not actually a column, but is not empty, so going to guess it's a model for a relationship
+								} else if ($this->$column_name !== NULL) {
+									$this->_lookup_data[$column_name] = $this->$column_name->group_concat($this->$column_name->table_name() . '.' . $options['label']);
 								} else {
 									$this->_lookup_data[$column_name] = array();
 								}
@@ -1210,10 +1262,28 @@ class cl4_ORM extends Kohana_ORM {
 				return $this->_lookup_data[$column_name];
 			}
 		} // if
-	} // function
+	} // function get_source_data
 
 	/**
-	* add any mandatory query parameters to _db_pending
+	* Gets the model name to use for a _has_many relationship
+	*
+	* @param  string  $alias  The alias to retrieve the model name for
+	*
+	* @return  string  The through model name
+	*/
+	public function get_through_model($alias) {
+		if ( ! empty($this->_has_many[$alias]['through_model'])) {
+			return $this->_has_many[$alias]['through_model'];
+		} else {
+			return $this->_has_many[$alias]['through'];
+		}
+	} // function get_through_model
+
+	/**
+	* Add any mandatory query parameters to _db_pending
+	*
+	* @chainable
+	* @return  ORM
 	*/
 	protected function add_search_filter() {
 		if ( ! empty($this->_search_filter)) {
@@ -1221,7 +1291,9 @@ class cl4_ORM extends Kohana_ORM {
 				$this->_db_pending[] = $search_array;
 			}
 		} // if
-	} // function
+
+		return $this;
+	} // function add_search_filter
 
 	/**
 	* generate a csv file for this model and settings
@@ -1408,6 +1480,7 @@ class cl4_ORM extends Kohana_ORM {
 			$post = $_POST;
 		}
 
+		$original_post = $post;
 		$post = $this->get_table_records_from_post($post);
 
 		// get the id from the post and set it in the object (if there is one, won't be one in 'add' case)
@@ -1424,34 +1497,111 @@ class cl4_ORM extends Kohana_ORM {
 		// only set columns that have a field_type and edit_flag true (or 1)
 		// todo: should this produce a warning if the column attempting to be set is not "editable"
 
-		try {
-			// loop through the columns in the model
-			foreach ($this->_table_columns as $column_name => $column_meta) {
-				// don't save, if:
-				// skip the primary key as we've delt with above
-				if (($column_name == $this->_primary_key)
-				// if the edit flag it set to false and the column is not in ignored columns
-				|| ( ! $column_meta['edit_flag'] && ! in_array($column_name, $this->_ignored_columns))
-				// if the mode is edit and view in edit mode is true
-				|| ($this->_mode == 'edit' && $column_meta['view_in_edit_mode'])) {
-					$save_field = FALSE;
-				} else {
-					$save_field = TRUE;
-				}
+		// loop through the columns in the model
+		foreach ($this->_table_columns as $column_name => $column_meta) {
+			// don't save, if:
+			// skip the primary key as we've delt with above
+			if (($column_name == $this->_primary_key)
+			// if the edit flag it set to false and the column is not in ignored columns
+			|| ( ! $column_meta['edit_flag'] && ! in_array($column_name, $this->_ignored_columns))
+			// if the mode is edit and view in edit mode is true
+			|| ($this->_mode == 'edit' && $column_meta['view_in_edit_mode'])) {
+				$save_field = FALSE;
+			} else {
+				$save_field = TRUE;
+			}
 
-				if ($save_field) {
-					$save_options = $this->get_save_options($column_name);
+			if ($save_field) {
+				$save_options = $this->get_save_options($column_name);
 
-					// this will set the value in the passed ORM model
-					call_user_func(ORM_FieldType::get_field_type_class_name($column_meta['field_type']) . '::save', $post, $column_name, $save_options, $this);
-				} // if
-			} // foreach
-		} catch (Exception $e) {
-			throw $e;
-		}
+				// this will set the value in the passed ORM model
+				call_user_func(ORM_FieldType::get_field_type_class_name($column_meta['field_type']) . '::save', $post, $column_name, $save_options, $this);
+			} // if
+		} // foreach
+
+		// save the related
+		$this->save_values_related($original_post);
 
 		return $this;
 	} // function save_values
+
+	/**
+	* Adds the data from the post in to _related_save_data based on the options in the relationship
+	* Only deals with _has_many relationships
+	*
+	* @param  array  $post
+	*
+	* @chainable
+	* @return  ORM
+	*/
+	public function save_values_related($post = NULL) {
+		// grab the values from the POST if the values have not been passed
+		if ($post === NULL) {
+			$post = $_POST;
+		}
+
+		// now deal with any data for has_many relationships where the edit flag is true
+		foreach ($this->_has_many as $alias => $relation_data) {
+			// only deal with relationships that have the edit_flag set as true
+			if ( ! empty($relation_data['edit_flag']) && $relation_data['edit_flag'] && ! empty($post[$this->_options['field_name_prefix']][$alias])) {
+				// add an empty array so save() will include it while saving
+				$this->_related_save_data[$alias] = array();
+				foreach ($post[$this->_options['field_name_prefix']][$alias] as $related_value) {
+					// @todo figure out what this should be instead of empty() because empty will skip values that maybe needed/wanted
+					if ( ! empty($related_value)) {
+						$this->_related_save_data[$alias][] = $related_value;
+					}
+				}
+			} // if
+		} // foreach
+
+		return $this;
+	} // function save_values_related
+
+	/**
+	 * Adds a new relationship to between this model and another.
+	 *
+	 * @param   string   alias of the has_many "through" relationship
+	 * @param   ORM      related ORM model
+	 * @param   array    additional data to store in "through"/pivot table
+	 * @return  ORM
+	 */
+	public function add($alias, ORM $model, $data = NULL) {
+		$values = array(
+			$this->_has_many[$alias]['foreign_key'] => $this->pk(),
+			$this->_has_many[$alias]['far_key'] => $model->pk(),
+		);
+
+		if ($data !== NULL) {
+			// Additional data stored in pivot table
+			$values = array_merge($values, $data);
+		}
+
+		ORM::factory($this->get_through_model($alias))
+			->values($values)
+			->save();
+
+		return $this;
+	} // function add
+
+	/**
+	 * Removes a relationship between this model and another.
+	 *
+	 * @param   string   alias of the has_many "through" relationship
+	 * @param   ORM      related ORM model
+	 *
+	 * @chainable
+	 * @return  ORM
+	 */
+	public function remove($alias, ORM $model) {
+		ORM::factory($this->get_through_model($alias))
+			->where($this->_has_many[$alias]['foreign_key'], '=', $this->pk())
+			->where($this->_has_many[$alias]['far_key'], '=', $model->pk())
+			->find()
+			->delete();
+
+		return $this;
+	} // function remove
 
 	/**
 	 * Loads a database result, either as a new object for this model, or as
@@ -1512,7 +1662,57 @@ class cl4_ORM extends Kohana_ORM {
 
 			return $this;
 		}
-	}
+	} // function _load_result
+
+	/**
+	* Returns a string of the values in the current object
+	*
+	* @param  string  $columns   The column to include in the concat; If more than 1 column is wanted, pass a string including CONCAT() or similar; If not column is passed, the primary value in the model will be used
+	* @param  array   $order_by  The sorting to use; pass an array the same way the sorting key in the model is set; if nothing passed and no _sorting property, no ordering will be applied
+	* @return  string  Comma separated list of values (as generated by MySQL)
+	*/
+	public function group_concat($columns = NULL, $order_by = NULL, $separator = NULL) {
+		if (empty($columns)) {
+			$columns = Database::instance()->quote_identifier($this->_table_name . '.' . $this->_primary_val);
+		}
+
+		if (empty($order_by)) {
+			$order_by = array($this->_sorting);
+		}
+
+		if ($separator === NULL) {
+			$separator_sql = " SEPARATOR ', '";
+		} else if ( ! empty($separator)) {
+			$separator_sql = " SEPARATOR " . Database::instance()->quote($separator);
+		} else {
+			$separator_sql = '';
+		}
+
+		if ( ! empty($order_by)) {
+			$sort = array();
+			foreach ($this->_sorting as $column => $direction) {
+				if ( ! empty($direction)) {
+					// Make the direction uppercase
+					$direction = ' ' . strtoupper($direction);
+				}
+
+				if (strpos($column, '.') === FALSE) {
+					$column = $this->_table_name . '.' . $column;
+				}
+
+				$sort[] = Database::instance()->quote_identifier($column) . $direction;
+			}
+
+			$order_by = 'ORDER BY '.implode(', ', $sort);
+		} else {
+			$order_by = '';
+		}
+
+		$query = $this->select(DB::expr("GROUP_CONCAT(DISTINCT {$columns} {$order_by}{$separator_sql}) AS group_concat"))
+			->find();
+
+		return $query->group_concat;
+	} // function group_concat
 
 	/**
 	 * Saves the current object.
@@ -1690,70 +1890,33 @@ class cl4_ORM extends Kohana_ORM {
 				$this->_was_update = TRUE;
 			}
 		} // if
-/* @todo: This is commented out because at the moment is causes problems. Should probably be moved to a separate function that is called manually (unless the Model is extended to include the saving the related records in save()).
-		if ($this->_saved) {
-			// check for has_many relationships and associated changes (adds / deletes)
-			// todo: should we add some of this to check() ?
-			foreach ($this->_has_many as $foreign_object => $relation_data) {
-				// can't process this table because the through table is not set
-				if (empty($relation_data['through'])) continue;
 
-				$through_table = $relation_data['through'];
-				$source_model = ! empty($relation_data['source_model']) ? $relation_data['source_model'] : NULL; // todo: should not need 'source_model' since we have the relationship via the model
+		// save any values find in _related_save_data
+		$this->save_related();
 
-				// get the current associated record ids
-				$current = $this->get_foreign_values($through_table, $relation_data);
-				//echo '<p>old records: ' . kohana::debug($current) . '</p>';
-
-				// see if there are any valid records to add and add them and keep track of which current ones are not re-added
-				if (isset($_POST[$through_table]) && is_array($_POST[$through_table])) {
-					//echo '<p>new records: ' . kohana::debug($_POST[$through_table]) . '</p>';
-					if (isset($_POST[$through_table][0])) unset($_POST[$through_table][0]);
-					foreach ($_POST[$through_table] AS $record_id) {
-						// if the record is not already set, set it
-						if ( ! in_array($record_id, $current) ) {
-							try {
-								DB::insert($through_table, array($relation_data['foreign_key'], $relation_data['far_key']))
-									->values(array($this->pk(), $record_id))
-									->execute($this->_db);
-								//echo '<p>add record id: ' . $record_id . '</p>';
-							} catch (Exception $e) {
-								throw $e;
-							}
-						} else {
-							unset($current[$record_id]); // remove from current list
-						} // if
-					} // foreach
-
-					// remove any current ones that were not re-added, $current should now have existing entries that were not re-added
-					foreach ($current AS $record_id) {
-						try {
-							DB::delete($through_table)
-								->where($relation_data['foreign_key'],'=',$this->pk())
-								->where($relation_data['far_key'],'=',$record_id)
-								->execute($this->_db);
-							//echo '<p>add record id: ' . $record_id . '</p>';
-							if (in_array($record_id, $current)) unset($current[$record_id]); // remove from current list
-						} catch (Exception $e) {
-							throw $e;
-						}
-						//echo '<p>remove record id: ' . $record_id . '</p>';
-					} // foreach
-
-				} else {
-					// does not appear to be any associated form fields in the $_POST
-					// maybe the form was not created with get_form()
-					// ok, just proceed
-
-				} // if
-			} // foreach
-		} // if
-*/
 		return $this;
 	} // function save
 
 	/**
-	* Returns true or false if the column has changed
+	* Saves the data for _has_many relationships as found in _related_save_data
+	*
+	* @chainable
+	* @return  ORM
+	*/
+	public function save_related() {
+		// now deal with any data for has_many relationships where the edit flag is true
+		foreach ($this->_has_many as $alias => $relation_data) {
+			// only deal with relationships that have the edit_flag set as true and have data
+			if ( ! empty($relation_data['edit_flag']) && $relation_data['edit_flag'] && array_key_exists($alias, $this->_related_save_data)) {
+				$this->save_through($alias, $this->_related_save_data[$alias]);
+			}
+		} // foreach
+
+		return $this;
+	} // function save_related
+
+	/**
+	* Returns TRUE or FALSE if the column has changed
 	*
 	* @param   string  $column_name  The column name
 	* @return  bool    true if the value has changed
@@ -1775,6 +1938,57 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $changed;
 	} // function column_changed
+
+	/**
+	* Saves a related record that is either there or removed
+	* Currently only supports has_many relationships with through table, for example:
+	*
+	*      user -> user_group <- group
+	*      function will insert and delete to user_group
+	*
+	* The related values cannot be empty. If they are, they will not be saved.
+	*
+	* @param   string  $alias  The alias in the has_many array. The model name will be pulled from here.
+	* @param   string  $post_location  The path to the location of the data in the POST array. Can also be passed in as an array where the values are the values to be saved.
+	*
+	* @chainable
+	* @return  ORM
+	*/
+	public function save_through($alias, $post_location) {
+		$current = $this->$alias->find_all()->as_array('id', 'id');
+
+		if ( ! Arr::is_array($post_location)) {
+			$received_data = Arr::path($_POST, $post_location, array());
+		} else {
+			$received_data = $post_location;
+		}
+
+		try {
+			foreach ($received_data as $related_id) {
+				if ( ! empty($related_id)) {
+					if ( ! isset($current[$related_id])) {
+						$this->add($alias, ORM::factory($this->_has_many[$alias]['model'], $related_id));
+					} else {
+						unset($current[$related_id]);
+					}
+				}
+			} // foreach
+		} catch (Exception $e) {
+			throw new Kohana_Exception('Failed to add new records ' . Kohana::exception_text($e));
+		}
+
+		try {
+			if ( ! empty($current)) {
+				foreach ($current as $related_id) {
+					$this->remove($alias, ORM::factory($this->_has_many[$alias]['model'], $related_id));
+				}
+			} // if
+		} catch (Exception $e) {
+			throw new Kohana_Exception('Failed to remove existing records ' . Kohana::exception_text($e));
+		}
+
+		return $this;
+	} // function save_through
 
 	/**
 	* Checks to see if the column name exists in the _table_columns array

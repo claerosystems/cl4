@@ -127,6 +127,23 @@ return array(
 		),
 	),
 
+	// default options for relationships, merged in during set_options()
+	'default_relation_options' => array(
+		'edit_flag'   => FALSE, // disables editing of this field when editing the model it's apart of
+		'field_label' => NULL, // the label to display beside the field values
+		'through_model' => NULL, // the model for the through/pivot table, used to add() or delete()
+		/* commented out so that it will use the model instead of using this source data
+		 * see the source array comments under config/cl4orm/default_meta_data_field_type.select.field_options for details on how to use this array
+		'source' => array(
+			'source' => 'model',
+			'data' => NULL,
+			'value' => 'id',
+			'label' => 'name',
+			'order_by' => NULL,
+		),
+		*/
+	),
+
 	// cl4_ORM class default options
 	'default_options' => array(
 		'db_group' => NULL, // the database instance name to be used as a default, if null, default is used
