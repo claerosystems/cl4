@@ -984,7 +984,7 @@ class cl4_ORM extends Kohana_ORM {
 				$reset_button_options = array(
 					'type' => 'button',
 					'class' => 'cl4_button_link',
-					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => $action, 'id' => $this->pk()))),
+					'data-cl4_link' => URL::site(Request::instance()->uri()), // this will return the current uri
 				);
 				if ( ! empty($this->_options['reset_button_attributes'])) {
 					$reset_button_options = HTML::merge_attributes($reset_button_options, $this->_options['reset_button_attributes']);
