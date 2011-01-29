@@ -982,25 +982,23 @@ class cl4_ORM extends Kohana_ORM {
 					$action = 'edit';
 				}
 				$reset_button_options = array(
-					'type' => 'button',
 					'class' => 'cl4_button_link',
 					'data-cl4_link' => URL::site(Request::instance()->uri()), // this will return the current uri
 				);
 				if ( ! empty($this->_options['reset_button_attributes'])) {
 					$reset_button_options = HTML::merge_attributes($reset_button_options, $this->_options['reset_button_attributes']);
 				}
-				$this->_form_buttons[] = Form::input('cl4_reset', __('Reset'), $reset_button_options);
+				$this->_form_buttons[] = Form::input_button('cl4_reset', __('Reset'), $reset_button_options);
 			}
 			if ($this->_options['display_cancel']) {
 				$cancel_button_options = array(
-					'type' => 'button',
 					'class' => 'cl4_button_link',
 					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'cancel'))),
 				);
 				if ( ! empty($this->_options['cancel_button_attributes'])) {
 					$cancel_button_options = HTML::merge_attributes($cancel_button_options, $this->_options['cancel_button_attributes']);
 				}
-				$this->_form_buttons[] = Form::input('cl4_cancel', __('Cancel'), $cancel_button_options);
+				$this->_form_buttons[] = Form::input_button('cl4_cancel', __('Cancel'), $cancel_button_options);
 			}
 		} // if
 

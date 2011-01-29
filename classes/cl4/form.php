@@ -850,10 +850,33 @@ class cl4_Form extends Kohana_Form {
 		return Form::textarea($name, $body, $attributes, $double_encode);
 	}
 
+	/**
+	* Creates a button input (not a button tag like Form::button())
+	* The type attrubte will be forced to "button"
+	*
+	* @param  string  $name        The name of the button (name attribute)
+	* @param  string  $value       The text of the button (value attribute)
+	* @param  array   $attributes  Any additional attributes to add to the input (type will be set to button)
+	*
+	* @return  string  The html input of type button
+	*/
+	public static function input_button($name, $value, array $attributes = NULL) {
+		$attributes['type'] = 'button';
+
+		return Form::input($name, $value, $attributes);
+	} // function input_button
+
+	/**
+	* Runs the SQL query and returns the source array for fields such as checkboxes, radios or selects
+	*
+	* @param  string  $source   The SELECT SQL query
+	* @param  array   $options  The options, including things like db instance, the values for the label, value and optional parent
+	*
+	* @return  array  The source array
+	*/
 	private static function get_sql_source($source, array $options = array()) {
 		$default_options = array(
 			'db_instance' => NULL,
-			'enable_parent' => TRUE,
 			'source_value' => Form::$default_source_value,
 			'source_label' => Form::$default_source_label,
 			'source_parent' => Form::$default_source_parent,
@@ -875,7 +898,7 @@ class cl4_Form extends Kohana_Form {
 		}
 
 		return $source_array;
-	} // function
+	} // function get_sql_source
 
 	/**
 	* Returns true of the value is empty
