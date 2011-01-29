@@ -1960,13 +1960,20 @@ class cl4_ORM extends Kohana_ORM {
 	*
 	* The related values cannot be empty. If they are, they will not be saved.
 	*
-	* @param   string  $alias  The alias in the has_many array. The model name will be pulled from here.
-	* @param   string  $post_location  The path to the location of the data in the POST array. Can also be passed in as an array where the values are the values to be saved.
+	* @param  string  $alias          The alias in the has_many array. The model name will be pulled from here.
+	* @param  string  $post_location  The path to the location of the data in the POST array. Can also be passed in as an array where the values are the values to be saved.
+	* @param  array   $counts         The counts for the number of records added, removed or kept. Set by reference. The keys to the array are: kept, added and removed.
 	*
 	* @chainable
 	* @return  ORM
 	*/
-	public function save_through($alias, $post_location) {
+	public function save_through($alias, $post_location, & $counts = array()) {
+		$counts = array(
+			'kept' => 0,
+			'added' => 0,
+			'removed' => 0,
+		);
+
 		$current = $this->$alias->find_all()->as_array('id', 'id');
 
 		if ( ! Arr::is_array($post_location)) {
@@ -1980,8 +1987,10 @@ class cl4_ORM extends Kohana_ORM {
 				if ( ! empty($related_id)) {
 					if ( ! isset($current[$related_id])) {
 						$this->add($alias, ORM::factory($this->_has_many[$alias]['model'], $related_id));
+						++ $counts['added'];
 					} else {
 						unset($current[$related_id]);
+						++ $counts['kept'];
 					}
 				}
 			} // foreach
@@ -1993,6 +2002,7 @@ class cl4_ORM extends Kohana_ORM {
 			if ( ! empty($current)) {
 				foreach ($current as $related_id) {
 					$this->remove($alias, ORM::factory($this->_has_many[$alias]['model'], $related_id));
+					++ $counts['removed'];
 				}
 			} // if
 		} catch (Exception $e) {
