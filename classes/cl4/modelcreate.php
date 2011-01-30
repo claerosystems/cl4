@@ -312,15 +312,13 @@ class cl4_ModelCreate {
 		// add auto-update fields placeholders
 		$model_code .= EOL;
 		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * @var timestamp $_created_column The time this row was created.' . EOL;
-		$model_code .= TAB . ' * ' . EOL;
+		$model_code .= TAB . ' * @var  array  $_created_column  The time this row was created.' . EOL;
 		$model_code .= TAB . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
 		$model_code .= TAB . ' */' . EOL;
 		$model_code .= TAB . ( ! isset($columns['date_created']) ? '//' : '') . 'protected $_created_column = array(\'column\' => \'date_created\', \'format\' => \'Y-m-j H:i:s\');'. EOL;
 		$model_code .= EOL;
 		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * @var timestamp $_updated_column The time this row was updated.' . EOL;
-		$model_code .= TAB . ' * ' . EOL;
+		$model_code .= TAB . ' * @var  array  $_updated_column  The time this row was updated.' . EOL;
 		$model_code .= TAB . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
 		$model_code .= TAB . ' */' . EOL;
 		$model_code .= TAB . ( ! isset($columns['date_modified']) ? '//' : '') . 'protected $_updated_column = array(\'column\' => \'date_modified\', \'format\' => TRUE);' . EOL;
@@ -332,8 +330,7 @@ class cl4_ModelCreate {
 
 		// Add expires column
 		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * @var timestamp $_expires_column The time this row expires and is no longer returned in standard searches.' . EOL;
-		$model_code .= TAB . ' * ' . EOL;
+		$model_code .= TAB . ' * @var  array  $_expires_column  The time this row expires and is no longer returned in standard searches.' . EOL;
 		$model_code .= TAB . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
 		$model_code .= TAB . ' */' . EOL;
 		if ( ! isset($columns['expiry_date'])) $model_code .= TAB . '/*' . EOL;
@@ -346,7 +343,7 @@ class cl4_ModelCreate {
 
 		// Add display order property
 		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * @var array $_display_order The order to display columns in, if different from as listed in $_table_columns.' . EOL;
+		$model_code .= TAB . ' * @var  array  $_display_order  The order to display columns in, if different from as listed in $_table_columns.' . EOL;
 		$model_code .= TAB . ' * Columns not listed here will be added beneath these columns, in the order they are listed in $_table_columns.' . EOL;
 		$model_code .= TAB . ' */' . EOL;
 		$model_code .= TAB . '/*' . EOL;
