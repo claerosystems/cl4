@@ -4,7 +4,7 @@ abstract class cl4_Database_Query_Builder_Where extends Kohana_Database_Query_Bu
 	/**
 	* Adds an expiry where clause similar to:
 	*
-	*     (expiry_date > NOW() OR expiry_date = 0)
+	*     expiry_date = 0
 	*
 	* @param  string  $table_name  The table name, default: none, just use the column name
 	* @param  string  $column  The column name, default: expiry_date
@@ -18,10 +18,7 @@ abstract class cl4_Database_Query_Builder_Where extends Kohana_Database_Query_Bu
 			$table_name = '';
 		}
 
-		$this->and_where_open()
-			->where($table_name . $column, '>', DB::expr("NOW()"))
-			->or_where($table_name . $column, '=', $default)
-			->and_where_close();
+		$this->where($table_name . $column, '=', $default);
 
 		return $this;
 	} // function add_expiry_where
