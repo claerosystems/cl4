@@ -11,7 +11,7 @@ abstract class cl4_Database_Query_Builder_Where extends Kohana_Database_Query_Bu
 	* @param  mixed  $default  The default value, default: 0
 	* @return  $this
 	*/
-	public function add_expiry_where($table_name = NULL, $column = 'expiry_date', $default = 0) {
+	public function where_expiry($table_name = NULL, $column = 'expiry_date', $default = 0) {
 		if ( ! empty($table_name)) {
 			$table_name .= '.';
 		} else {
@@ -21,5 +21,5 @@ abstract class cl4_Database_Query_Builder_Where extends Kohana_Database_Query_Bu
 		$this->where($table_name . $column, '=', $default);
 
 		return $this;
-	} // function add_expiry_where
+	} // function where_expiry
 } // class XM_Database_Query_Builder_Select
