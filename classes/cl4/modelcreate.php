@@ -37,7 +37,7 @@ class cl4_ModelCreate {
 		$model_code = "<?php defined('SYSPATH') or die ('No direct script access.');" . EOL;
 		$model_code .= EOL;
 		$model_code .= "/**" . EOL;
-		$model_code .= " * This model was created using cl4_ORM and should provide " . EOL;
+		$model_code .= " * This model was created using cl4_ORM and should provide" . EOL;
 		$model_code .= " * standard Kohana ORM features in additon to cl4-specific features." . EOL;
 		$model_code .= " */" . EOL;
 		$model_code .= 'class Model_' . ModelCreate::make_class_name($table_name) . ' extends ORM {' . EOL;
