@@ -58,7 +58,7 @@ class cl4_Message {
 
 				$messages[] = array(
 					'level' => $level,
-					'message' => $_message,
+					'message' => __($_message), // translate the message
 				);
 			}
 		} else {
