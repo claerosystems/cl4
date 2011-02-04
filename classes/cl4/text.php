@@ -121,4 +121,15 @@ class cl4_Text extends Kohana_Text {
 	public static function these($count) {
 	    return ($count == 1 ? 'this' : 'these');
 	} // function these
+
+	/**
+	*   Returns, based on $count, 'it' or 'them'
+	*
+	*   @param      int     $count      the count
+	*
+	*   @return     string      the string based on the count
+	*/
+	public static function it($count) {
+	    return ($count == 1 ? 'it' : 'them');
+	} // function these
 } // class cl4_Text
