@@ -129,7 +129,7 @@ class cl4_Text extends Kohana_Text {
 	*
 	*   @return     string      the string based on the count
 	*/
-	public static function it($count) {
+	public static function them($count) {
 	    return ($count == 1 ? 'it' : 'them');
-	} // function these
+	} // function them
 } // class cl4_Text
