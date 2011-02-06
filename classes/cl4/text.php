@@ -85,9 +85,9 @@ class cl4_Text extends Kohana_Text {
 	*
 	*   @return     string      the string based on the count
 	*/
-	public static function was($count) {
+	public static function were($count) {
 	    return ($count == 1 ? 'was' : 'were');
-	} // function was
+	} // function were
 
 	/**
 	*   Returns, based on $count, 'has' or 'have'
