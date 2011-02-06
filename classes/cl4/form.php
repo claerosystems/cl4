@@ -901,12 +901,15 @@ class cl4_Form extends Kohana_Form {
 	} // function get_sql_source
 
 	/**
-	* Returns true of the value is empty
+	* Returns TRUE if the date value is empty
+	* Empty is 0000-00-00 or 0000-00-00 00:00:00 or NULL
 	*
-	* @param mixed $value
+	* @param  string  $date  The date to test
+	*
+	* @return  boolean
 	*/
-	public static function check_date_empty_value($value) {
-		return ($value == '0000-00-00' || $value == '0000-00-00 00:00:00');
+	public static function check_date_empty_value($date) {
+		return ($date == '0000-00-00' || $date == '0000-00-00 00:00:00' || $date === NULL);
 	}
 
 	/**
