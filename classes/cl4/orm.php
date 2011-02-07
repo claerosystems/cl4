@@ -1616,6 +1616,16 @@ class cl4_ORM extends Kohana_ORM {
 	} // function remove
 
 	/**
+	* Returns TRUE when a SELECT SQL parameter has already been added
+	* Used within _load_result() to determine if * should be added to the query
+	*
+	* @return  boolean
+	*/
+	protected function is_select_applied() {
+		return isset($this->_db_applied['select']);
+	}
+
+	/**
 	 * Loads a database result, either as a new object for this model, or as
 	 * an iterator for multiple rows.
 	 * Also stores the record in _original incase a save is run later for single records.
@@ -1633,7 +1643,7 @@ class cl4_ORM extends Kohana_ORM {
 			$this->_db_builder->limit(1);
 		}
 
-		if ( ! isset($this->_db_applied['select'])) {
+		if ( ! $this->is_select_applied()) {
 			// Select all columns by default
 			$this->_db_builder->select($this->_table_name.'.*');
 		}
