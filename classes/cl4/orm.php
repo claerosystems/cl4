@@ -138,6 +138,19 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_related_save_data = array();
 
 	/**
+	* Calls Kohana_ORM::_intialize() and then check to see if the default value for the expiry column is set
+	*
+	* @return  void
+	*/
+	protected function _initialize() {
+		parent::_initialize();
+
+		if ( ! empty($this->_expires_column) && ! array_key_exists('default', $this->_expires_column)) {
+			$this->_expires_column['default'] = 0;
+		}
+	} // function _initialize
+
+	/**
 	 * Instructs builder to include expired rows in select queries.
 	 *
 	 * @chainable
