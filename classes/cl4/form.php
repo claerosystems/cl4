@@ -758,9 +758,9 @@ class cl4_Form extends Kohana_Form {
 	 *
 	 * The format is [country code]-[area code]-[exchange]-[line]-[extension]:
 	 *
-	 *	 echo Form::datetime('start_date','1-613-744-7011-1'); 1 (613) 744-7011 x1
-	 *	 echo Form::datetime('start_date','-613-744-7011-'); (613) 744-7011
-	 *	 echo Form::datetime('start_date','--744-7011-'); 744-7011
+	 *	 echo Form::phone('start_date','1-613-744-7011-1'); 1 (613) 744-7011 x1
+	 *	 echo Form::phone('start_date','-613-744-7011-'); (613) 744-7011
+	 *	 echo Form::phone('start_date','--744-7011-'); 744-7011
 	 *
 	 * @param   string  input name
 	 * @param   string  input value false will set the field to be empty, this the default;
@@ -782,22 +782,48 @@ class cl4_Form extends Kohana_Form {
 		);
 		$options += $default_options;
 
+		$set_title_attribute = ( ! array_key_exists('title', $attributes));
+
 		// get the default values for the form fields
 		$default_data = cl4::parse_phone_value($value);
 		// add the country code
-		$html = '+ ' . Form::input_with_suffix_size($name, $default_data['country_code'], $attributes, 'cl4_phone_field', 'country_code', $options['country_code_size'], $options['country_code_max_length']);
+		$_attributes = $attributes;
+		if ($set_title_attribute) {
+			$_attributes['title'] = 'Country Code';
+		}
+		$html = '+ ' . Form::input_with_suffix_size($name, $default_data['country_code'], $_attributes, 'cl4_phone_field', 'country_code', $options['country_code_size'], $options['country_code_max_length']);
+
 		// add the area code
 		$attributes = Form::increment_tabindex($attributes);
-		$html .= ' (' . Form::input_with_suffix_size($name, $default_data['area_code'], $attributes, 'cl4_phone_field', 'area_code', $options['area_code_size'], $options['area_code_max_length']) . ')';
+		$_attributes = $attributes;
+		if ($set_title_attribute) {
+			$_attributes['title'] = 'Area Code';
+		}
+		$html .= ' (' . Form::input_with_suffix_size($name, $default_data['area_code'], $_attributes, 'cl4_phone_field', 'area_code', $options['area_code_size'], $options['area_code_max_length']) . ')';
+
 		// add the exchange field
 		$attributes = Form::increment_tabindex($attributes);
-		$html .= ' ' . Form::input_with_suffix_size($name, $default_data['exchange'], $attributes, 'cl4_phone_field', 'exchange', $options['exchange_size'], $options['exchange_max_length']);
+		$_attributes = $attributes;
+		if ($set_title_attribute) {
+			$_attributes['title'] = 'Phone Number Part 1 (Exchange)';
+		}
+		$html .= ' ' . Form::input_with_suffix_size($name, $default_data['exchange'], $_attributes, 'cl4_phone_field', 'exchange', $options['exchange_size'], $options['exchange_max_length']);
+
 		// add the line field
 		$attributes = Form::increment_tabindex($attributes);
-		$html .= '-' . Form::input_with_suffix_size($name, $default_data['line'], $attributes, 'cl4_phone_field', 'line', $options['line_size'], $options['line_max_length']);
+		$_attributes = $attributes;
+		if ($set_title_attribute) {
+			$_attributes['title'] = 'Phone Number Part 2 (Line)';
+		}
+		$html .= '-' . Form::input_with_suffix_size($name, $default_data['line'], $_attributes, 'cl4_phone_field', 'line', $options['line_size'], $options['line_max_length']);
+
 		// add the extension field
 		$attributes = Form::increment_tabindex($attributes);
-		$html .= ' ' . __('ext.') . ' ' . Form::input_with_suffix_size($name, $default_data['extension'], $attributes, 'cl4_phone_field', 'extension', $options['extension_size'], $options['extension_max_length']);
+		$_attributes = $attributes;
+		if ($set_title_attribute) {
+			$_attributes['title'] = 'Extension';
+		}
+		$html .= ' ' . __('<span title="Extension">ext.</span>') . ' ' . Form::input_with_suffix_size($name, $default_data['extension'], $_attributes, 'cl4_phone_field', 'extension', $options['extension_size'], $options['extension_max_length']);
 
 		return $html;
 	} // function
