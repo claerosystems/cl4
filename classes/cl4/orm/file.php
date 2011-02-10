@@ -57,6 +57,7 @@ class cl4_ORM_File extends ORM_FieldType {
 		if ( ! empty($post_value)) {
 			// 20100921 CSN not sure when we get here, the post normally wouldn't have the field in it, just $_FILES?
 			// 20101027 CSN this must be when we want to pass the function a path manually
+			// todo: when doing this, we'll need to have some options/flags on the file to determine if this is allowed and from where
 			throw new Kohana_Exception('Passing file paths to save is not supported yet');
 			/*
 			// we have been passed a file path, so we want to copy the file
