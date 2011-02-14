@@ -3,7 +3,7 @@
 /**
  * Extended session class.
  *
- * @package    CL4
+ * @package    cl4
  * @category   Session
  * @author     Claero Systems
  * @copyright  (c) 2010 Claero Systems
@@ -51,4 +51,4 @@ abstract class cl4_Session extends Kohana_Session {
 	public function get_deep($path, $default = NULL, $delimiter = NULL) {
 		return Arr::path($this->_data, $path, $default);
 	} // function get_deep
-} // class CL4_Session
+} // class cl4_Session

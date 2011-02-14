@@ -9,22 +9,10 @@
 class Model_cl4_List extends ORM {
 	protected $_table_names_plural = FALSE;
 
-	// column labels
-	protected $_labels = array(
-		'id' => 'ID',
-		'name' => 'Name',
-		'display_order' => 'Display Order',
-	);
-
 	// default sorting
 	protected $_sorting = array(
 		'display_order' => 'ASC',
 		'name' => 'ASC',
-	);
-
-	// Filters
-	protected $_filters = array(
-	    TRUE => array('trim' => array()),
 	);
 
 	// column definitions
@@ -62,4 +50,28 @@ class Model_cl4_List extends ORM {
 			),
 		),
 	);
+
+	/**
+	 * Labels for columns
+	 *
+	 * @return  array
+	 */
+	public function labels() {
+		return array(
+			'id' => 'ID',
+			'name' => 'Name',
+			'display_order' => 'Display Order',
+		);
+	}
+
+	/**
+	 * Filter definitions, run everytime a field is set
+	 *
+	 * @return  array
+	 */
+	public function filters() {
+		return array(
+		    TRUE => array('trim' => array()),
+		);
+	}
 } // class

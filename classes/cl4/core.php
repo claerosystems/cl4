@@ -37,11 +37,11 @@ class cl4_Core extends Kohana_Core {
 			$line    = $e->getLine();
 
 			// Create a text version of the exception
-			$error = Kohana::exception_text($e);
+			$error = Kohana_Exception::text($e);
 
 			if (is_object(Kohana::$log)) {
 				// Add this exception to the log
-				Kohana::$log->add(Kohana::ERROR, $error);
+				Kohana::$log->add(Log::ERROR, $error);
 
 				// Make sure the logs are written
 				Kohana::$log->write();
@@ -50,17 +50,15 @@ class cl4_Core extends Kohana_Core {
 			if (Kohana::$is_cli) {
 				// Just display the text of the exception
 				echo "\n{$error}\n";
-
-				return TRUE;
 			}
 
 			// Get the exception backtrace
 			$trace = $e->getTrace();
 
 			if ($e instanceof ErrorException) {
-				if (isset(Kohana::$php_errors[$code])) {
+				if (isset(Kohana_Exception::$php_errors[$code])) {
 					// Use the human-readable error name
-					$code = Kohana::$php_errors[$code];
+					$code = Kohana_Exception::$php_errors[$code];
 				}
 
 				if (version_compare(PHP_VERSION, '5.3', '<')) {
@@ -78,23 +76,31 @@ class cl4_Core extends Kohana_Core {
 				}
 			}
 
-			// only echo out the message when errors is set to true
+			// only echo out the message when errors is set to true (probably in debug)
 			if (Kohana::$errors === TRUE) {
 				if ( ! headers_sent()) {
-					// Make sure the proper content type is sent with a 500 status
-					header('Content-Type: text/html; charset='.Kohana::$charset, TRUE, 500);
+					// Make sure the proper http header is sent
+					$http_header_status = ($e instanceof Http_Exception) ? $code : 500;
+
+					header('Content-Type: text/html; charset='.Kohana::$charset, TRUE, $http_header_status);
 				}
 
 				// Start an output buffer
 				ob_start();
 
 				// Include the exception HTML
-				include Kohana::find_file('views', Kohana::$error_view);
+				if ($view_file = Kohana::find_file('views', Kohana_Exception::$error_view)) {
+					include $view_file;
+				} else {
+					throw new Kohana_Exception('Error view file does not exist: views/:file', array(
+						':file' => Kohana_Exception::$error_view,
+					));
+				}
 
 				// Display the contents of the output buffer
 				echo ob_get_clean();
 
-			// If not echoing errors
+			// If not echoing errors (probably not in debug)
 			} else {
 				try {
 					// Start an output buffer
@@ -107,7 +113,13 @@ class cl4_Core extends Kohana_Core {
 <body>';
 
 					// Include the exception HTML
-					include Kohana::find_file('views', Kohana::$error_view);
+					if ($view_file = Kohana::find_file('views', Kohana_Exception::$error_view)) {
+						include $view_file;
+					} else {
+						throw new Kohana_Exception('Error view file does not exist: views/:file', array(
+							':file' => Kohana_Exception::$error_view,
+						));
+					}
 
 echo '</body></html>';
 
@@ -124,11 +136,13 @@ echo '</body></html>';
 
 					$error_email->Send();
 
+				// catch a PhpMailer exception
 				} catch (phpmailerException $e) {
-					Kohana::$log->add(Kohana::ERROR, $error_email->ErrorInfo);
+					Kohana::$log->add(Log::ERROR, $error_email->ErrorInfo);
 					Kohana::$log->write();
+				// catch a general exception
 				} catch (Exception $e) {
-					Kohana::$log->add(Kohana::ERROR, Kohana::exception_text($e));
+					Kohana::$log->add(Log::ERROR, Kohana_Exception::text($e));
 					Kohana::$log->write();
 				}
 			} // if
@@ -141,7 +155,7 @@ echo '</body></html>';
 				ob_get_level() and ob_clean();
 
 				// Display the exception text
-				echo Kohana::exception_text($e), "\n";
+				echo Kohana_Exception::text($e), "\n";
 
 				// Exit with an error status
 				exit(1);
@@ -248,11 +262,11 @@ echo '</body></html>';
 		if (empty($value)) {
 			// controller and action are special cases
 			if ($key == 'controller') {
-				$value = Request::instance()->controller;
+				$value = Request::current()->controller();
 			} else if ($key == 'action') {
-				$value = Request::instance()->action;
+				$value = Request::current()->action();
 			} else {
-				$value = Request::instance()->param($key);
+				$value = Request::current()->param($key);
 			} // if
 		} // if
 		// check for GET; only look for it if the value was not set in POST or the Route (Request)
@@ -284,22 +298,12 @@ echo '</body></html>';
 
 	/**
 	* Cleans the value using xss_clean and optionally casts it to a certain type
-	* Security::xss_clean() will only be applied on string and array values (other values don't need to be cleaned)
 	*
 	* @param  mixed  $value  the value to be cleaned
 	* @param  string  $type  used for type casting, can be 'int', 'string', 'bool' or 'array'
 	* @return  mixed  the cleaned value
 	*/
 	public static function clean_param($value, $type = NULL) {
-		// only do xss_clean when the value is a string or an array
-		// other types, such as bools, NULL or integers don't need to be cleaned
-		if (is_string($value) || is_array($value)) {
-			// do some cleaning, this will likely change in the future because xss_clean may be deprecated
-			$cleaned_value = Security::xss_clean($value);
-		} else {
-			$cleaned_value = $value;
-		}
-
 		// cast the type if one is specified
 		switch($type) {
 			case 'int' :
@@ -313,6 +317,8 @@ echo '</body></html>';
 			case 'bool' :
 				$cleaned_value = (bool) $cleaned_value;
 				break;
+			default :
+				$cleaned_value = $value;
 		} // switch
 
 		return $cleaned_value;

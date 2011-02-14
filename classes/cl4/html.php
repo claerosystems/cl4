@@ -9,19 +9,20 @@ class cl4_HTML extends Kohana_HTML {
 	public static $append_attributes = array('class', 'style');
 
     /**
-     * Creates a style sheet link element.
-     * Same as Kohana_HTML::style() but supports using //example.com/path/to/file.css and doesn't add a type="text/css"
-     *
-     *     echo HTML::style('media/css/screen.css');
-     *
-     * @param   string  file name
-     * @param   array   default attributes
-     * @param   boolean  include the index page
-     * @return  string
-     * @uses    URL::base
-     * @uses    HTML::attributes
-     */
-    public static function style($file, array $attributes = NULL, $index = FALSE) {
+	 * Creates a style sheet link element.
+	 * Same as Kohana_HTML::style() but supports using //example.com/path/to/file.css and doesn't add a type="text/css"
+	 *
+	 *     echo HTML::style('media/css/screen.css');
+	 *
+	 * @param   string   file name
+	 * @param   array    default attributes
+	 * @param   mixed    protocol to pass to URL::base()
+	 * @param   boolean  include the index page
+	 * @return  string
+	 * @uses    URL::base
+	 * @uses    HTML::attributes
+	 */
+	public static function style($file, array $attributes = NULL, $protocol = NULL, $index = FALSE) {
         if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
             // Add the base URL
             $file = URL::base($index).$file;
@@ -37,19 +38,20 @@ class cl4_HTML extends Kohana_HTML {
     } // function
 
     /**
-     * Creates a script link.
-     * Same as Kohana_HTML::script() but supports using //example.com/path/to/file.js and doesn't add a type="text/javascript"
-     *
-     *     echo HTML::script('media/js/jquery.min.js');
-     *
-     * @param   string   file name
-     * @param   array    default attributes
-     * @param   boolean  include the index page
-     * @return  string
-     * @uses    URL::base
-     * @uses    HTML::attributes
-     */
-    public static function script($file, array $attributes = NULL, $index = FALSE) {
+	 * Creates a script link.
+	 * Same as Kohana_HTML::script() but supports using //example.com/path/to/file.js and doesn't add a type="text/javascript"
+	 *
+	 *     echo HTML::script('media/js/jquery.min.js');
+	 *
+	 * @param   string   file name
+	 * @param   array    default attributes
+	 * @param   mixed    protocol to pass to URL::base()
+	 * @param   boolean  include the index page
+	 * @return  string
+	 * @uses    URL::base
+	 * @uses    HTML::attributes
+	 */
+	public static function script($file, array $attributes = NULL, $protocol = NULL, $index = FALSE) {
         if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
             // Add the base URL
             $file = URL::base($index).$file;

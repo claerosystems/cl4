@@ -22,6 +22,7 @@ class cl4_ORM_Checkbox extends ORM_FieldType {
 	/**
 	* Sets the value of checkbox in the model
 	* If the value is not in the post, will be set to 0 in the model
+	* This will set the field value to a string because MySQL retrieves the value from the DB as a string and therefore the change checking in ORM will see an int as a changed field
 	*
 	* @see  ORM_FieldType::save()
 	*
@@ -31,7 +32,8 @@ class cl4_ORM_Checkbox extends ORM_FieldType {
 	* @param  ORM     $orm_model    The ORM Model; the value for the field is set within this model
 	*/
 	public static function save($post, $column_name, array $options = array(), ORM $orm_model = NULL) {
-		$orm_model->$column_name = Arr::get($post, $column_name, 0);
+		// set the value to the value in the post and then cast it to a string (see the method comments)
+		$orm_model->$column_name = (string) Arr::get($post, $column_name, 0);
 	}
 
 	/**

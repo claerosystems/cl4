@@ -21,7 +21,7 @@ if ($routes['login']) {
 		->defaults(array(
 			'lang' => DEFAULT_LANG,
 			'controller' => 'login',
-			'action' => '',
+			'action' => NULL,
 	));
 }
 
@@ -51,7 +51,7 @@ if ($routes['cl4admin']) {
 		'controller' => 'cl4admin',
 		'model' => NULL, // this is the default object that will be displayed when accessing cl4admin (dbadmin) without a model
 		'action' => 'index',
-		'id' => '',
+		'id' => NULL,
 		'column_name' => NULL,
 	));
 }
@@ -63,7 +63,7 @@ if ( ! defined('EOL')) {
 	*   @var    string
 	*/
 	define('EOL', "\r\n");
-} // if
+}
 
 if ( ! defined('HEOL')) {
 	/**
@@ -71,7 +71,7 @@ if ( ! defined('HEOL')) {
 	*   @var    string
 	*/
 	define('HEOL', "<br />\r\n");
-} // if
+}
 
 if ( ! defined('TAB')) {
 	/**
@@ -79,4 +79,4 @@ if ( ! defined('TAB')) {
 	*   @var    string
 	*/
 	define('TAB', "\t");
-} // if
+}

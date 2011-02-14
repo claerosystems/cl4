@@ -11,24 +11,6 @@ class Model_cl4_Change_Log extends ORM {
 	public $_table_name_display = 'Change Log'; // cl4-specific
 	protected $_log = FALSE; // don't log changes (will create loop)
 
-	protected $_options = array(
-		// this will disable the change checking that is done in save() as we don't really care for the change_log
-		'only_update_changed' => FALSE,
-	);
-
-	// column labels
-	protected $_labels = array(
-		'id' => 'ID',
-		'event_timestamp' => 'Event Timestamp',
-		'user_id' => 'User',
-		'table_name' => 'Table Name',
-		'record_pk' => 'Record Primary Key',
-		'query_type' => 'Query Type',
-		'row_count' => 'Row Count',
-		'sql' => 'SQL',
-		'changed' => 'Changed',
-	);
-
 	// default sorting
 	protected $_sorting = array(
 		'event_timestamp' => 'DESC',
@@ -139,8 +121,38 @@ class Model_cl4_Change_Log extends ORM {
 		),
 	);
 
-	protected $_max_changed_length = 1000;
+	/**
+	* @var  int  The maximum length that an individual field in the change log
+	*/
+	protected $_max_changed_length = 5000;
 
+	/**
+	 * Labels for columns
+	 *
+	 * @return  array
+	 */
+	public function labels() {
+		return array(
+			'id' => 'ID',
+			'event_timestamp' => 'Event Timestamp',
+			'user_id' => 'User',
+			'table_name' => 'Table Name',
+			'record_pk' => 'Record Primary Key',
+			'query_type' => 'Query Type',
+			'row_count' => 'Row Count',
+			'sql' => 'SQL',
+			'changed' => 'Changed',
+		);
+	}
+
+	/**
+	* Add a change log record.
+	*
+	* @see  ORM::update() or ORM::create() to see how to use this
+	*
+	* @param   array  $data  The data, including the changed values, user, etc
+	* @return  ORM
+	*/
 	public function add_change_log($data) {
 		// of no user id was passed, then try to find one using the
 		if ( ! array_key_exists('user_id', $data)) {
@@ -158,12 +170,18 @@ class Model_cl4_Change_Log extends ORM {
 			} // if
 
 			$data['changed'] = serialize($data['changed']);
-		}
+		} // if
 
 		return $this->values($data)
 			->save();
-	}
+	} // function add_change_log
 
+	/**
+	* Retrieves the user id from the Auth or returns 0 when there is no user.
+	* For use in add_change_log(), but can be modified to make it work with other methods of retrieving the user id.
+	*
+	* @return  int
+	*/
 	protected function get_user_id() {
 		$user = Auth::instance()->get_user();
 		if ( ! empty($user)) {
@@ -171,5 +189,5 @@ class Model_cl4_Change_Log extends ORM {
 		} else {
 			return 0;
 		}
-	}
+	} // function get_user_id
 } // class

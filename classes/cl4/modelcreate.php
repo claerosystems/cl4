@@ -42,10 +42,10 @@ class cl4_ModelCreate {
 		$model_code .= " */" . EOL;
 		$model_code .= 'class Model_' . ModelCreate::make_class_name($table_name) . ' extends ORM {' . EOL;
 
-		if (empty($db_name)) {
-			$model_code .= TAB . '//protected $_db = \'default\'; // or any group in database configuration' . EOL;
+		if (empty($db_name) || $db_name == Database::$default) {
+			$model_code .= TAB . '//protected $_db_group = \'default\'; // or any group in database configuration' . EOL;
 		} else {
-			$model_code .= TAB . 'protected $_db = \'' . $db_name . '\'; // or any group in database configuration' . EOL;
+			$model_code .= TAB . 'protected $_db_group = \'' . $db_name . '\'; // or any group in database configuration' . EOL;
 		}
 
 		$model_code .= TAB . 'protected $_table_names_plural = FALSE;' . EOL;
@@ -55,20 +55,6 @@ class cl4_ModelCreate {
 		// todo: guess at a smart primary value
 		$model_code .= TAB . '//protected $_primary_val = \'' . 'name' . '\'; // default: name (column used as primary value)' . EOL;
 		$model_code .= TAB . 'public $_table_name_display = \'' . cl4::underscores_to_words($table_name) . '\'; // cl4-specific' . EOL;
-
-		// add the column labels
-		$model_code .= EOL;
-		$model_code .= TAB . '// column labels'. EOL;
-		$model_code .= TAB . 'protected $_labels = array(' . EOL;
-		foreach ($columns as $column_name => $column_data) {
-			// special case for column name because it's correct having it in all capitals
-			$column_name_for_label = $column_name;
-			if (substr($column_name, strrpos($column_name, '_')) == '_id') $column_name_for_label = substr($column_name, 0, strrpos($column_name, '_'));
-			else if ($column_name == 'id') $column_name_for_label = 'ID';
-
-			$model_code .= TAB . TAB . '\'' . $column_name . '\' => \'' . cl4::underscores_to_words($column_name_for_label) . '\',' . EOL;
-		} // foreach
-		$model_code .= TAB . ');' . EOL;
 
 		// add sorting
 		$model_code .= EOL;
@@ -92,19 +78,6 @@ class cl4_ModelCreate {
 		$model_code .= TAB . '{[has_one_code]}' . EOL;
 		$model_code .= TAB . '//protected $_has_many = array();' . EOL;
 		$model_code .= TAB . '//protected $_belongs_to = array();' . EOL;
-
-		// add validation rules placeholder
-		$model_code .= EOL;
-		$model_code .= TAB . '// validation rules'. EOL;
-		$model_code .= TAB . '//protected $_rules = array();' . EOL;
-		$model_code .= TAB . '//protected $_callbacks = array();' . EOL;
-
-		// Add trim filter
-		$model_code .= EOL;
-		$model_code .= TAB . '// Filters' . EOL;
-		$model_code .= TAB . '//protected $_filters = array(' . EOL;
-		$model_code .= TAB . '    //TRUE => array(\'trim\' => array()),' . EOL;
-		$model_code .= TAB . '//);' . EOL;
 
 		// add the column definitions
 		$model_code .= EOL;
@@ -354,10 +327,56 @@ class cl4_ModelCreate {
 		$model_code .= TAB . ');' . EOL;
 		$model_code .= TAB . '*/' . EOL;
 
+		// add the column labels
+		$model_code .= EOL;
+		$model_code .= TAB . '/**' . EOL;
+		$model_code .= TAB . '* Labels for columns' . EOL;
+		$model_code .= TAB . '*' . EOL;
+		$model_code .= TAB . '* @return  array' . EOL;
+		$model_code .= TAB . '*/' . EOL;
+		$model_code .= TAB . 'public function labels() {' . EOL;
+		$model_code .= TAB . TAB . 'return array(' . EOL;
+		foreach ($columns as $column_name => $column_data) {
+			// special case for column name because it's correct having it in all capitals
+			$column_name_for_label = $column_name;
+			if (substr($column_name, strrpos($column_name, '_')) == '_id') $column_name_for_label = substr($column_name, 0, strrpos($column_name, '_'));
+			else if ($column_name == 'id') $column_name_for_label = 'ID';
+
+			$model_code .= TAB . TAB . '\'' . $column_name . '\' => \'' . cl4::underscores_to_words($column_name_for_label) . '\',' . EOL;
+		} // foreach
+		$model_code .= TAB . TAB . ');' . EOL;
+		$model_code .= TAB . '}' . EOL;
+
+		// add validation rules placeholder
+		$model_code .= EOL;
+		$model_code .= TAB . '/**' . EOL;
+		$model_code .= TAB . '* Rule definitions for validation' . EOL;
+		$model_code .= TAB . '*' . EOL;
+		$model_code .= TAB . '* @return  array' . EOL;
+		$model_code .= TAB . '*/' . EOL;
+		$model_code .= TAB . '/*' . EOL;
+		$model_code .= TAB . 'public function rules() {' . EOL;
+		$model_code .= TAB . TAB . 'return array();' . EOL;
+		$model_code .= TAB . '}' . EOL;
+		$model_code .= TAB . '*/' . EOL;
+
+		// Add trim filter
+		$model_code .= EOL;
+		$model_code .= TAB . '/**' . EOL;
+		$model_code .= TAB . '* Filter definitions, run everytime a field is set' . EOL;
+		$model_code .= TAB . '*' . EOL;
+		$model_code .= TAB . '* @return  array' . EOL;
+		$model_code .= TAB . '*/' . EOL;
+		$model_code .= TAB . '/*' . EOL;
+		$model_code .= TAB . 'public function filters() {' . EOL;
+		$model_code .= TAB . TAB . 'return array(TRUE => array(\'trim\' => array()),);' . EOL;
+		$model_code .= TAB . '}' . EOL;
+		$model_code .= TAB . '*/' . EOL;
+
 		$model_code .= '} // class';
 
 		return $model_code;
-	} // function
+	} // function create_model
 
 	/**
 	* Make a nice class name by capitalizing first letters of words and replacing spaces with underscores
@@ -367,7 +386,7 @@ class cl4_ModelCreate {
 	*/
 	public static function make_class_name($name) {
 		return str_replace(' ', '_', ucwords(str_replace('_', ' ', $name)));
-	} // function
+	}
 
 	/**
 	* Returns a string base on the type of data in the variable

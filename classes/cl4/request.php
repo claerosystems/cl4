@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-class CL4_Request extends Kohana_Request {
+class cl4_Request extends Kohana_Request {
 	/**
 	 * Send file download as the response. All execution will be halted when
 	 * this method is called! Use TRUE for the filename to send the current
@@ -45,4 +45,4 @@ class CL4_Request extends Kohana_Request {
 		// Send the file
 		parent::send_file($filename, $download, $options);
 	} // function send_file
-} // class CL4_Request
+} // class cl4_Request

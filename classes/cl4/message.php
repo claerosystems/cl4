@@ -58,7 +58,7 @@ class cl4_Message {
 
 				$messages[] = array(
 					'level' => $level,
-					'message' => __($_message), // translate the message
+					'message' => $_message, // translate the message
 				);
 			}
 		} else {
@@ -105,17 +105,17 @@ class cl4_Message {
 	*
 	* 	Message::add(__(Kohana::message('file', 'pre_message')) . Message::add_validate_errors($validate, 'file'), Message::$error);
 	*
-	* @param 	Validate 	$validate	The validate object
-	* @param 	string 		$file		The file to get the messages from
-	* @param    array       $additional_messages  Additional messages to add the errors from Validate
-	* @return 	string
+	* @param   Validation  $validate   The validate object
+	* @param   string      $file       The file to get the messages from
+	* @param   array       $additional_messages  Additional messages to add the errors from Validate
+	* @return  string
 	*/
-	public static function add_validate_errors(Validate $validate, $file = NULL, $additional_messages = NULL) {
+	public static function add_validate_errors($validation, $file = NULL, $additional_messages = NULL) {
 		if ($file === NULL) {
 			$file = '';
 		}
 
-		$messages = $validate->errors($file);
+		$messages = $validation->errors($file);
 
 		if ( ! empty($additional_messages)) {
 			foreach ($additional_messages as $message) {

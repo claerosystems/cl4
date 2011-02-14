@@ -184,7 +184,7 @@ class cl4_MultiORM {
 		if ( ! empty($route_name)) {
 			$this->_options['target_route'] = Route::name($route_name);
 		} else if ($this->_options['target_route'] === NULL) {
-			$this->_options['target_route'] = Route::name(Request::instance()->route);
+			$this->_options['target_route'] = Route::name(Request::current()->route());
 		}
 
 		return $this;
@@ -259,7 +259,8 @@ class cl4_MultiORM {
 
 		// set up the open form tag
 		$this->_options['form_attributes'] = HTML::set_class_attribute($this->_options['form_attributes'], 'cl4_multiple_edit_form');
-		$form_open_tag = Form::open($this->_options['form_action'], $this->_options['form_attributes']);
+		$form_action = ($this->_options['form_action'] === NULL ? Request::current() : $this->_options['form_action']);
+		$form_open_tag = Form::open($form_action, $this->_options['form_attributes']);
 
 		// set up first column
 		if ($list_options['per_row_links']['checkbox']) {
@@ -672,7 +673,8 @@ class cl4_MultiORM {
 			}
 
 			// generate the form tags
-			$form_open_tag = Form::open($this->_options['form_action'], $this->_options['form_attributes']);
+			$form_action = ($this->_options['form_action'] === NULL ? Request::current() : $this->_options['form_action']);
+			$form_open_tag = Form::open($form_action, $this->_options['form_attributes']);
 			$form_close_tag = Form::close();
 		} else {
 			$form_open_tag = NULL;
@@ -701,11 +703,10 @@ class cl4_MultiORM {
 		$fields = array();
 		$i = 1;
 		foreach ($display_order as $column_name) {
-			try {
-				$column_info = $table_columns[$column_name];
-			} catch (Exception $e) {
-				throw new Kohana_Exception('The column :column_name in _display_order is not defined in $table_columns', array(':column_name' => $column_name));
-			}
+			// skip any fields that are no in the table columns as they maybe things like related tables
+			if ( ! array_key_exists($column_name, $table_columns)) continue;
+
+			$column_info = $table_columns[$column_name];
 
 			if ($column_info['edit_flag'] && ! in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
 				$headings[$i] = $labels[$column_name];
@@ -756,11 +757,10 @@ class cl4_MultiORM {
 
 			// add each of the fields to the row data array, except for fields that shouldn't be displayed (edit_flag) or are hidden
 			foreach ($display_order as $column_name) {
-				try {
-					$column_info = $table_columns[$column_name];
-				} catch (Exception $e) {
-					throw new Kohana_Exception('The column :column_name in _display_order is not defined in $table_columns', array(':column_name' => $column_name));
-				}
+				// skip any fields that are no in the table columns as they maybe things like related tables
+				if ( ! array_key_exists($column_name, $table_columns)) continue;
+
+				$column_info = $table_columns[$column_name];
 
 				$show_field = FALSE;
 				if ($column_info['edit_flag']) {
@@ -905,20 +905,23 @@ class cl4_MultiORM {
 	* Loops through all of the records validating them
 	* If any object doesn't valid, the Validate object will be stored in _validate_objects
 	* Will return false if any record doesn't validate
-	* This will empty the _validate_object first
+	* This will empty _validate_objects first
 	*
 	* @return  boolean
 	*/
 	public function check() {
-		$this->_validate_objects = array();
+		//$this->_validate_objects = array();
+		$this->_validation_exceptions = array();
 
 		foreach ($this->_records as $num => $record_model) {
-			if ( ! $record_model->check()) {
-				$this->_validate_objects[$num] = $record_model->validate();
+			try {
+				$record_model->check();
+			} catch (ORM_Validation_Exception $e) {
+				$this->_validation_exceptions[] = $e;
 			}
 		}
 
-		return empty($this->_validate_objects);
+		return empty($this->_validation_exceptions);
 	} // function check
 
 	/**
@@ -927,12 +930,12 @@ class cl4_MultiORM {
 	*
 	* @return  array
 	*/
-	public function validate_objects() {
-		if (empty($this->_validate_objects)) {
+	public function validation_exceptions() {
+		if (empty($this->_validation_exceptions)) {
 			return FALSE;
 		}
 
-		return $this->_validate_objects;
+		return $this->_validation_exceptions;
 	} // function validate_objects
 
 	/**
