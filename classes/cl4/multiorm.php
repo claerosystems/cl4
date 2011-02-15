@@ -910,7 +910,6 @@ class cl4_MultiORM {
 	* @return  boolean
 	*/
 	public function check() {
-		//$this->_validate_objects = array();
 		$this->_validation_exceptions = array();
 
 		foreach ($this->_records as $num => $record_model) {
@@ -945,17 +944,23 @@ class cl4_MultiORM {
 	* @return  MultiOrm
 	*/
 	public function save() {
+		$this->_validation_exceptions = array();
+
 		foreach ($this->_records as $num => $record_model) {
 			try {
 				$record_model->save();
+				++ $this->_records_saved;
+			} catch (ORM_Validation_Exception $e) {
+				$this->_validation_exceptions[] = $e;
 
-				if ($record_model->saved()) {
-					++ $this->_records_saved;
-				}
 			} catch (Exception $e) {
 				throw $e;
 			}
 		} // foreach
+
+		if ( ! empty($this->_validation_exceptions)) {
+			throw $this->_validation_exceptions[0];
+		}
 
 		return $this;
 	} // function save
