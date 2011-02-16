@@ -47,15 +47,9 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_form_fields_hidden = array();
 
 	/**
-	*  this holds the form buttons
+	* @var  array  Holds the form buttons
 	*/
 	protected $_form_buttons = array();
-
-	/**
-	* holds all status messages to be displayed to the user
-	* @var mixed
-	*/
-	protected $_message = array();
 
 	/**
 	* a cache for any lookups we do for select or relationship data
@@ -71,7 +65,7 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	 * @var boolean $_include_expired If true, includes expired rows in select queries.
 	 */
-	protected $_include_expired = false;
+	protected $_include_expired = FALSE;
 
 	/**
 	* The table name to display
@@ -80,7 +74,7 @@ class cl4_ORM extends Kohana_ORM {
 	public $_table_name_display;
 
 	/**
-	 * @var array $_display_order The order to display columns in, if different from as listed in $_table_columns.
+	 * @var  array  The order to display columns in, if different from as listed in $_table_columns.
 	 * Columns not listed here will be added beneath these columns, in the order they are listed in $_table_columns.
 	 */
 	protected $_display_order = array();
@@ -188,22 +182,11 @@ class cl4_ORM extends Kohana_ORM {
 	 * @param   mixed   parameter for find()
 	 * @return  ORM
 	 */
-	public static function factory($model_name, $id = NULL, $options = array()) {
-		// a try/catch will not work if the model does not exist because PHP throws a FATAL error
-		// therefore, we at least look for the model first
-		$class_name = 'Model_' . ucfirst($model_name);
-		if ( ! class_exists($class_name)) {
-			// the model does not appear to exist
-			throw new Kohana_Exception('The requested model was not found: :model_name:', array(':model_name:' => $model_name), 3001);
-		} else {
-			// now try to create the model
-			try {
-				// instantiate the model
-				return new $class_name($id, $options);
-			} catch (Exception $e) {
-				throw $e;
-			}
-		} // if
+	public static function factory($model, $id = NULL, $options = array()) {
+		// Set class name
+		$model = 'Model_'.ucfirst($model);
+
+		return new $model($id, $options);
 	} // function factory
 
 	/**
@@ -2323,7 +2306,7 @@ class cl4_ORM extends Kohana_ORM {
 		$this->empty_fields();
 
 		return $this;
-	}
+	} // function clear
 
 	/**
 	* Sets the db instance within the object
