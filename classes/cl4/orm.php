@@ -491,7 +491,7 @@ class cl4_ORM extends Kohana_ORM {
 		}
 
 		return $options;
-	} // function
+	} // function get_view_html_options
 
 	/**
 	* Returns an array of options that are passed to ORM_FieldType::save()
@@ -510,7 +510,7 @@ class cl4_ORM extends Kohana_ORM {
 		}
 
 		return $options;
-	} // function
+	} // function get_save_options
 
 	/**
 	* Empties the 2 html field arrays
@@ -527,7 +527,7 @@ class cl4_ORM extends Kohana_ORM {
 	} // function empty_fields
 
 	/**
-	* Return TRUE if the column exists in _table_columns
+	* Return TRUE if the column exists in _table_columns and is set to show/display in the current mode
 	*
 	* @param  string  $column_name  The column name
 	* @return  boolean
@@ -760,7 +760,7 @@ class cl4_ORM extends Kohana_ORM {
 					);
 				} // if
 			} // foreach
-		}
+		} // if
 
 		return $this;
 	} // function prepare_form
@@ -856,10 +856,21 @@ class cl4_ORM extends Kohana_ORM {
 		}
 	} // function get_field_id
 
+	/**
+	* Returns TRUE if the post field names will include square brackets to create an array in $_POST
+	*
+	* @return  boolean
+	*/
 	public function is_field_name_array() {
 		return (bool) $this->_options['field_name_include_array'];
 	}
 
+	/**
+	* Returns the prefix used in the $_POST
+	* By default c_record
+	*
+	* @return  string
+	*/
 	public function field_name_prefix() {
 		return $this->_options['field_name_prefix'];
 	}
@@ -868,8 +879,8 @@ class cl4_ORM extends Kohana_ORM {
 	* Sets the record number
 	*
 	* @chainable
-	* @param mixed $record_number
-	* @return ORM
+	* @param  int  $record_number
+	* @return  ORM
 	*/
 	public function set_record_number($record_number = 0) {
 		$this->_record_number = $record_number;
@@ -880,7 +891,7 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	* Retrieves the record number
 	*
-	* @return int
+	* @return  int
 	*/
 	public function record_number() {
 		return $this->_record_number;
@@ -888,6 +899,8 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* This function returns the HTML as a string and is taking advantage of some PHP magic which will auto call __toString if an object is echoed
+	*
+	* @return  string
 	*/
 	public function __toString() {
 		if ($this->_mode == 'view') {
@@ -895,7 +908,7 @@ class cl4_ORM extends Kohana_ORM {
 		} else {
 			return $this->get_form();
 		}
-	} // function
+	} // function __toString
 
 	/**
 	 * Generate the formatted HTML form with all fields (except those in the optional excluded columns option array) and formatting.
@@ -1016,14 +1029,14 @@ class cl4_ORM extends Kohana_ORM {
 			'display_order'         => $this->_display_order,
 			'additional_view_data'  => $this->_options['additional_view_data'],
 		));
-	} // function
+	} // function get_form
 
     /**
 	 * Generate the formatted HTML list or table with all fields (except those in the optional excluded columns option array) and formatting.
 	 *
-	 * @param 		array		array of options, see defaults for details
-	 * 							$options['excluded_fields'] = array()
-	 * @return  	string		the HTML for the formatted form
+	 * @param   array   array of options, see defaults for details
+	 *                  $options['excluded_fields'] = array()
+	 * @return  string  the HTML for the formatted form
 	 */
 	public function get_view(array $options = array()) {
 		// set options if passed
@@ -1056,7 +1069,7 @@ class cl4_ORM extends Kohana_ORM {
 			'display_order'     => $this->_display_order,
 			'additional_view_data' => $this->_options['additional_view_data'],
 		));
-	} // function
+	} // function get_view
 
 	/**
 	 * Generate and return the formatted HTML for the given field
@@ -1076,10 +1089,10 @@ class cl4_ORM extends Kohana_ORM {
 		} else {
 			throw new Kohana_Exception('Prepare form was unable to prepare the field therefore there is no field available: :column_name', array(':column_name' => $column_name));
 		} // if
-	} // function
+	} // function get_field
 
 	/**
-	* return the meta data from the table columns array in the model for the given column
+	* Return the meta data from the table columns array in the model for the given column
 	*
 	* @param mixed $column_name
 	*/
@@ -1090,7 +1103,7 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	* Adds a where clause with the ids in an IN() (if any IDs were passed) and then does a find_all()
 	*
-	* @param array $ids
+	* @param  array  $ids
 	*
 	* @return $this
 	*/
@@ -1105,7 +1118,7 @@ class cl4_ORM extends Kohana_ORM {
 		} // if
 
 		return $this->find_all();
-	} // function
+	} // function find_ids
 
 	/**
 	* Returns an array of data values for this column, use relationships or source meta data in model
@@ -1416,15 +1429,15 @@ class cl4_ORM extends Kohana_ORM {
 		} // foreach
 
 		return NULL;
-	} // function
+	} // function get_source_model
 
 	/**
 	* Retrieves the record from the post based on the field_name_prefix option, table name and record number
 	* Will return the entire post if field_name_prefix is not set in the post
 	* Will return NULL if the record number or table name is not in the array but the field_name_prefix is in the post
 	*
-	* @param mixed $post
-	* @return array
+	* @param   array  $post
+	* @return  array
 	*/
 	public function get_table_records_from_post($post = NULL) {
 		if ($post === NULL) {
@@ -1454,7 +1467,8 @@ class cl4_ORM extends Kohana_ORM {
 	* Set all values from the $_POST or passed array using the model rules (field_type, edit_flag, ignored_columns, etc.)
 	* By default it will use $_POST if nothing is passed
 	*
-	* @param  array  $post  The values to use instead of post
+	* @param   array  $post  The values to use instead of post
+	* @return  ORM
 	*/
 	public function save_values($post = NULL) {
 		// grab the values from the POST if the values have not been passed
@@ -1570,15 +1584,6 @@ class cl4_ORM extends Kohana_ORM {
 		return $this;
 	} // function add
 
-	/**
-	 * Removes a relationship between this model and another.
-	 *
-	 * @param   string   alias of the has_many "through" relationship
-	 * @param   ORM      related ORM model
-	 *
-	 * @chainable
-	 * @return  ORM
-	 */
 	/**
 	 * Removes a relationship between this model and another.
 	 *
