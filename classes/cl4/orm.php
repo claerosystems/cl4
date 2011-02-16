@@ -192,14 +192,23 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	 * Allows serialization of only the object data and state, to prevent
 	 * "stale" objects being unserialized, which also requires less memory.
-	 * This is the same as Kohana_ORM::serialize(), but includes _options, _table_columns
+	 * This is the same as Kohana_ORM::serialize(), but including _table_columns
+	 * _options are also stored, but only the ones that are not the default found in config/cl4orm.default_options
 	 *
 	 * @return  string
 	 */
 	public function serialize() {
 		// Store only information about the object
-		foreach (array('_primary_key_value', '_object', '_changed', '_loaded', '_saved', '_sorting', '_options', '_table_columns') as $var) {
+		foreach (array('_primary_key_value', '_object', '_changed', '_loaded', '_saved', '_sorting', '_table_columns') as $var) {
 			$data[$var] = $this->{$var};
+		}
+
+		// only store the options that are not the default when serializing to keep the size down
+		$default_options = Kohana::config('cl4orm.default_options');
+		foreach ($default_options as $key => $value) {
+			if ($this->_options[$key] !== $default_options[$key]) {
+				$data['_options'][$key] = $this->_options[$key];
+			}
 		}
 
 		return serialize($data);
@@ -255,7 +264,7 @@ class cl4_ORM extends Kohana_ORM {
 		}
 
 		return $this;
-	} // function
+	} // function set_options
 
 	/**
 	* Allows setting of a specific option using a path
