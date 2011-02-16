@@ -369,7 +369,7 @@ class cl4_ModelCreate {
 		$model_code .= TAB . '*/' . EOL;
 		$model_code .= TAB . '/*' . EOL;
 		$model_code .= TAB . 'public function filters() {' . EOL;
-		$model_code .= TAB . TAB . 'return array(TRUE => array(\'trim\' => array()),);' . EOL;
+		$model_code .= TAB . TAB . 'return array(TRUE => array(array(\'trim\')),);' . EOL;
 		$model_code .= TAB . '}' . EOL;
 		$model_code .= TAB . '*/' . EOL;
 
