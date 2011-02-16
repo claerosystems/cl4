@@ -416,11 +416,11 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	 * Gets the display order of the table columns.
 	 *
-	 * @return array
+	 * @return  array
 	 */
-	public function get_display_order() {
+	public function display_order() {
 		return $this->_display_order;
-	} // function get_display_order
+	} // function display_order
 
 	/**
 	* Sets the target_route option within the model
@@ -446,10 +446,15 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	* sets the log property to FALSE in order to disable the changelog
 	*
-	* @param mixed $setting true or false
+	* @param  boolean  $setting  true or false
+	*
+	* @chainable
+	* @return  ORM
 	*/
 	public function set_log($setting = FALSE) {
 		$this->_log = $setting;
+
+		return $this;
 	}
 
 	/**
@@ -465,7 +470,7 @@ class cl4_ORM extends Kohana_ORM {
 		$value = call_user_func(ORM_FieldType::get_field_type_class_name($field_type) . '::view', $this->$column_name, $column_name, $this);
 
 		return $value;
-	} // function
+	}
 
 	/**
 	* Returns an array of options that are passed to ORM_FieldType::view_html()
