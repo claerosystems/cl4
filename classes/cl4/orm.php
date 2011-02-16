@@ -86,22 +86,6 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_display_order = array();
 
 	/**
-	* Contains the original record, populate during find()
-	* @var  array
-	*/
-	protected $_original = array();
-
-	/**
-	* Records if the record was updated
-	* Set during save()
-	* no save run: NULL
-	* no save needed: FALSE
-	* save run: TRUE
-	* @var  bool
-	*/
-	protected $_was_updated;
-
-	/**
 	* Disables/enables logging updates (insert, update, delete) for the object
 	* By default, all changes will be logged
 	* @var  bool
@@ -116,14 +100,12 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_log_next_query = TRUE;
 
 	/**
-	* If the last save() was an insert (vs update)
-	* @var  bool
+	* @var  boolean  If the last save() was an insert (vs update)
 	*/
 	public $_was_insert;
 
 	/**
-	* If the last save() was an update (vs insert)
-	* @var  bool
+	* @var  boolean  If the last save() was an update (vs insert)
 	*/
 	public $_was_update;
 
@@ -165,7 +147,7 @@ class cl4_ORM extends Kohana_ORM {
 		$this->_include_expired = $include;
 
 		return $this;
-	} // function
+	} // function include_expired
 
 	/**
 	 * Modifies selct queries to ignore expired rows.
@@ -222,7 +204,7 @@ class cl4_ORM extends Kohana_ORM {
 				throw $e;
 			}
 		} // if
-	} // function
+	} // function factory
 
 	/**
 	 * Allows serialization of only the object data and state, to prevent
@@ -1662,14 +1644,13 @@ class cl4_ORM extends Kohana_ORM {
 	}
 
 	/**
-	 * Loads a database result, either as a new object for this model, or as
+	 * Loads a database result, either as a new record for this model, or as
 	 * an iterator for multiple rows.
-	 * Also stores the record in _original incase a save is run later for single records.
+	 * If there is already a select appled in the _db_builder, this will not add a * to the select
 	 *
 	 * @chainable
-	 * @param   boolean       return an iterator or load a single row
-	 * @return  ORM           for single rows
-	 * @return  ORM_Iterator  for multiple rows
+	 * @param  bool $multiple Return an iterator or load a single row
+	 * @return ORM|Database_Result
 	 */
 	protected function _load_result($multiple = FALSE) {
 		$this->_db_builder->from($this->_table_name);
@@ -1679,6 +1660,7 @@ class cl4_ORM extends Kohana_ORM {
 			$this->_db_builder->limit(1);
 		}
 
+		// Select all columns by default
 		if ( ! $this->is_select_applied()) {
 			// Select all columns by default
 			$this->_db_builder->select($this->_table_name.'.*');
@@ -1709,8 +1691,6 @@ class cl4_ORM extends Kohana_ORM {
 			$this->reset();
 
 			if ($result->count() === 1) {
-				// store the database record in the original param
-				$this->_original = $result->current();
 				// Load object values
 				$this->_load_values($result->current());
 			} else {
@@ -1949,7 +1929,7 @@ class cl4_ORM extends Kohana_ORM {
 				->add_change_log(array(
 					'table_name' => $this->_table_name,
 					// send the original pk so the change to the pk can be tracked when doing an update
-					'record_pk' => $this->_original[$this->_primary_key],
+					'record_pk' => $id,
 					'query_type' => 'UPDATE',
 					'row_count' => 1, // always 1, because the update is set to update based on the primary key which is unique
 					'sql' => $this->last_query(),
