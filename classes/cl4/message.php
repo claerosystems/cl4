@@ -98,19 +98,19 @@ class cl4_Message {
 	}
 
 	/**
-	* Returns a HTML unordered list with the errors from the validate object
+	* Returns a HTML unordered list with the errors from the validation exception
 	* This can then be used with add() to add the messages to the session
-	* By default it uses views/cl4/cl4_message_validate to format the messages
+	* By default it uses views/cl4/cl4_message_validation to format the messages
 	* To add additional messages to the output (so they are included in this message), pass them in as an array in $additional_messages
 	*
-	* 	Message::add(__(Kohana::message('file', 'pre_message')) . Message::add_validate_errors($validation, 'file'), Message::$error);
+	* 	Message::add(__(Kohana::message('file', 'pre_message')) . Message::add_validation_errors($validation, 'file'), Message::$error);
 	*
-	* @param   ORM_Validation_Exception  $validate   The Validation object or ORM_Validation_Exception exception object
+	* @param   ORM_Validation_Exception  $validation   The Validation object or ORM_Validation_Exception exception object
 	* @param   string  $file       The file to get the messages from
 	* @param   array   $additional_messages  Additional messages to add the errors from Validate
 	* @return  string
 	*/
-	public static function add_validate_errors($validation, $file = NULL, $additional_messages = NULL) {
+	public static function add_validation_errors($validation, $file = NULL, $additional_messages = NULL) {
 		if ($file === NULL) {
 			$file = '';
 		}
@@ -133,9 +133,9 @@ class cl4_Message {
 			}
 		} // if
 
-		return View::factory('cl4/message/validate_errors')
+		return View::factory('cl4/message/validation_errors')
 			->set('messages', $messages);
-	} // function add_validate_errors
+	} // function add_validation_errors
 
 	/**
 	* Sets the array in the session
@@ -202,7 +202,7 @@ class cl4_Message {
 	} // function
 
 	/**
-	 * Converts validate errors to cl4_Message-compatable messages.
+	 * Converts validation errors to cl4_Message-compatable messages.
 	 *
 	 * @param array $errors The errors to convert.
 	 *

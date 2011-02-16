@@ -88,10 +88,9 @@ class cl4_MultiORM {
 	protected $_search;
 
 	/**
-	* Stores an array Validate objects from each record in _records after check() if any Models don't validate
-	* @var  Validate
+	* @var  ORM_Validation_Exception  Stores an array Validation exceptions from each record in _records after check() is run if any Models don't validate
 	*/
-	protected $_validate_objects;
+	protected $_validation_exceptions;
 
 	/**
 	* Returns an instance of MultiORM
@@ -903,9 +902,9 @@ class cl4_MultiORM {
 
 	/**
 	* Loops through all of the records validating them
-	* If any object doesn't valid, the Validate object will be stored in _validate_objects
+	* If any object doesn't valid, the Validation exceptions will be stored in _validation_exceptions
 	* Will return false if any record doesn't validate
-	* This will empty _validate_objects first
+	* This will empty _validation_exceptions first
 	*
 	* @return  boolean
 	*/
@@ -924,7 +923,7 @@ class cl4_MultiORM {
 	} // function check
 
 	/**
-	* Returns all of the validate objects in the object
+	* Returns all of the validation exceptions in the object
 	* If there are none, FALSE will be returned
 	*
 	* @return  array
@@ -935,7 +934,7 @@ class cl4_MultiORM {
 		}
 
 		return $this->_validation_exceptions;
-	} // function validate_objects
+	} // function validation_exceptions
 
 	/**
 	* Saves all of the records within the object
