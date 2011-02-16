@@ -271,24 +271,6 @@ class cl4_ORM extends Kohana_ORM {
 			$this->_options['field_id_prefix'] = uniqid();
 		}
 
-		// set the default database
-		// if _db is a string and not empty then use it as the db instance name
-		if (is_string($this->_db) && ! empty($this->_db)) {
-			try {
-				$this->_db = Database::instance($this->_db);
-			} catch (Exception $e) {
-				throw $e;
-			}
-		// if the database instance has not been set, use the value in the options as the db instance name
-		// by default, _options['db_group'] will be NULL, therefore Database::instance() will get the default db instance
-		} else if (empty($this->_db)) {
-			try {
-				$this->_db = Database::instance($this->_options['db_group']);
-			} catch (Exception $e) {
-				throw $e;
-			}
-		}
-
 		return $this;
 	} // function
 
