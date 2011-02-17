@@ -205,8 +205,8 @@ class cl4_ORM extends Kohana_ORM {
 
 		// only store the options that are not the default when serializing to keep the size down
 		$default_options = Kohana::config('cl4orm.default_options');
-		foreach ($default_options as $key => $value) {
-			if ($this->_options[$key] !== $default_options[$key]) {
+		foreach ($this->_options as $key => $value) {
+			if ( ! array_key_exists($key, $default_options) || $this->_options[$key] !== $default_options[$key]) {
 				$data['_options'][$key] = $this->_options[$key];
 			}
 		}
@@ -2339,6 +2339,8 @@ class cl4_ORM extends Kohana_ORM {
 		if (is_object($db_group)) {
 			$db_group = (string) $db_group;
 		}
+
+		$this->_options['db_group'] = $db_group;
 
 		$this->_db = Database::instance($db_group);
 
