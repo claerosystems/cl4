@@ -2065,7 +2065,7 @@ class cl4_ORM extends Kohana_ORM {
 
 			$file_name = ORM_File::view($this->$column_name, $column_name, $this, $this->_table_columns[$column_name]['field_options']);
 
-			Request::current()->send_file($file_path, $file_name);
+			Request::current()->response()->send_file($file_path, $file_name);
 		} // if
 
 		// nothing to stream

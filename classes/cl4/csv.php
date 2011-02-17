@@ -186,7 +186,7 @@ class cl4_CSV {
 		}
 
 		try {
-			Request::current()->send_file($this->filename, $user_filename, array(
+			Request::current()->response()->send_file($this->filename, $user_filename, array(
 				'mime_type' => 'application/csv',
 			));
 		} catch (Exception $e) {
