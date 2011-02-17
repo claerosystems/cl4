@@ -1858,6 +1858,9 @@ class cl4_ORM extends Kohana_ORM {
 			throw new Kohana_Exception('Cannot update :model model because it is not loaded.', array(':model' => $this->_object_name));
 
 		if (empty($this->_changed)) {
+			// save any values find in _related_save_data
+			$this->save_related();
+
 			// Nothing to update
 			return $this;
 		}

@@ -140,15 +140,15 @@ class cl4_Message {
 	/**
 	* Sets the array in the session
 	*
-	* @param mixed $messages
-	* @return $this
+	* @param   array  $messages
+	* @return  void
 	*/
 	public static function set($messages) {
 		Session::instance()->set(Message::$session_key, $messages);
-	} // function
+	}
 
 	/**
-	* put your comment there...
+	* Retrieves the current messages
 	*
 	* @param 	int		$level	!!!! not implemented !!!! only return the messages of this level
 	* @param 	bool	$clear	if set to true, the messages will be cleared from the session; if level is set, only the messages of that level will be removed
