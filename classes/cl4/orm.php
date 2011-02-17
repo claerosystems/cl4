@@ -47,15 +47,9 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_form_fields_hidden = array();
 
 	/**
-	*  this holds the form buttons
+	* @var  array  Holds the form buttons
 	*/
 	protected $_form_buttons = array();
-
-	/**
-	* holds all status messages to be displayed to the user
-	* @var mixed
-	*/
-	protected $_message = array();
 
 	/**
 	* a cache for any lookups we do for select or relationship data
@@ -71,7 +65,7 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	 * @var boolean $_include_expired If true, includes expired rows in select queries.
 	 */
-	protected $_include_expired = false;
+	protected $_include_expired = FALSE;
 
 	/**
 	* The table name to display
@@ -80,7 +74,7 @@ class cl4_ORM extends Kohana_ORM {
 	public $_table_name_display;
 
 	/**
-	 * @var array $_display_order The order to display columns in, if different from as listed in $_table_columns.
+	 * @var  array  The order to display columns in, if different from as listed in $_table_columns.
 	 * Columns not listed here will be added beneath these columns, in the order they are listed in $_table_columns.
 	 */
 	protected $_display_order = array();
@@ -188,35 +182,33 @@ class cl4_ORM extends Kohana_ORM {
 	 * @param   mixed   parameter for find()
 	 * @return  ORM
 	 */
-	public static function factory($model_name, $id = NULL, $options = array()) {
-		// a try/catch will not work if the model does not exist because PHP throws a FATAL error
-		// therefore, we at least look for the model first
-		$class_name = 'Model_' . ucfirst($model_name);
-		if ( ! class_exists($class_name)) {
-			// the model does not appear to exist
-			throw new Kohana_Exception('The requested model was not found: :model_name:', array(':model_name:' => $model_name), 3001);
-		} else {
-			// now try to create the model
-			try {
-				// instantiate the model
-				return new $class_name($id, $options);
-			} catch (Exception $e) {
-				throw $e;
-			}
-		} // if
+	public static function factory($model, $id = NULL, $options = array()) {
+		// Set class name
+		$model = 'Model_'.ucfirst($model);
+
+		return new $model($id, $options);
 	} // function factory
 
 	/**
 	 * Allows serialization of only the object data and state, to prevent
 	 * "stale" objects being unserialized, which also requires less memory.
-	 * This is the same as Kohana_ORM::serialize(), but includes _options, _table_columns
+	 * This is the same as Kohana_ORM::serialize(), but including _table_columns
+	 * _options are also stored, but only the ones that are not the default found in config/cl4orm.default_options
 	 *
 	 * @return  string
 	 */
 	public function serialize() {
 		// Store only information about the object
-		foreach (array('_primary_key_value', '_object', '_changed', '_loaded', '_saved', '_sorting', '_options', '_table_columns') as $var) {
+		foreach (array('_primary_key_value', '_object', '_changed', '_loaded', '_saved', '_sorting', '_table_columns') as $var) {
 			$data[$var] = $this->{$var};
+		}
+
+		// only store the options that are not the default when serializing to keep the size down
+		$default_options = Kohana::config('cl4orm.default_options');
+		foreach ($default_options as $key => $value) {
+			if ($this->_options[$key] !== $default_options[$key]) {
+				$data['_options'][$key] = $this->_options[$key];
+			}
 		}
 
 		return serialize($data);
@@ -272,7 +264,7 @@ class cl4_ORM extends Kohana_ORM {
 		}
 
 		return $this;
-	} // function
+	} // function set_options
 
 	/**
 	* Allows setting of a specific option using a path
@@ -424,11 +416,11 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	 * Gets the display order of the table columns.
 	 *
-	 * @return array
+	 * @return  array
 	 */
-	public function get_display_order() {
+	public function display_order() {
 		return $this->_display_order;
-	} // function get_display_order
+	} // function display_order
 
 	/**
 	* Sets the target_route option within the model
@@ -454,10 +446,15 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	* sets the log property to FALSE in order to disable the changelog
 	*
-	* @param mixed $setting true or false
+	* @param  boolean  $setting  true or false
+	*
+	* @chainable
+	* @return  ORM
 	*/
 	public function set_log($setting = FALSE) {
 		$this->_log = $setting;
+
+		return $this;
 	}
 
 	/**
@@ -473,7 +470,7 @@ class cl4_ORM extends Kohana_ORM {
 		$value = call_user_func(ORM_FieldType::get_field_type_class_name($field_type) . '::view', $this->$column_name, $column_name, $this);
 
 		return $value;
-	} // function
+	}
 
 	/**
 	* Returns an array of options that are passed to ORM_FieldType::view_html()
@@ -494,7 +491,7 @@ class cl4_ORM extends Kohana_ORM {
 		}
 
 		return $options;
-	} // function
+	} // function get_view_html_options
 
 	/**
 	* Returns an array of options that are passed to ORM_FieldType::save()
@@ -513,7 +510,7 @@ class cl4_ORM extends Kohana_ORM {
 		}
 
 		return $options;
-	} // function
+	} // function get_save_options
 
 	/**
 	* Empties the 2 html field arrays
@@ -530,7 +527,7 @@ class cl4_ORM extends Kohana_ORM {
 	} // function empty_fields
 
 	/**
-	* Return TRUE if the column exists in _table_columns
+	* Return TRUE if the column exists in _table_columns and is set to show/display in the current mode
 	*
 	* @param  string  $column_name  The column name
 	* @return  boolean
@@ -763,7 +760,7 @@ class cl4_ORM extends Kohana_ORM {
 					);
 				} // if
 			} // foreach
-		}
+		} // if
 
 		return $this;
 	} // function prepare_form
@@ -859,10 +856,21 @@ class cl4_ORM extends Kohana_ORM {
 		}
 	} // function get_field_id
 
+	/**
+	* Returns TRUE if the post field names will include square brackets to create an array in $_POST
+	*
+	* @return  boolean
+	*/
 	public function is_field_name_array() {
 		return (bool) $this->_options['field_name_include_array'];
 	}
 
+	/**
+	* Returns the prefix used in the $_POST
+	* By default c_record
+	*
+	* @return  string
+	*/
 	public function field_name_prefix() {
 		return $this->_options['field_name_prefix'];
 	}
@@ -871,8 +879,8 @@ class cl4_ORM extends Kohana_ORM {
 	* Sets the record number
 	*
 	* @chainable
-	* @param mixed $record_number
-	* @return ORM
+	* @param  int  $record_number
+	* @return  ORM
 	*/
 	public function set_record_number($record_number = 0) {
 		$this->_record_number = $record_number;
@@ -883,7 +891,7 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	* Retrieves the record number
 	*
-	* @return int
+	* @return  int
 	*/
 	public function record_number() {
 		return $this->_record_number;
@@ -891,6 +899,8 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* This function returns the HTML as a string and is taking advantage of some PHP magic which will auto call __toString if an object is echoed
+	*
+	* @return  string
 	*/
 	public function __toString() {
 		if ($this->_mode == 'view') {
@@ -898,7 +908,7 @@ class cl4_ORM extends Kohana_ORM {
 		} else {
 			return $this->get_form();
 		}
-	} // function
+	} // function __toString
 
 	/**
 	 * Generate the formatted HTML form with all fields (except those in the optional excluded columns option array) and formatting.
@@ -1019,14 +1029,14 @@ class cl4_ORM extends Kohana_ORM {
 			'display_order'         => $this->_display_order,
 			'additional_view_data'  => $this->_options['additional_view_data'],
 		));
-	} // function
+	} // function get_form
 
     /**
 	 * Generate the formatted HTML list or table with all fields (except those in the optional excluded columns option array) and formatting.
 	 *
-	 * @param 		array		array of options, see defaults for details
-	 * 							$options['excluded_fields'] = array()
-	 * @return  	string		the HTML for the formatted form
+	 * @param   array   array of options, see defaults for details
+	 *                  $options['excluded_fields'] = array()
+	 * @return  string  the HTML for the formatted form
 	 */
 	public function get_view(array $options = array()) {
 		// set options if passed
@@ -1059,7 +1069,7 @@ class cl4_ORM extends Kohana_ORM {
 			'display_order'     => $this->_display_order,
 			'additional_view_data' => $this->_options['additional_view_data'],
 		));
-	} // function
+	} // function get_view
 
 	/**
 	 * Generate and return the formatted HTML for the given field
@@ -1079,10 +1089,10 @@ class cl4_ORM extends Kohana_ORM {
 		} else {
 			throw new Kohana_Exception('Prepare form was unable to prepare the field therefore there is no field available: :column_name', array(':column_name' => $column_name));
 		} // if
-	} // function
+	} // function get_field
 
 	/**
-	* return the meta data from the table columns array in the model for the given column
+	* Return the meta data from the table columns array in the model for the given column
 	*
 	* @param mixed $column_name
 	*/
@@ -1093,7 +1103,7 @@ class cl4_ORM extends Kohana_ORM {
 	/**
 	* Adds a where clause with the ids in an IN() (if any IDs were passed) and then does a find_all()
 	*
-	* @param array $ids
+	* @param  array  $ids
 	*
 	* @return $this
 	*/
@@ -1108,7 +1118,7 @@ class cl4_ORM extends Kohana_ORM {
 		} // if
 
 		return $this->find_all();
-	} // function
+	} // function find_ids
 
 	/**
 	* Returns an array of data values for this column, use relationships or source meta data in model
@@ -1419,15 +1429,15 @@ class cl4_ORM extends Kohana_ORM {
 		} // foreach
 
 		return NULL;
-	} // function
+	} // function get_source_model
 
 	/**
 	* Retrieves the record from the post based on the field_name_prefix option, table name and record number
 	* Will return the entire post if field_name_prefix is not set in the post
 	* Will return NULL if the record number or table name is not in the array but the field_name_prefix is in the post
 	*
-	* @param mixed $post
-	* @return array
+	* @param   array  $post
+	* @return  array
 	*/
 	public function get_table_records_from_post($post = NULL) {
 		if ($post === NULL) {
@@ -1457,7 +1467,8 @@ class cl4_ORM extends Kohana_ORM {
 	* Set all values from the $_POST or passed array using the model rules (field_type, edit_flag, ignored_columns, etc.)
 	* By default it will use $_POST if nothing is passed
 	*
-	* @param  array  $post  The values to use instead of post
+	* @param   array  $post  The values to use instead of post
+	* @return  ORM
 	*/
 	public function save_values($post = NULL) {
 		// grab the values from the POST if the values have not been passed
@@ -1573,15 +1584,6 @@ class cl4_ORM extends Kohana_ORM {
 		return $this;
 	} // function add
 
-	/**
-	 * Removes a relationship between this model and another.
-	 *
-	 * @param   string   alias of the has_many "through" relationship
-	 * @param   ORM      related ORM model
-	 *
-	 * @chainable
-	 * @return  ORM
-	 */
 	/**
 	 * Removes a relationship between this model and another.
 	 *
@@ -2323,7 +2325,7 @@ class cl4_ORM extends Kohana_ORM {
 		$this->empty_fields();
 
 		return $this;
-	}
+	} // function clear
 
 	/**
 	* Sets the db instance within the object
