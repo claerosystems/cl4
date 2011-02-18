@@ -307,15 +307,15 @@ echo '</body></html>';
 		// cast the type if one is specified
 		switch($type) {
 			case 'int' :
-				$cleaned_value = (int) $cleaned_value;
+				$cleaned_value = (int) $value;
 				break;
 			case 'array' :
-				if ( ! is_array($cleaned_value)) $cleaned_value = (array) $cleaned_value;
+				if ( ! is_array($cleaned_value)) $cleaned_value = (array) $value;
 			case 'string' :
-				$cleaned_value = (string) $cleaned_value;
+				$cleaned_value = (string) $value;
 				break;
 			case 'bool' :
-				$cleaned_value = (bool) $cleaned_value;
+				$cleaned_value = (bool) $value;
 				break;
 			default :
 				$cleaned_value = $value;
