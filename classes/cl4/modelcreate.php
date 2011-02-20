@@ -54,8 +54,9 @@ class cl4_ModelCreate {
 		if ( ! isset($columns['id'])) {
 			$model_code .= TAB . '//protected $_primary_key = \'' . 'id' . '\'; // default: id' . EOL;
 		}
-		// todo: guess at a smart primary value
-		$model_code .= TAB . '//protected $_primary_val = \'' . 'name' . '\'; // default: name (column used as primary value)' . EOL;
+		if ( ! isset($columns['name'])) {
+			$model_code .= TAB . '//protected $_primary_val = \'' . 'name' . '\'; // default: name (column used as primary value)' . EOL;
+		}
 		$model_code .= TAB . 'public $_table_name_display = \'' . cl4::underscores_to_words($table_name) . '\'; // cl4-specific' . EOL;
 
 		// add sorting
@@ -335,12 +336,7 @@ class cl4_ModelCreate {
 		$model_code .= TAB . 'public function labels() {' . EOL;
 		$model_code .= TAB . TAB . 'return array(' . EOL;
 		foreach ($columns as $column_name => $column_data) {
-			// special case for column name because it's correct having it in all capitals
-			$column_name_for_label = $column_name;
-			if (substr($column_name, strrpos($column_name, '_')) == '_id') $column_name_for_label = substr($column_name, 0, strrpos($column_name, '_'));
-			else if ($column_name == 'id') $column_name_for_label = 'ID';
-
-			$model_code .= TAB . TAB . '\'' . $column_name . '\' => \'' . cl4::underscores_to_words($column_name_for_label) . '\',' . EOL;
+			$model_code .= TAB . TAB . TAB . '\'' . $column_name . '\' => \'' . ModelCreate::make_column_label($column_name) . '\',' . EOL;
 		} // foreach
 		$model_code .= TAB . TAB . ');' . EOL;
 		$model_code .= TAB . '}' . EOL;
@@ -384,6 +380,15 @@ class cl4_ModelCreate {
 	*/
 	public static function make_class_name($name) {
 		return str_replace(' ', '_', ucwords(str_replace('_', ' ', $name)));
+	}
+
+	public static function make_column_label($column_name) {
+		// special cases for column names because it's correct having it in all capitals
+		if (substr($column_name, strrpos($column_name, '_')) == '_id') $label = substr($column_name, 0, strrpos($column_name, '_'));
+		else if ($column_name == 'id') $label = 'ID';
+		else $label = $column_name;
+
+		return cl4::underscores_to_words($label);
 	}
 
 	/**
