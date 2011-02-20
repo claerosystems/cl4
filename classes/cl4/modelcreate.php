@@ -24,9 +24,10 @@ class cl4_ModelCreate {
 
 		// figure out database configuration name to use
 		$db_name = isset($options['db_group']) ? $options['db_group'] : $default_options['db_group'];
+		$db_options = isset($options['db_options']) ? $options['db_options'] : NULL;
 
 		// connect to the database
-		$_db = Database::instance($db_name);
+		$_db = Database::instance($db_name, $db_options);
 
 		// get the column data
 		// todo: can / should we determine if database introspection is being used and flag/log this if it is not?
@@ -50,8 +51,9 @@ class cl4_ModelCreate {
 
 		$model_code .= TAB . 'protected $_table_names_plural = FALSE;' . EOL;
 		$model_code .= TAB . 'protected $_table_name = \'' . $table_name . '\';' . EOL;
-		// todo: get primary key from intorspection!!
-		$model_code .= TAB . '//protected $_primary_key = \'' . 'id' . '\'; // default: id' . EOL;
+		if ( ! isset($columns['id'])) {
+			$model_code .= TAB . '//protected $_primary_key = \'' . 'id' . '\'; // default: id' . EOL;
+		}
 		// todo: guess at a smart primary value
 		$model_code .= TAB . '//protected $_primary_val = \'' . 'name' . '\'; // default: name (column used as primary value)' . EOL;
 		$model_code .= TAB . 'public $_table_name_display = \'' . cl4::underscores_to_words($table_name) . '\'; // cl4-specific' . EOL;
@@ -296,10 +298,6 @@ class cl4_ModelCreate {
 		$model_code .= TAB . ' */' . EOL;
 		$model_code .= TAB . ( ! isset($columns['date_modified']) ? '//' : '') . 'protected $_updated_column = array(\'column\' => \'date_modified\', \'format\' => TRUE);' . EOL;
 		$model_code .= EOL;
-
-		// ignored fields
-		$model_code .= TAB . '// fields mentioned here can be accessed like properties, but will not be referenced in write operations' . EOL;
-		$model_code .= TAB . '//protected $_ignored_columns = array();' . EOL . EOL;
 
 		// Add expires column
 		$model_code .= TAB . '/**' . EOL;
