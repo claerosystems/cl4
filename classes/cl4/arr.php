@@ -8,41 +8,6 @@
  */
 class cl4_Arr extends Kohana_Arr {
 	/**
-	 * Sets an array value deep within an array, based on a path.
-	 *
-	 * $array = Arr::set_deep('foo.bar', 'baz', $array);
-	 *
-	 * @param   array   $array      The array to set within
-	 * @param   string  $path       The path of keys separated by the deliminator
-	 * @param   mixed   $value      The value to set at $path
-	 * @param   string  $delimiter  The path delimiter to use, if different from Arr::$delimiter
-	 *
-	 * @return  array
-	 */
-	public static function set_deep(array $array, $path, $value, $delimiter = NULL) {
-		// Get the delimiter to use
-		if ($delimiter === NULL) {
-			// Use the default delimiter
-			$delimiter = Arr::$delimiter;
-		}
-
-		// Create a reference to the array
-		$inner = & $array;
-
-		// Loop through all the keys and modify our reference to go deeper within the array
-		$keys = explode($delimiter, $path);
-		foreach($keys as $key) {
-			// Create a reference at this level
-			$inner = & $inner[$key];
-		}
-
-		// Modify the innermost part of the array
-		$inner = $value;
-
-		return $array;
-	} // function set_deep
-
-	/**
 	* Explodes a string on 2 or more strings
 	* Useful when you have a strings such as:
 	*
