@@ -100,7 +100,7 @@ class cl4_File {
 		if ($this->options['make_dir'] && ! file_exists($destination_folder)) {
 			// option is set to make the dir and it doesn't exist
 			if ( ! mkdir($destination_folder, 0755, TRUE)) {
-				throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana::exception_text($e)), cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
+				throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana_Exception::text($e)), cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
 			}
 
 		// make sure the destination folder exists
@@ -223,7 +223,7 @@ class cl4_File {
 			if ($new_destination_folder != $destination_folder && ! file_exists($new_destination_folder)) {
 				// option is set to make the dir and it doesn't exist
 				if ( ! mkdir($new_destination_folder, 0755, TRUE)) {
-					throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana::exception_text($e)), cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
+					throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana_Exception::text($e)), cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
 				}
 			}
 		}

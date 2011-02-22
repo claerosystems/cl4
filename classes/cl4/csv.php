@@ -90,7 +90,7 @@ class cl4_CSV {
 				$this->fp = fopen($this->filename, 'r');
 			} // if
 		} catch (Exception $e) {
-			throw new Kohana_Exception('There was a problem opening the file for ' . ($this->mode == 'write' ? 'writing' : 'reading') . ': ' . ($this->filename ? $this->filename : 'temp file') . ': ' . Kohana::exception_text($e));
+			throw new Kohana_Exception('There was a problem opening the file for ' . ($this->mode == 'write' ? 'writing' : 'reading') . ': ' . ($this->filename ? $this->filename : 'temp file') . ': ' . Kohana_Exception::text($e));
 		}
 
 		if ($this->fp === FALSE) {

@@ -1998,7 +1998,7 @@ class cl4_ORM extends Kohana_ORM {
 				}
 			} // foreach
 		} catch (Exception $e) {
-			throw new Kohana_Exception('Failed to add new records ' . Kohana::exception_text($e));
+			throw new Kohana_Exception('Failed to add new records ' . Kohana_Exception::text($e));
 		}
 
 		try {
@@ -2009,7 +2009,7 @@ class cl4_ORM extends Kohana_ORM {
 				}
 			} // if
 		} catch (Exception $e) {
-			throw new Kohana_Exception('Failed to remove existing records ' . Kohana::exception_text($e));
+			throw new Kohana_Exception('Failed to remove existing records ' . Kohana_Exception::text($e));
 		}
 
 		return $this;
