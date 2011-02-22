@@ -1576,6 +1576,7 @@ class cl4_ORM extends Kohana_ORM {
 
 		foreach ( (array) $far_keys as $key) {
 			ORM::factory($through_model)
+				->set_db($this->_db_group)
 				->values(array(
 					$this->_has_many[$alias]['foreign_key'] => $foreign_key,
 					$this->_has_many[$alias]['far_key'] => $key,
@@ -1606,6 +1607,7 @@ class cl4_ORM extends Kohana_ORM {
 		$far_keys = ($far_keys instanceof ORM) ? $far_keys->pk() : $far_keys;
 
 		$through_model = ORM::factory($this->get_through_model($alias))
+			->set_db($this->_db_group)
 			->where($this->_has_many[$alias]['foreign_key'], '=', $this->pk());
 
 		if ($far_keys !== NULL) {
@@ -2345,9 +2347,11 @@ class cl4_ORM extends Kohana_ORM {
 			$db_group = (string) $db_group;
 		}
 
-		$this->_options['db_group'] = $db_group;
-
 		$this->_db = Database::instance($db_group);
+
+		// set the property and option; only do it after incase Database::instance fails
+		$this->_db_group = $db_group;
+		$this->_options['db_group'] = $db_group;
 
 		return $this;
 	} // function set_db
