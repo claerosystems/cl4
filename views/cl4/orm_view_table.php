@@ -23,6 +23,6 @@ if ($any_visible) {
 	echo '<p>No fields are visible.</p>';
 }
 
-if ($form_options['display_buttons']) {
+if ($form_options['display_buttons'] && ! empty($form_buttons)) {
 	echo '<div class="cl4_buttons">' . implode('', $form_buttons) . '</div>';
 }
