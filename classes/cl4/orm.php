@@ -909,13 +909,12 @@ class cl4_ORM extends Kohana_ORM {
 	} // function __toString
 
 	/**
-	 * Generate the formatted HTML form with all fields (except those in the optional excluded columns option array) and formatting.
+	 * Generate the formatted HTML form with all fields and formatting.
 	 *
 	 * todo: add an error option that will add an error class to items that failed validation
 	 *
-	 * @param 		array		array of options, see defaults for details
-	 * 							$options['excluded_fields'] = array()
-	 * @return  	string		the HTML for the formatted form
+	 * @param     array    array of options, see defaults for details
+	 * @return    string   the HTML for the formatted form
 	 */
 	public function get_form(array $options = array()) {
 		// set options if passed
@@ -1030,10 +1029,9 @@ class cl4_ORM extends Kohana_ORM {
 	} // function get_form
 
     /**
-	 * Generate the formatted HTML list or table with all fields (except those in the optional excluded columns option array) and formatting.
+	 * Generate the formatted HTML list or table with all fields and formatting.
 	 *
 	 * @param   array   array of options, see defaults for details
-	 *                  $options['excluded_fields'] = array()
 	 * @return  string  the HTML for the formatted form
 	 */
 	public function get_view(array $options = array()) {
