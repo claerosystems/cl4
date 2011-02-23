@@ -569,11 +569,11 @@ class cl4_ORM extends Kohana_ORM {
 	 * This can be run multiple times and it will overwrite the pervious data every time either for all fields or a specific field
 	 *
 	 * @chainable
-	 * @param   array     $column_name     Can be a string or an array of column names
+	 * @param   array  $process_column_name  Can be a string or an array of column names
 	 *
 	 * @return  ORM
 	 */
-	public function prepare_form($column_name = NULL) {
+	public function prepare_form($process_column_name = NULL) {
 		// add the extra hidden fields from options, if there is any
 		if (count($this->_options['hidden_fields'] > 0)) {
 			foreach ($this->_options['hidden_fields'] as $hidden_field) {
@@ -585,10 +585,10 @@ class cl4_ORM extends Kohana_ORM {
 		$first_field = NULL;
 
 		// do some columns, 1 column or all columns
-		if (is_array($column_name)) {
-			$process_columns = $column_name;
-		} else if ( ! empty($column_name) && is_string($column_name)) {
-			$process_columns = array($column_name);
+		if (is_array($process_column_name)) {
+			$process_columns = $process_column_name;
+		} else if ( ! empty($process_column_name) && is_string($process_column_name)) {
+			$process_columns = array($process_column_name);
 		} else {
 			$process_columns = array_keys($this->_table_columns);
 
@@ -620,7 +620,10 @@ class cl4_ORM extends Kohana_ORM {
 		// loop through and create all of the form field HTML snippets and store in $this->_field_html[$column_name] as ['label'] and ['field']
 		foreach ($process_columns as $column_name) {
 			if ( ! $this->table_column_exists($column_name)) {
-				throw new Kohana_Exception('The column name :column_name: sent to prepare is not in _table_columns', array(':column_name:' => $column_name));
+				// only through an exception when the column is also not in the has_many array because it maybe processed below
+				if ( ! isset($this->_has_many[$column_name])) {
+					throw new Kohana_Exception('The column name :column_name: sent to prepare is not in _table_columns', array(':column_name:' => $column_name));
+				}
 			}
 
 			$column_info = $this->_table_columns[$column_name];
@@ -720,7 +723,8 @@ class cl4_ORM extends Kohana_ORM {
 						break;
 				} // switch
 
-				if ($show_field && ! in_array($alias, $process_columns)) {
+				// if only 1 or more should be processed and this column/table/relationship is not in that list, then don't process it
+				if ($show_field && ! empty($process_column_name) && ! in_array($alias, $process_columns)) {
 					$show_field = FALSE;
 				}
 
