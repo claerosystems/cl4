@@ -270,8 +270,6 @@ class cl4_ORM extends Kohana_ORM {
 	* Allows setting of a specific option using a path
 	* Becareful when using this: check what done in set_options() to ensure there isn't special functionality for an option
 	*
-	* @uses  Arr::set_deep()
-	*
 	* @chainable
 	* @param  string  $option_path  The path to the option
 	* @param  mixed   $value        The option to set
@@ -279,7 +277,7 @@ class cl4_ORM extends Kohana_ORM {
 	* @return  ORM
 	*/
 	public function set_option($option_path, $value, $deliminator = NULL) {
-		$this->_options = Arr::set_deep($this->_options, $option_path, $value, $deliminator);
+		Arr::set_path($this->_options, $option_path, $value, $deliminator);
 
 		return $this;
 	} // function set_option

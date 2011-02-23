@@ -21,26 +21,23 @@ abstract class cl4_Session extends Kohana_Session {
 	 * @chainable
 	 * @return  $this
 	 */
-	public function set_deep($path, $value, $delimiter = NULL) {
+	public function set_path($path, $value, $delimiter = NULL) {
 		// Get the delimiter to use
 		if ($delimiter == NULL) {
 			// Use the default delimiter
 			$delimiter = Arr::$delimiter;
 		}
 
-		// Need the first key in the path to load the array data
-		$key = substr($path, 0, strpos($path, $delimiter) - 1);
-
-		// Load the array from the session, set the value, and store it in local session to be written later
-		$this->_data[$key] = Arr::set_deep($this->get($key, array()), $path, $value);
+		// set the value direclty in the _data array/property
+		Arr::set_path($this->_data, $path, $value, $delimiter);
 
 		return $this;
-	} // function set_deep
+	} // function set_path
 
 	/**
 	 * Gets a variable from a sub-array within a session.
 	 *
-	 *     $session->get('foo.bar');
+	 *     $session->path('foo.bar');
 	 *
 	 * @param  string  $path       The path of keys.
 	 * @param  mixed   $value      Value to set.
@@ -48,7 +45,7 @@ abstract class cl4_Session extends Kohana_Session {
 	 *
 	 * @return  mixed
 	 */
-	public function get_deep($path, $default = NULL, $delimiter = NULL) {
+	public function path($path, $default = NULL, $delimiter = NULL) {
 		return Arr::path($this->_data, $path, $default);
-	} // function get_deep
+	} // function path
 } // class cl4_Session
