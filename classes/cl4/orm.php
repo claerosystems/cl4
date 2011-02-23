@@ -720,6 +720,10 @@ class cl4_ORM extends Kohana_ORM {
 						break;
 				} // switch
 
+				if ($show_field && ! in_array($alias, $process_columns)) {
+					$show_field = FALSE;
+				}
+
 				// only deal with relationships that have the edit_flag set as true
 				if ($show_field) {
 					// retrieve all the related values in the related table
