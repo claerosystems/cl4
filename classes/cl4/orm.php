@@ -1809,6 +1809,7 @@ class cl4_ORM extends Kohana_ORM {
 				$file_options = $column_info['field_options']['file_options'];
 				if ($file_options['name_change_method'] == 'id' || $file_options['name_change_method'] == 'pk') {
 					// move the file to it's id based filename and set the value in the model
+					$file_options['orm_model'] = $this;
 					$dest_file_data = cl4File::move_to_id_path($this->get_filename_with_path($column_name), $this->pk(), $file_options['destination_folder'], $file_options);
 					$this->$column_name = $dest_file_data['dest_file'];
 					$files_moved[$column_name] = $this->$column_name;

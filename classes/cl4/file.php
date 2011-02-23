@@ -91,7 +91,7 @@ class cl4_File {
 		);
 
 		// reset the options if they are passed (otherwise they have been set in the construct())
-		if (count($options) > 0) $this->set_options($options);
+		if ( ! empty($options)) $this->set_options($options);
 
 		$destination_folder = rtrim($destination_folder, DIRECTORY_SEPARATOR);
 
@@ -603,8 +603,9 @@ class cl4_File {
 	/**
 	*   Copies the file from it's currently location to a new location
 	*
-	*   @param	  string	  $file		   a path to a file to copy
-	*   @param	  string	  $destination	Where to copy the file to (uses additional options within object to determine the path)
+	* @param  string  $file         a path to a file to copy
+	* @param  string  $destination  Where to copy the file to (uses additional options within object to determine the path)
+	* @param  array   $options      If using name change method id, you may also need to pass the option orm_model
 	*/
 	public function copy_with_name_change($original_file, $destination_file = '', $move = FALSE, array $options = array()) {
         $return = array(

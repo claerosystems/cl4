@@ -34,6 +34,7 @@ class cl4_ORM_File extends ORM_FieldType {
 
 	public static function save($post, $column_name, array $options = array(), ORM $orm_model = NULL) {
 		$file_options = $options['file_options'];
+		$file_options['orm_model'] = $orm_model;
 
 		$destination_folder = cl4File::get_file_path($file_options['destination_folder'], $orm_model->table_name(), $column_name, $file_options);
 
