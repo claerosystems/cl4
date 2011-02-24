@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
-* For deal with multiple ORM models
+* To deal with multiple ORM models
 */
 class cl4_MultiORM {
 	/**
