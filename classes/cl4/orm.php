@@ -569,11 +569,11 @@ class cl4_ORM extends Kohana_ORM {
 	 * This can be run multiple times and it will overwrite the pervious data every time either for all fields or a specific field
 	 *
 	 * @chainable
-	 * @param   array     $column_name     Can be a string or an array of column names
+	 * @param   array  $process_column_name  Can be a string or an array of column names
 	 *
 	 * @return  ORM
 	 */
-	public function prepare_form($column_name = NULL) {
+	public function prepare_form($process_column_name = NULL) {
 		// add the extra hidden fields from options, if there is any
 		if (count($this->_options['hidden_fields'] > 0)) {
 			foreach ($this->_options['hidden_fields'] as $hidden_field) {
@@ -585,10 +585,10 @@ class cl4_ORM extends Kohana_ORM {
 		$first_field = NULL;
 
 		// do some columns, 1 column or all columns
-		if (is_array($column_name)) {
-			$process_columns = $column_name;
-		} else if ( ! empty($column_name) && is_string($column_name)) {
-			$process_columns = array($column_name);
+		if (is_array($process_column_name)) {
+			$process_columns = $process_column_name;
+		} else if ( ! empty($process_column_name) && is_string($process_column_name)) {
+			$process_columns = array($process_column_name);
 		} else {
 			$process_columns = array_keys($this->_table_columns);
 
@@ -620,92 +620,91 @@ class cl4_ORM extends Kohana_ORM {
 		// loop through and create all of the form field HTML snippets and store in $this->_field_html[$column_name] as ['label'] and ['field']
 		foreach ($process_columns as $column_name) {
 			if ( ! $this->table_column_exists($column_name)) {
-				throw new Kohana_Exception('The column name :column_name: sent to prepare is not in _table_columns', array(':column_name:' => $column_name));
+				// only through an exception when the column is also not in the has_many array because it maybe processed below
+				if ( ! isset($this->_has_many[$column_name])) {
+					throw new Kohana_Exception('The column name :column_name: sent to prepare is not in _table_columns', array(':column_name:' => $column_name));
+				}
 			}
 
 			$column_info = $this->_table_columns[$column_name];
 
-			try {
-				if ($this->show_field($column_name)) {
-					// look for the attributes and set them
-					$field_attributes = $column_info['field_attributes'];
-					$label_attributes = array();
-					if ($this->_mode == 'edit' && isset($rules[$column_name]['not_empty'])) {
-						$field_attributes = HTML::set_class_attribute($field_attributes, 'cl4_required');
-						$label_attributes['class'] = 'cl4_required';
+			if ($this->show_field($column_name)) {
+				// look for the attributes and set them
+				$field_attributes = $column_info['field_attributes'];
+				$label_attributes = array();
+				if ($this->_mode == 'edit' && isset($rules[$column_name]['not_empty'])) {
+					$field_attributes = HTML::set_class_attribute($field_attributes, 'cl4_required');
+					$label_attributes['class'] = 'cl4_required';
+				}
+
+				// determine the field type class name
+				$field_type_class_name = ORM_FieldType::get_field_type_class_name($column_info['field_type']);
+
+				// get the field name (for html)
+				$field_html_name = $this->get_field_html_name($column_name);
+
+				// get the field id
+				if ( ! array_key_exists('id', $field_attributes) || $field_attributes['id'] === NULL) {
+					$field_attributes['id'] = $this->get_field_id($column_name);
+				}
+
+				// determine the value of the field based on the default value
+				$pk = $this->pk();
+				if ($this->_options['load_defaults'] && $this->_mode == 'add' && empty($pk) && empty($this->$column_name)) {
+					$field_value = $column_info['field_options']['default_value'];
+				} else {
+					$field_value = $this->$column_name;
+				}
+
+				if ($this->_mode == 'edit' && $column_info['view_in_edit_mode']) {
+					$_field_type_class_function = 'view_html';
+				} else {
+					$_field_type_class_function = $field_type_class_function;
+				}
+
+				if ($this->_mode != 'view' && in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
+					// hidden (or other fields) are a special case because they don't get a column or row in a table and they will not be displayed
+					$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $_field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
+
+				} else {
+					if ($first_field == $column_name && $this->_options['add_autofocus']) {
+						// this is the first visible field, so add the autofocus attribute
+						$field_attributes = HTML::merge_attributes($field_attributes, array('autofocus' => 'autofocus'));
 					}
 
-					// determine the field type class name
-					$field_type_class_name = ORM_FieldType::get_field_type_class_name($column_info['field_type']);
+					// create the label tag with the field name
+					$field_label = $this->column_label($column_name);
+					$label_html = Form::label($field_attributes['id'], $field_label, $label_attributes);
 
-					// get the field name (for html)
-					$field_html_name = $this->get_field_html_name($column_name);
+					if ($_field_type_class_function == 'view_html') {
+						// create an array of the options that need to be passed to view html
+						$view_html_options = $this->get_view_html_options($column_name);
 
-					// get the field id
-					if ( ! array_key_exists('id', $field_attributes) || $field_attributes['id'] === NULL) {
-						$field_attributes['id'] = $this->get_field_id($column_name);
-					}
-
-					// determine the value of the field based on the default value
-					$pk = $this->pk();
-					if ($this->_options['load_defaults'] && $this->_mode == 'add' && empty($pk) && empty($this->$column_name)) {
-						$field_value = $column_info['field_options']['default_value'];
-					} else {
-						$field_value = $this->$column_name;
-					}
-
-					if ($this->_mode == 'edit' && $column_info['view_in_edit_mode']) {
-						$_field_type_class_function = 'view_html';
-					} else {
-						$_field_type_class_function = $field_type_class_function;
-					}
-
-					if ($this->_mode != 'view' && in_array($column_info['field_type'], $this->_options['field_types_treated_as_hidden'])) {
-						// hidden (or other fields) are a special case because they don't get a column or row in a table and they will not be displayed
-						$this->_form_fields_hidden[$column_name] = call_user_func($field_type_class_name . '::' . $_field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
-
-					} else {
-						if ($first_field == $column_name && $this->_options['add_autofocus']) {
-							// this is the first visible field, so add the autofocus attribute
-							$field_attributes = HTML::merge_attributes($field_attributes, array('autofocus' => 'autofocus'));
-						}
-
-						// create the label tag with the field name
-						$field_label = $this->column_label($column_name);
-						$label_html = Form::label($field_attributes['id'], $field_label, $label_attributes);
-
-						if ($_field_type_class_function == 'view_html') {
-							// create an array of the options that need to be passed to view html
-							$view_html_options = $this->get_view_html_options($column_name);
-
-							// get the source if there is one
-							if ( ! empty($column_info['field_options']) && is_array($column_info['field_options']) && array_key_exists('source', $column_info['field_options'])) {
-								// get the lookup data based on the source info
-								$source = $this->get_source_data($column_name, NULL);
-							} else {
-								$source = NULL;
-							}
-
-							$field_html = call_user_func($field_type_class_name . '::view_html', $this->$column_name, $column_name, $this, $view_html_options, $source);
+						// get the source if there is one
+						if ( ! empty($column_info['field_options']) && is_array($column_info['field_options']) && array_key_exists('source', $column_info['field_options'])) {
+							// get the lookup data based on the source info
+							$source = $this->get_source_data($column_name, NULL);
 						} else {
-							$field_html = call_user_func($field_type_class_name . '::' . $_field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
+							$source = NULL;
 						}
 
-						if ($this->_options['add_field_help']) {
-							// append the field help to the field html
-							$field_html .= $this->get_field_help($column_name, $field_html_name);
-						}
+						$field_html = call_user_func($field_type_class_name . '::view_html', $this->$column_name, $column_name, $this, $view_html_options, $source);
+					} else {
+						$field_html = call_user_func($field_type_class_name . '::' . $_field_type_class_function, $column_name, $field_html_name, $field_value, $field_attributes, $column_info['field_options'], $this);
+					}
 
-						// add the field label and data in the object
-						$this->_field_html[$column_name] = array(
-							'label' => $label_html,
-							'field' => $field_html,
-						);
-					} // if
+					if ($this->_options['add_field_help']) {
+						// append the field help to the field html
+						$field_html .= $this->get_field_help($column_name, $field_html_name);
+					}
+
+					// add the field label and data in the object
+					$this->_field_html[$column_name] = array(
+						'label' => $label_html,
+						'field' => $field_html,
+					);
 				} // if
-			} catch (Exception $e) {
-				throw $e;
-			} // try
+			} // if
 		} // foreach
 
 		// now check for has_many relationships and add the fields
@@ -723,6 +722,11 @@ class cl4_ORM extends Kohana_ORM {
 						$show_field = $relation_data['edit_flag'];
 						break;
 				} // switch
+
+				// if only 1 or more should be processed and this column/table/relationship is not in that list, then don't process it
+				if ($show_field && ! empty($process_column_name) && ! in_array($alias, $process_columns)) {
+					$show_field = FALSE;
+				}
 
 				// only deal with relationships that have the edit_flag set as true
 				if ($show_field) {
