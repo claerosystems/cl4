@@ -1,10 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 /**
-*   This class is used to build an HTML table with data and options.
+* This class is used to build an HTML table with data and options.
 *
-*   @author	 Claero Systems <craig.nakamoto@claero.com> / XM Media Inc <dhein@xmmedia.net>
-*   @copyright  Claero Systems / XM Media Inc  2004-2009
-*   @version	$Id: class-cl4_table.php 715 2010-01-15 17:19:50Z cnakamoto $
+* @author	 Claero Systems <craig.nakamoto@claero.com> / XM Media Inc <dhein@xmmedia.net>
+* @copyright  Claero Systems / XM Media Inc  2004-2009
+* @version	$Id: class-cl4_table.php 715 2010-01-15 17:19:50Z cnakamoto $
 */
 
 class cl4_HTMLTable {
@@ -13,45 +13,45 @@ class cl4_HTMLTable {
 	protected $tab = "\t";
 
 	/**
-	*   this is the array of rows in the current table, add using AddRow and/or AddCell
-	*   @var	string
+	*  this is the array of rows in the current table, add using AddRow and/or AddCell
+	*  @var  string
 	*/
 	protected $table_data = array();
 
 	/**
-	*   this is the array of attributes for the table
-	*   @var	string
+	* this is the array of attributes for the table
+	* @var  string
 	*/
 	protected $options = array();
 
 	/**
-	*   this is the row number of the last row added
-	*   @var	string
+	* this is the row number of the last row added
+	* @var  string
 	*/
 	protected $last_row_number = 0;
 
 	/**
-	*   array of td attributes if set in form $this->td_attribute[$row_number][$column_number] = $attributeString, set using $this->set_attribute()
-	*   @var	string
+	* array of td attributes if set in form $this->td_attribute[$row_number][$column_number] = $attributeString, set using $this->set_attribute()
+	* @var  string
 	*/
 	protected $td_attribute = array();
 
 	/**
-	*   array of tr attributes if set in form $this->tr_attribute[$row_number] = $attributeString, set using $this->set_attribute()
-	*   @var	string
+	* array of tr attributes if set in form $this->tr_attribute[$row_number] = $attributeString, set using $this->set_attribute()
+	* @var  string
 	*/
 	protected $tr_attribute = array();
 
 	/**
-	*   array of column spans in form $this->col_spans[$row_number][$col_number] = $count, set using $this->Setcol_span(), which also adds the attribute to the row
-	*   @var	string
+	* array of column spans in form $this->col_spans[$row_number][$col_number] = $count, set using $this->Setcol_span(), which also adds the attribute to the row
+	* @var  string
 	*/
 	protected $col_span = array();
 
 	/**
-	*   Prepares the table
+	* Prepares the table
 	*
-	*   @param
+	* @param  array  $options  Class options
 	*/
 	public function __construct(array $options = array()) {
 		$this->reset_options($options);
@@ -62,7 +62,7 @@ class cl4_HTMLTable {
 	}
 
 	/**
-	*   Takes an array of options and sets them within the object
+	* Takes an array of options and sets them within the object
 	*/
 	public function reset_options(array $options = array()) {
 		// set up default options (and clear any existing options)
@@ -161,13 +161,21 @@ class cl4_HTMLTable {
 	} // function reset_options
 
 	/**
-	*   Add html tr or td tag attributes.  Can set row or cell.
+	* Add or merge HTML tr or td tag attributes. Can set an attribute for a row or a cell.
+	* Uses HTML::merge_attributes to merge the attributes. Some, for example, classes are appended.
 	*
-	*   @param	  int	 $row_number	  the row number to be set - required
-	*   @param	  int	 $column_number   the column number to be set - required for cell only, set to false otherwise
+	* @uses  HTML::merge_attributes()
+	*
+	* @param  int     $row_number       The row number to be set - required
+	* @param  int     $column_number    The column number to be set - required for cell only, set to NULL or FALSE otherwise
+	* @param  string  $attribute        The attribute to set
+	* @param  mixed   $attribute_value  The value to set the attribute to
+	*
+	* @chainable
+	* @return  HTMLTable
 	*/
 	public function set_attribute($row_number, $column_number, $attribute, $attribute_value) {
-		if ($column_number !== FALSE) {
+		if ($column_number !== FALSE && $column_number !== NULL) {
 			// must be cell attribute
 			if ( ! isset($this->td_attribute[$row_number][$column_number])) $this->td_attribute[$row_number][$column_number] = array();
 			$this->td_attribute[$row_number][$column_number] = HTML::merge_attributes($this->td_attribute[$row_number][$column_number], array($attribute => $attribute_value));
@@ -176,51 +184,80 @@ class cl4_HTMLTable {
 			if ( ! isset($this->tr_attribute[$row_number])) $this->tr_attribute[$row_number] = array();
 			$this->tr_attribute[$row_number] = HTML::merge_attributes($this->tr_attribute[$row_number], array($attribute => $attribute_value));
 		} // if
+
+		return $this;
 	} // function set_attribute
 
+	/**
+	* Sets the class of a cell based on the row and column number
+	*
+	* @param  mixed  $row_number     The row number (starting at 0)
+	* @param  mixed  $column_number  The cell number (starting at 0)
+	* @param  mixed  $class          The class to add
+	*
+	* @chainable
+	* @return  HTMLTable
+	*/
 	public function set_cell_class($row_number, $column_number, $class) {
 		$this->set_attribute($row_number, $column_number, 'class', $class);
+
+		return $this;
 	} // function set_cell_class
 
 	/**
-	*   Sets the row class in the table_options
+	* Sets the class of a row based on the row number
 	*
-	*   @param	  int	 $row_number	  The row number to apply the class to
-	*   @param	  string  $class		  The class to apply (adds to existing classes)
+	* @param  int     $row_number  The row number to apply the class to
+	* @param  string  $class       The class to apply (adds to existing classes)
+	*
+	* @chainable
+	* @return  HTMLTable
 	*/
 	public function set_row_class($row_number, $class) {
 		$this->set_attribute($row_number, FALSE, 'class', $class);
+
+		return $this;
 	} // function set_row_class
 
 	/**
-	*   Sets the row id using set_attribute
+	* Sets the row id using set_attribute
 	*
-	*   @param	  int	 $row_number	  The row number to apply the id to
-	*   @param	  string  $id			 The id to apply
+	* @param  int     $row_number  The row number to apply the id to
+	* @param  string  $id          The id to apply
+	*
+	* @chainable
+	* @return  HTMLTable
 	*/
 	public function set_row_id($row_number, $id) {
 		$this->set_attribute($row_number, FALSE, 'id', $id);
+
+		return $this;
 	} // function set_row_id
 
 	/**
-	*   Sets the column span for a specific column using set_attribute
+	* Sets the column span for a specific column using set_attribute
 	*
-	*   @param	  int	 $row_number	  The row number of the column (starting at 0)
-	*   @param	  int	 $column_number   The column number (starting at 0)
-	*   @param	  int	 $count		  The number of columns to span (defualt 2)
+	* @param  int  $row_number     The row number of the column (starting at 0)
+	* @param  int  $column_number  The column number (starting at 0)
+	* @param  int  $count          The number of columns to span (defualt 2)
+	*
+	* @chainable
+	* @return  HTMLTable
 	*/
 	public function set_col_span($row_number, $column_number, $count = 2) {
 		$this->set_attribute($row_number, $column_number, 'colspan', $count);
 
 		$this->col_span[$row_number][$column_number] = $count;
+
+		return $this;
 	} // function set_col_span
 
 	/**
-	*   Add a row of data to the table (populate the next row)
+	* Add a row of data to the table (populate the next row)
 	*
-	*   @param	  array	   $rowData		An array of the data to display
+	* @param  array  $row_data  An array of the data to display
 	*
-	*   @return	 int	 row number of added row
+	* @return  int  row number of added row
 	*/
 	public function add_row(array $row_data = array(), $escape_output_for_html = FALSE) {
 		// set last row number
@@ -240,14 +277,14 @@ class cl4_HTMLTable {
 	} // function add_row
 
 	/**
-	*   Adds a cell to the row specified, other at the end of the existing rows or a specific column
-	*   (the row *does not* need to already exist within the table_data array)
+	* Adds a cell to the row specified, other at the end of the existing rows or a specific column
+	* (the row *does not* need to already exist within the table_data array)
 	*
-	*   @param	  int	 $row_number	  The row to add the cell to
-	*   @param	  string  $cellData	   The string to put inside the cell (put in table_data)
-	*   @param	  int	 $column_number   The column number to put the data in (default: null therefore the next column in the row)
+	* @param  int     $row_number     The row to add the cell to
+	* @param  string  $cellData	      The string to put inside the cell (put in table_data)
+	* @param  int     $column_number  The column number to put the data in (default: null therefore the next column in the row)
 	*
-	*   @return	 int	 The column number that was added
+	* @return  int  The column number that was added
 	*/
 	public function add_cell($row_number, $cellData, $column_number = NULL, $escape_output_for_html = FALSE) {
 		if ( ! isset($this->table_data[$row_number])) {
@@ -265,11 +302,12 @@ class cl4_HTMLTable {
 	} // function add_cell
 
 	/**
-	*   Adds a heading to the list of headings
+	* Adds a heading to the list of headings
 	*
-	*   @param	  string	  $text	   The string to put in the table cell (make sure to escape first)
+	* @param  string   $text  The string to put in the table cell (make sure to escape first)
+	* @param  boolean  $escape_output_for_html  If the heading should be escaped, by the default FALSE (no)
 	*
-	*   @return	 int		 The column number of the one that was added
+	* @return  int  The column number of the one that was added
 	*/
 	public function add_heading($text, $escape_output_for_html = FALSE) {
 		$this->options['heading'][] = $escape_output_for_html ? HTML::chars($text) : $text;
@@ -282,9 +320,9 @@ class cl4_HTMLTable {
 	} // function __toString
 
 	/**
-	*   Generates and returns the html of the table
+	* Generates and returns the html of the table
 	*
-	*   @return	 string	  HTML of the table
+	* @return  string  HTML of the table
 	*/
 	public function get_html() {
 		$result_html = '';
@@ -447,11 +485,11 @@ class cl4_HTMLTable {
 	} // function get_html
 
 	/**
-	*   Check to see if the given column number is within a column span for this row in the table
+	* Check to see if the given column number is within a column span for this row in the table
 	*
-	*   @return	 boolean	 true if it is, false otherwise
+	* @return  boolean  true if it is, false otherwise
 	*/
-	function in_col_span($col_num, $row_num) {
+	protected function in_col_span($col_num, $row_num) {
 		$columns_in_span = array();
 
 		// see if there are any col_spans in this row first
