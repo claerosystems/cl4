@@ -466,14 +466,14 @@ echo '</body></html>';
 
 		if ( ! empty($phone['country_code'])) $formatted_phone .= '+ ' . $phone['country_code'];
 		// add the area code
-		if ( ! empty($phone['area_code'])) $formatted_phone .= ' (' . $phone['area_code'] . ')';
+		if ( ! empty($phone['area_code']))    $formatted_phone .= ' (' . $phone['area_code'] . ')';
 		// add the exchange field
-		if ( ! empty($phone['exchange'])) $formatted_phone .= ' ' . $phone['exchange'];
+		if ( ! empty($phone['exchange']))     $formatted_phone .= ' ' . $phone['exchange'];
 		// add the line field
-		if ( ! empty($phone['line'])) $formatted_phone .= '-' . $phone['line'];
+		if ( ! empty($phone['line']))         $formatted_phone .= '-' . $phone['line'];
 		// add the extension field
-		if ( ! empty($phone['extension'])) $formatted_phone .= ' ' . __('ext.') . ' ' . $phone['extension'];
+		if ( ! empty($phone['extension']))    $formatted_phone .= ' ' . __('ext.') . ' ' . $phone['extension'];
 
 		return $formatted_phone;
-	} // function
+	} // function format_phone
 } // class

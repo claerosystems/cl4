@@ -107,7 +107,7 @@ class cl4_HTML extends Kohana_HTML {
     	} else {
     		return parent::chars($value, $double_encode);
 		}
-	} // function
+	} // function chars
 
 	/**
 	* If the class attribute is not set, it will add it otherwise, it will add the new class prefixed with a space
