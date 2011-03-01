@@ -57,7 +57,7 @@ class cl4_ModelCreate {
 		if ( ! isset($columns['name'])) {
 			$model_code .= TAB . '//protected $_primary_val = \'' . 'name' . '\'; // default: name (column used as primary value)' . EOL;
 		}
-		$model_code .= TAB . 'public $_table_name_display = \'' . cl4::underscores_to_words($table_name) . '\'; // cl4-specific' . EOL;
+		$model_code .= TAB . 'public $_table_name_display = \'' . cl4::underscores_to_words($table_name) . '\'; // cl4 specific' . EOL;
 
 		// add sorting
 		$model_code .= EOL;
