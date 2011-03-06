@@ -21,6 +21,7 @@ class cl4_ORM extends Kohana_ORM {
 		'having_close', 'and_having_close', 'or_having_close', 'order_by', 'limit', 'offset', 'cached',
 		// cl4 custom
 		'on_expiry', 'on_active',
+		'where_expiry', 'where_active',
 	);
 
 	/**
