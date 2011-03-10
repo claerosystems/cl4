@@ -1133,4 +1133,36 @@ class cl4_MultiORM {
 
 		return $options;
 	} // function
+
+	/**
+	* Returns the number of records in the object as found in _records
+	*
+	* @return  int
+	*/
+	public function record_count() {
+		return count($this->_records);
+	}
+
+	/**
+	* Returns all the records in the object, an array of Models
+	* These will be returned by reference, so any changes made to them will also be changed within MultiORM
+	*
+	* @return  array
+	*/
+	public function records() {
+		return $this->_records;
+	}
+
+	/**
+	* Allows the removal of a model/record from object
+	*
+	* @param  int  $key  The numeric key of the model within the _records array
+	*
+	* @return  MultiORM
+	*/
+	public function unset_record($key) {
+		unset($this->_records[$key]);
+
+		return $this;
+	}
 } // class
