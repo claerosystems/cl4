@@ -981,4 +981,59 @@ class cl4_Form extends Kohana_Form {
 
 		return Form::input($name . '[' . $suffix . ']', $value, $attributes);
 	} // function input_with_suffix_size
+
+	/**
+	* Returns hidden fields for an nested array of data based on the keys and values of the array
+	*
+	* @param  array  $fields  The array of fields
+	*
+	* @return  string  The HTML
+	*
+	* @uses  Form::hidden()
+	*
+	* @todo  Make this a recursive function to make it simpler
+	*/
+	public function array_to_fields($fields) {
+		$form_html = '';
+
+		foreach ($fields as $name1 => $value1) {
+			if ( ! is_array($value1)) {
+				$form_html .= Form::hidden($name1, $value1) . EOL;
+			} else {
+				foreach ($value1 as $name2 => $value2) {
+					if ( ! is_array($value2)) {
+						$form_html .= Form::hidden($name1 . '[' . $name2 . ']', $value2) . EOL;
+					} else {
+						foreach ($value2 as $name3 => $value3) {
+							if ( ! is_array($value3)) {
+								$form_html .= Form::hidden($name1 . '[' . $name2 . '][' . $name3 . ']', $value3) . EOL;
+							} else {
+								foreach ($value3 as $name4 => $value4) {
+									if ( ! is_array($value4)) {
+										$form_html .= Form::hidden($name1 . '[' . $name2 . '][' . $name3 . '][' . $name4 . ']', $value4) . EOL;
+									} else {
+										foreach ($value4 as $name5 => $value5) {
+											if ( ! is_array($value5)) {
+												$form_html .= Form::hidden($name1 . '[' . $name2 . '][' . $name3 . '][' . $name4 . '][' . $name5 . ']', $value5) . EOL;
+											} else {
+												foreach ($value5 as $name6 => $value6) {
+													if ( ! is_array($value6)) {
+														$form_html .= Form::hidden($name1 . '[' . $name2 . '][' . $name3 . '][' . $name4 . '][' . $name5 . '][' . $name6 . ']', $value6) . EOL;
+													} else {
+														throw new Kohana_Exception('There are no levels than are supported by array_to_fields . Ending entire loop');
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			} // if
+		} // foreach
+
+		return $form_html;
+	} // function array_to_fields
 } // class
