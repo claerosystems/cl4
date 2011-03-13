@@ -2371,4 +2371,61 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function set_db
+
+	/**
+	* Sets an attribute for a table column
+	*
+	* @param  string  $column_name  The column name
+	* @param  string  $attribute    The attribute to set
+	* @param  mixed   $value        The value to set the attribute to
+	*
+	* @chainable
+	* @return ORM
+	*/
+	public function set_field_attribute($column_name, $attribute, $value = NULL) {
+		if ($this->table_column_exists($column_name)) {
+			$this->_table_columns[$column_name]['field_attributes'] = HTML::merge_attributes($this->_table_columns[$column_name]['field_attributes'], array($attribute => $value));
+		}
+
+		return $this;
+	}
+
+	/**
+	* Sets a field option for a table column
+	*
+	* @param  string  $column_name  The column name
+	* @param  string  $option_path  The path to the option within field_options
+	* @param  mixed   $value        The value to set the option to
+	*
+	* @chainable
+	* @return ORM
+	*
+	* @uses  Arr::set_path()
+	*/
+	public function set_field_option($column_name, $option_path, $value = NULL) {
+		if ($this->table_column_exists($column_name)) {
+			Arr::set_path($this->_table_columns[$column_name]['field_options'], $option_path, $value);
+		}
+
+		return $this;
+	}
+
+	/**
+	* Sets a value within a relationship, allowing for the modification of a relationship in 1 instance
+	*
+	* @param  string  $alias        The alias of the relationship in _has_many
+	* @param  string  $path         The path to value to set
+	* @param  mixed   $value        The value to set the key to
+	* @param  string  $deliminator  The deliminator to use in Arr::set_path()
+	*
+	* @chainable
+	* @return  ORM
+	*
+	* @uses  Arr::set_path()
+	*/
+	public function set_has_many($alias, $path, $value = NULL, $deliminator = '.') {
+		Arr::set_path($this->_has_many[$alias], $path, $value, $deliminator);
+
+		return $this;
+	}
 } // class
