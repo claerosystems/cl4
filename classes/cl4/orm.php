@@ -757,7 +757,10 @@ class cl4_ORM extends Kohana_ORM {
 						$related_label = $related_model->primary_val();
 
 						// get the current source values
-						$current_values = $this->$alias->select($related_table . '.' . $related_pk)->find_all()->as_array(NULL, $related_pk);
+						$current_values = $this->$alias
+							->select($related_table . '.' . $related_pk)
+							->find_all()
+							->as_array(NULL, $related_pk);
 
 						// note: never disable the hidden checkbox or save_values() will not initiate the saving of the related data
 						$checkbox_options = array(
@@ -1187,12 +1190,8 @@ class cl4_ORM extends Kohana_ORM {
 
 				case 'sql' :
 					if ( ! empty($options['data'])) {
-						try {
-							// source data appears to be a sql statement so get all the values
-							$this->_lookup_data[$column_name] = DB::query(Database::SELECT, $options['data'])->execute($this->_db)->as_array($options['value'], $options['label']);
-						} catch (Exception $e) {
-							throw $e;
-						}
+						// source data appears to be a sql statement so get all the values
+						$this->_lookup_data[$column_name] = DB::query(Database::SELECT, $options['data'])->execute($this->_db)->as_array($options['value'], $options['label']);
 					} else {
 						throw new Kohana_Exception('The source is set to sql, but the data is empty');
 					}
@@ -1200,25 +1199,21 @@ class cl4_ORM extends Kohana_ORM {
 
 				case 'table_name' :
 					if ( ! empty($options['data'])) {
-						try {
-							// source data appears to be a table name so get all the values using id_field and name_field
-							$query = DB::select($options['value'], $options['label'])->from($options['data']);
+						// source data appears to be a table name so get all the values using id_field and name_field
+						$query = DB::select($options['value'], $options['label'])->from($options['data']);
 
-							// add the order by if there is one
-							if ( ! empty($options['order_by'])) {
-								$query->order_by($options['label']);
-							}
-
-							// filter the results by the ones used when in view mode (other modes require all the values)
-							if ($this->_mode == 'view') {
-								// add the id array to the query
-								$query->where($options['data'] . '.' . $options['value'], '=', $this->$column_name);
-							} // if
-
-							$this->_lookup_data[$column_name] = $query->execute($this->_db)->as_array($options['value'], $options['label']);
-						} catch (Exception $e) {
-							throw $e;
+						// add the order by if there is one
+						if ( ! empty($options['order_by'])) {
+							$query->order_by($options['label']);
 						}
+
+						// filter the results by the ones used when in view mode (other modes require all the values)
+						if ($this->_mode == 'view') {
+							// add the id array to the query
+							$query->where($options['data'] . '.' . $options['value'], '=', $this->$column_name);
+						} // if
+
+						$this->_lookup_data[$column_name] = $query->execute($this->_db)->as_array($options['value'], $options['label']);
 					} else {
 						throw new Kohana_Exception('The source is set to table_name, but the data is empty');
 					}
@@ -1235,26 +1230,22 @@ class cl4_ORM extends Kohana_ORM {
 
 					// if we found a source model
 					if ( ! empty($source_model)) {
-						try {
-							// filter the results by the ones used when in view mode (other modes require all the values)
-							if ($this->_mode == 'view') {
-								// it's a column and the column is not NULL
-								if ($this->table_column_exists($column_name) && $this->$column_name !== NULL) {
-									$model = ORM::factory($source_model, $this->$column_name);
-									$this->_lookup_data[$column_name] = array($model->$options['value'] => $model->$options['label']);
-								// the column is not actually a column, but is not empty, so going to guess it's a model for a relationship
-								} else if ($this->$column_name !== NULL) {
-									$this->_lookup_data[$column_name] = $this->$column_name->group_concat($this->$column_name->table_name() . '.' . $options['label']);
-								} else {
-									$this->_lookup_data[$column_name] = array();
-								}
+						// filter the results by the ones used when in view mode (other modes require all the values)
+						if ($this->_mode == 'view') {
+							// it's a column and the column is not NULL
+							if ($this->table_column_exists($column_name) && $this->$column_name !== NULL) {
+								$model = ORM::factory($source_model, $this->$column_name);
+								$this->_lookup_data[$column_name] = array($model->$options['value'] => $model->$options['label']);
+							// the column is not actually a column, but is not empty, so going to guess it's a model for a relationship
+							} else if ($this->$column_name !== NULL) {
+								$this->_lookup_data[$column_name] = $this->$column_name->group_concat($this->$column_name->table_name() . '.' . $options['label']);
 							} else {
-								// we want all the records
-								$this->_lookup_data[$column_name] = ORM::factory($source_model)->find_all()->as_array($options['value'], $options['label']);
+								$this->_lookup_data[$column_name] = array();
 							}
-						} catch (Exception $e) {
-							throw $e;
-						} // try
+						} else {
+							// we want all the records
+							$this->_lookup_data[$column_name] = ORM::factory($source_model)->find_all()->as_array($options['value'], $options['label']);
+						}
 					} else {
 						throw new Kohana_Exception('There is no source model (:model:) for the column: :column:', array(':model:' => $source_model, ':column:' => $column_name));
 					} // if
