@@ -655,6 +655,26 @@ class cl4_Form extends Kohana_Form {
 		return Form::$options['type']($name, $source, $selected, $attributes, $options);
 	} // function yes_no
 
+	public static function yes_no_na($name, $selected = NULL, array $attributes = NULL, array $options = array()) {
+		$default_options = array(
+			'reverse' => FALSE,
+			'type' => 'radios', // radios or select
+		);
+		$options += $default_options;
+
+		$source = array(
+			1 => __('Yes'),
+			2 => __('No'),
+			3 => __('N/A'),
+		);
+
+		if ($options['reverse']) {
+			$source = array_reverse($source, TRUE);
+		}
+
+		return Form::$options['type']($name, $source, $selected, $attributes, $options);
+	} // function yes_no_na
+
 	public static function gender($name, $selected = NULL, array $attributes = NULL, array $options = array()) {
 		$default_options = array(
 			'reverse' => FALSE,
