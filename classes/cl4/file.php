@@ -179,7 +179,8 @@ class cl4_File {
 			'orig_file' => $file_data['name'],
 			'tmp_file' => $file_data['tmp_name'],
 			'filename_no_ext' => $this->options['lowercase_filename'] ? strtolower($path_info['filename']) : $path_info['filename'],
-			'ext' => $this->options['lowercase_filename'] ? strtolower($path_info['extension']) : $path_info['extension'],
+			// check to make sure the extension isn't empty because sometimes mac users don't have extensions on their files
+			'ext' => $this->options['lowercase_filename'] && ! empty($path_info['extension']) ? strtolower($path_info['extension']) : $path_info['extension'],
 			'size' => $file_data['size'],
 			'record_pk' => ( ! empty($this->options['record_pk']) ? $this->options['record_pk'] : NULL),
 		);
