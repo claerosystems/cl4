@@ -6,6 +6,12 @@ if ( ! Kohana::load(Kohana::find_file('vendor', 'phpmailer/class.phpmailer'))) {
 
 class cl4_Mail extends PHPMailer {
 	/**
+	* The default mail config to use, unless otherwise specified
+	* @var  string
+	*/
+	public static $default = 'default';
+
+	/**
 	* If we should perform debug type actions
 	* @var bool
 	*/
@@ -31,7 +37,7 @@ class cl4_Mail extends PHPMailer {
 	/**
 	* Constructor, sets up smtp using config
 	*
-	* @param string $config The config in config/cl4orm to use (defaults to "default")
+	* @param string $config The config in config/cl4orm to use (defaults to Mail::$default)
 	* @param      array       $options    Options for the object
 	*           ['from'] => the email from which all emails will come from, if not sent then will use SITE::$emailFrom if it's set
 	*           ['from_name'] => the name from which the email will come from (attached to the email address), if not sent then will use SITE::$emailFromName if it's set
@@ -42,10 +48,16 @@ class cl4_Mail extends PHPMailer {
 	*           ['last_name_field'] => Field that contains the person's last namel; default last_name
 	* 			[char_set] => The character set for the emails
 	*/
-    public function __construct($config = 'default', $options = array()) {
+	public function __construct($config = NULL, $options = array()) {
+		if ($config === NULL) {
+			$config = Mail::$default;
+		}
+
 		// Set default options
-		$default_options = Kohana::config('cl4mail');
-		$options += $default_options[$config];
+		$config_options = Kohana::config('cl4mail.' . $config);
+		$default_options = Kohana::config('cl4mail.default');
+		$config_options += $default_options;
+		$options += $config_options;
 
 		// Run PHPMailer constructor
 		parent::__construct($options['phpmailer_throw_exceptions']);
