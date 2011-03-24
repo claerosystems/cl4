@@ -70,7 +70,7 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 			return $found_value;
 		} else {
 			// the value is not set (0 or NULL likely)
-			return '<span class="cl4_not_set">' . __('not set') . '</span>';
+			return __(Kohana::message('cl4', 'cl4_not_set_html'));
 		}
 	}
 
