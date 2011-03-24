@@ -31,16 +31,30 @@ class cl4_HTMLTable {
 	protected $last_row_number = 0;
 
 	/**
-	* array of td attributes if set in form $this->td_attribute[$row_number][$column_number] = $attributeString, set using $this->set_attribute()
-	* @var  string
+	* Array of td attributes if set in form $this->td_attribute[$row_number][$column_number]['attribute_name'] = 'attribute_value', set using $this->set_attribute()
+	* @var  array
 	*/
 	protected $td_attribute = array();
 
 	/**
-	* array of tr attributes if set in form $this->tr_attribute[$row_number] = $attributeString, set using $this->set_attribute()
-	* @var  string
+	* Array of tr attributes if set in form $this->tr_attribute[$row_number]['attribute_name'] = 'attribute_value', set using $this->set_attribute()
+	* @var  array
 	*/
 	protected $tr_attribute = array();
+
+	/**
+	* Array of th attributes if set in form $this->th_attribute[$column_number]['attribute_name'] = 'attribute_value', set using $this->set_th_attribute()
+	* @var  array
+	*/
+	protected $th_attribute = array();
+
+	/**
+	* Array of td attributes that will be added to all tds in one column based on only column number (vs row & column number)
+	* In the form $this->all_td_attributes[$column_number]['attribute_name'] = 'attribute_value'
+	* Set using $this->set_all_td_attribute()
+	* @var  array
+	*/
+	protected $all_td_attributes = array();
 
 	/**
 	* array of column spans in form $this->col_spans[$row_number][$col_number] = $count, set using $this->Setcol_span(), which also adds the attribute to the row
@@ -80,6 +94,7 @@ class cl4_HTMLTable {
 			'heading' => array(),
 			'data' => array(), // array of row data array(row_num => array())
 
+			'th_attributes' => array(),
 			'tr_attributes' => array(),
 			'td_attributes' => array(),
 
@@ -138,9 +153,25 @@ class cl4_HTMLTable {
 			$this->options['table_attributes'] = Arr::merge($this->options['table_attributes'], $this->options['email_options']['table_attributes']);
 		}
 
+		// set the th attributes
+		foreach ($this->options['th_attributes'] as $column_number => $attributes) {
+			foreach ($attributes as $attribute => $attribute_value) {
+				$this->set_th_attribute($column_number, $attribute, $attribute_value);
+			}
+		}
 		// set the tr attributes within the object
-		foreach ($this->options['tr_attributes'] as $row_number => $attribute) {
-			$this->set_attribute($row_number, false, $attribute);
+		foreach ($this->options['tr_attributes'] as $row_number => $attributes) {
+			foreach ($attributes as $attribute => $attribute_value) {
+				$this->set_attribute($row_number, NULL, $attribute, $attribute_value);
+			}
+		}
+		// set the td attributes
+		foreach ($this->options['td_attributes'] as $row_number => $cols) {
+			foreach ($cols as $column_number => $attributes) {
+				foreach ($attributes as $attribute => $attribute_value) {
+					$this->set_attribute($row_number, $column_number, $attribute, $attribute_value);
+				}
+			}
 		}
 
 		if ( ! empty($this->options['data'])) {
@@ -251,6 +282,41 @@ class cl4_HTMLTable {
 
 		return $this;
 	} // function set_col_span
+
+	/**
+	* Sets an attribute on a th element
+	* Only specifies the column number because there is only one row of th elements per table
+	*
+	* @param  int     $column_number    The column number
+	* @param  string  $attribute        The attribute to set (eg, class)
+	* @param  string  $attribute_value  The attribute value
+	*
+	* @chainable
+	* @return  HTMLTable
+	*/
+	public function set_th_attribute($column_number, $attribute, $attribute_value) {
+		if ( ! isset($this->th_attribute[$column_number])) $this->th_attribute[$column_number] = array();
+		$this->th_attribute[$column_number] = HTML::merge_attributes($this->th_attribute[$column_number], array($attribute => $attribute_value));
+
+		return $this;
+	} // function set_th_attribute
+
+	/**
+	* Sets a td attribute that will be applied to all tds in one column
+	*
+	* @param  int     $column_number    The column number
+	* @param  string  $attribute        The attribute to set (eg, class)
+	* @param  string  $attribute_value  The attribute value
+	*
+	* @chainable
+	* @return  HTMLTable
+	*/
+	public function set_all_td_attribute($column_number, $attribute, $attribute_value) {
+		if ( ! isset($this->all_td_attributes[$column_number])) $this->all_td_attributes[$column_number] = array();
+		$this->all_td_attributes[$column_number] = HTML::merge_attributes($this->all_td_attributes[$column_number], array($attribute => $attribute_value));
+
+		return $this;
+	} // function set_all_td_attribute
 
 	/**
 	* Add a row of data to the table (populate the next row)
@@ -377,6 +443,9 @@ class cl4_HTMLTable {
 					if ($add_cell_widths && ! empty($this->options['width'][$j])) {
 						$th_attributes['width'] = $this->options['width'][$j];
 					}
+					if ( ! empty($this->th_attribute[$j]) && is_array($this->th_attribute[$j])) {
+						$th_attributes = HTML::merge_attributes($th_attributes, $this->th_attribute[$j]);
+					}
 					$result_html .= $this->tab . $this->tab . '<th' . HTML::attributes($th_attributes) . '>';
 
 					if ($this->options['add_td_div']) $result_html .= '<div>';
@@ -440,6 +509,9 @@ class cl4_HTMLTable {
 						);
 						if ($this->options['sort_column'] !== NULL && $col_num == $this->options['sort_column']) {
 							$td_attributes['class'] .= ' sort' . $col_num . ' sort_' . strtolower($this->options['sort_order']);
+						}
+						if ( ! empty($this->all_td_attributes[$col_num]) && is_array($this->all_td_attributes[$col_num])) {
+							$td_attributes = HTML::merge_attributes($td_attributes, $this->all_td_attributes[$col_num]);
 						}
 						if ( ! empty($this->td_attribute[$row_num][$col_num]) && is_array($this->td_attribute[$row_num][$col_num])) {
 							$td_attributes = HTML::merge_attributes($td_attributes, $this->td_attribute[$row_num][$col_num]);
