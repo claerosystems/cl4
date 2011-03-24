@@ -1105,7 +1105,7 @@ class cl4_ORM extends Kohana_ORM {
 		} else if (isset($this->_form_fields_hidden[$column_name])) {
 			return $this->_form_fields_hidden[$column_name];
 		} else {
-			throw new Kohana_Exception('Prepare form was unable to prepare the field therefore there is no field available: :column_name', array(':column_name' => $column_name));
+			throw new Kohana_Exception('Prepare form was unable to prepare the field because there is no field available: :column_name', array(':column_name' => $column_name));
 		} // if
 	} // function get_field
 
