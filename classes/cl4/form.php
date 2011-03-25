@@ -127,6 +127,7 @@ class cl4_Form extends Kohana_Form {
 				'class' => 'radio_table',
 			),
 			'radio_attributes' => array(),
+			'label_attributes' => array(),
 		);
 		if (isset($options['table_attributes'])) $options['table_attributes'] += $default_options['table_attributes'];
 		$options += $default_options;
@@ -167,13 +168,20 @@ class cl4_Form extends Kohana_Form {
 			$this_attributes = Arr::overwrite($attributes, array('id' => $attributes['id'] . '-' . $radio_key));
 
 			if (isset($options['radio_attributes'][$radio_key])) {
-				$this_attributes = Arr::merge($this_attributes, $options['radio_attributes'][$radio_key]);
+				$this_attributes = HTML::merge_attributes($this_attributes, $options['radio_attributes'][$radio_key]);
+			}
+
+			$label_attributes = array(
+				'for' => $this_attributes['id'],
+			);
+			if (isset($options['label_attributes'][$radio_key])) {
+				$label_attributes = HTML::merge_attributes($label_attributes, $options['label_attributes'][$radio_key]);
 			}
 
 			$fields[] = array(
 				'radio' => Form::radio($name, $radio_key, $checked, $this_attributes),
 				'label' => $radio_value,
-				'label_tag' => '<label' . HTML::attributes(array('for' => $this_attributes['id'])) . '>',
+				'label_tag' => '<label' . HTML::attributes($label_attributes) . '>',
 			);
 		} // foreach
 
