@@ -55,4 +55,17 @@ class cl4_AJAX_Status {
 
 		return json_encode($data);
 	} // function ajax
-}
+
+	/**
+	* Simplified way of calling
+	*
+	*      AJAX_Status::ajax(array())
+	*
+	* Will return the json encoded array with the status variable set to AJAX_Status::SUCCESSFUL
+	*
+	* @return  string
+	*/
+	public static function success() {
+		return AJAX_Status::ajax(array());
+	}
+} // class cl4_AJAX_Status
