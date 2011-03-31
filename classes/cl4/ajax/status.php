@@ -10,6 +10,7 @@
 *    status => the status using the constants in AJAX
 *    error_msg => message to be displayed the user at the top of the page
 *    debug_msg => message to be displayed in debug mode
+*    validation_msg => a validation message to be displayed at the top of the page (functions a bit differently than an error_msg, see ajax.js)
 *    html => the html to display
 *    ... any other data for that request
 * )
@@ -39,6 +40,10 @@ class cl4_AJAX_Status {
 	* @var  int  5: The page/path/URL cannot be found
 	*/
 	const NOT_FOUND_404 = 5;
+	/**
+	* @var  int  6: There was a validation error; will use the validation class and functionality in ajax.js
+	*/
+	const VALIDATION_ERROR = 6;
 
 	/**
 	* JSON encodes the passed array
