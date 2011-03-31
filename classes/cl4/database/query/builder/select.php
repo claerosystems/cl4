@@ -34,4 +34,40 @@ class cl4_Database_Query_Builder_Select extends Kohana_Database_Query_Builder_Se
 
 		return $this;
 	} // function on_active
+
+	/**
+	* Removes any columns to be selected in the current query
+	* Useful when doing a count on a search query
+	*
+	* @return  $this
+	*/
+	public function reset_select() {
+		$this->_select = array();
+
+		return $this;
+	} // function reset_select
+
+	/**
+	* Removes the limit on the current query
+	* Useful when doing a count on a search query
+	*
+	* @return  $this
+	*/
+	public function reset_limit() {
+		$this->_limit = NULL;
+
+		return $this;
+	} // function reset_limit
+
+	/**
+	* Removes the offset on the current query
+	* Useful when doing a count on a search query
+	*
+	* @return  $this
+	*/
+	public function reset_offset() {
+		$this->_offset = NULL;
+
+		return $this;
+	} // function reset_offset
 } // class cl4_Database_Query_Builder_Select
