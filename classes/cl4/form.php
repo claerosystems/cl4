@@ -807,6 +807,7 @@ class cl4_Form extends Kohana_Form {
 			'line_max_length' => 8,
 			'extension_size' => 4,
 			'extension_max_length' => 4,
+			'show_country_code' => TRUE, // changes the country code field to a hidden field and removed the + before it
 		);
 		$options += $default_options;
 
@@ -814,12 +815,19 @@ class cl4_Form extends Kohana_Form {
 
 		// get the default values for the form fields
 		$default_data = cl4::parse_phone_value($value);
+
 		// add the country code
 		$_attributes = $attributes;
-		if ($set_title_attribute) {
-			$_attributes['title'] = 'Country Code';
+		if ($options['show_country_code']) {
+			if ($set_title_attribute) {
+				$_attributes['title'] = 'Country Code';
+			}
+			$html = '+ ' . Form::input_with_suffix_size($name, $default_data['country_code'], $_attributes, 'cl4_phone_field', 'country_code', $options['country_code_size'], $options['country_code_max_length']);
+		} else {
+			$_attributes = HTML::set_class_attribute($_attributes, 'cl4_phone_field-country_code');
+			if ( ! empty($_attributes['id'])) $_attributes['id'] .= '-country_code';
+			$html = Form::hidden($name . '[country_code]', $default_data['country_code'], $_attributes);
 		}
-		$html = '+ ' . Form::input_with_suffix_size($name, $default_data['country_code'], $_attributes, 'cl4_phone_field', 'country_code', $options['country_code_size'], $options['country_code_max_length']);
 
 		// add the area code
 		$attributes = Form::increment_tabindex($attributes);
@@ -854,7 +862,7 @@ class cl4_Form extends Kohana_Form {
 		$html .= ' ' . __('<span title="Extension">ext.</span>') . ' ' . Form::input_with_suffix_size($name, $default_data['extension'], $_attributes, 'cl4_phone_field', 'extension', $options['extension_size'], $options['extension_max_length']);
 
 		return $html;
-	} // function
+	} // function phone
 
 	/**
 	* Creates a select with heights including "X or under" and "X or over"
