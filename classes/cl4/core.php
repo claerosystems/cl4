@@ -310,7 +310,8 @@ echo '</body></html>';
 				$cleaned_value = (int) $value;
 				break;
 			case 'array' :
-				if ( ! is_array($cleaned_value)) $cleaned_value = (array) $value;
+				$cleaned_value = (array) $value;
+				break;
 			case 'string' :
 				$cleaned_value = (string) $value;
 				break;
