@@ -2220,41 +2220,37 @@ class cl4_ORM extends Kohana_ORM {
 	*/
 	public function delete_file($column_name) {
 		if ($this->table_column_exists($column_name) && $this->_table_columns[$column_name]['field_type'] == 'file') {
-			try {
-				$file_options = $this->_table_columns[$column_name]['field_options']['file_options'];
+			$file_options = $this->_table_columns[$column_name]['field_options']['file_options'];
 
-				$destination_folder = cl4File::get_file_path($file_options['destination_folder'], $this->table_name(), $column_name, $file_options);
+			$destination_folder = cl4File::get_file_path($file_options['destination_folder'], $this->table_name(), $column_name, $file_options);
 
-				if ($file_options['delete_files']) {
-					// try to delete the existing file
-					$file_to_delete = $destination_folder . '/' . $this->$column_name;
+			if ($file_options['delete_files']) {
+				// try to delete the existing file
+				$file_to_delete = $destination_folder . '/' . $this->$column_name;
 
-					if (file_exists($file_to_delete) && ! is_dir($file_to_delete) && ! cl4File::delete($file_to_delete)) {
-						throw new Kohana_Exception('The old file could not be removed: :filename:', array(':filename:' => $file_to_delete), 10001);
-					}
-				} // if
+				if (file_exists($file_to_delete) && ! is_dir($file_to_delete) && ! cl4File::delete($file_to_delete)) {
+					throw new Kohana_Exception('The old file could not be removed: :filename:', array(':filename:' => $file_to_delete), 10001);
+				}
+			} // if
 
-				// check if the field can be nulled
-				if ($this->_table_columns[$column_name]['is_nullable']) {
+			// check if the field can be nulled
+			if ($this->_table_columns[$column_name]['is_nullable']) {
+				$no_value = NULL;
+			} else {
+				$no_value = '';
+			}
+
+			// remove the existing filename and original file name column data
+			$this->$column_name = $no_value;
+
+			if ( ! empty($file_options['original_filename_column'])) {
+				if ($this->_table_columns[$file_options['original_filename_column']]['is_nullable']) {
 					$no_value = NULL;
 				} else {
 					$no_value = '';
 				}
-
-				// remove the existing filename and original file name column data
-				$this->$column_name = $no_value;
-
-				if ( ! empty($file_options['original_filename_column'])) {
-					if ($this->_table_columns[$file_options['original_filename_column']]['is_nullable']) {
-						$no_value = NULL;
-					} else {
-						$no_value = '';
-					}
-					$this->$file_options['original_filename_column'] = $no_value;
-				} // if
-			} catch (Exception $e) {
-				throw $e;
-			}
+				$this->$file_options['original_filename_column'] = $no_value;
+			} // if
 		} // if
 
 		return $this;
