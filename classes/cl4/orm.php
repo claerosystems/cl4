@@ -134,6 +134,11 @@ class cl4_ORM extends Kohana_ORM {
 	protected $_primary_val = 'name';
 
 	/**
+	* @var  array  All the change log IDs for any save (create or update), delete, add related or remove related
+	*/
+	protected $_change_log_ids = array();
+
+	/**
 	* Calls Kohana_ORM::_intialize() and then check to see if the default value for the expiry column is set
 	*
 	* @return  void
@@ -1574,21 +1579,23 @@ class cl4_ORM extends Kohana_ORM {
 	 * @return ORM
 	 */
 	public function add($alias, $far_keys) {
-		$far_keys = ($far_keys instanceof ORM) ? $far_keys->pk() : $far_keys;
+		$far_keys = ($far_keys instanceof ORM ? $far_keys->pk() : $far_keys);
 
 		$foreign_key = $this->pk();
 
 		$through_model = $this->get_through_model($alias);
 
 		foreach ( (array) $far_keys as $key) {
-			ORM::factory($through_model)
+			$add_model = ORM::factory($through_model)
 				->set_db($this->_db_group)
 				->values(array(
 					$this->_has_many[$alias]['foreign_key'] => $foreign_key,
 					$this->_has_many[$alias]['far_key'] => $key,
 				))
 				->save();
-		}
+
+			$this->_change_log_ids = array_merge($this->_change_log_ids, $add_model->change_log_ids());
+		} // foreach
 
 		return $this;
 	} // function add
@@ -1624,8 +1631,12 @@ class cl4_ORM extends Kohana_ORM {
 		$through_model->find()
 			->delete();
 
+		$this->_change_log_ids = array_merge($this->_change_log_ids, $through_model->change_log_ids());
+
 		return $this;
 	} // function remove
+
+
 
 	/**
 	* Returns TRUE when a SELECT SQL parameter has already been added
@@ -1808,6 +1819,7 @@ class cl4_ORM extends Kohana_ORM {
 					'sql' => $this->last_query(),
 					'changed' => $data,
 				));
+			$this->_change_log_ids[] = $change_log->pk();
 		} // if log
 
 		$files_moved = array();
@@ -1844,6 +1856,7 @@ class cl4_ORM extends Kohana_ORM {
 						'sql' => $this->last_query(),
 						'changed' => $files_moved,
 					));
+				$this->_change_log_ids[] = $change_log->pk();
 			} // if log
 		} // if
 
@@ -1933,6 +1946,7 @@ class cl4_ORM extends Kohana_ORM {
 					'sql' => $this->last_query(),
 					'changed' => $data,
 				));
+			$this->_change_log_ids[] = $change_log->pk();
 		} // if log
 
 		// save any values find in _related_save_data
@@ -2145,7 +2159,8 @@ class cl4_ORM extends Kohana_ORM {
 							'sql' => $this->last_query(),
 							'changed' => array($this->_expires_column['column'] => DB::expr('NOW()')),
 						));
-				}
+					$this->_change_log_ids[] = $change_log->pk();
+				} // if
 
 			// If this model just deletes rows
 			} else {
@@ -2168,7 +2183,8 @@ class cl4_ORM extends Kohana_ORM {
 							'row_count' => $num_affected,
 							'sql' => $this->last_query(),
 						));
-				}
+					$this->_change_log_ids[] = $change_log->pk();
+				} // if
 			} // if
 		} // if
 
@@ -2243,6 +2259,27 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function delete_file
+
+	/**
+	* Returns all of the change log ids in the Model
+	*
+	* @return  array
+	*/
+	public function change_log_ids() {
+		return $this->_change_log_ids;
+	}
+
+	/**
+	* Empties the change log ids in the Model
+	*
+	* @chainable
+	* @return  ORM
+	*/
+	public function empty_change_log_ids() {
+		$this->_change_log_ids = array();
+
+		return $this;
+	}
 
 	/**
 	* Takes an array of values from a search form and adds them to _db_pending to be applied the next time the model is retrieved
@@ -2337,6 +2374,7 @@ class cl4_ORM extends Kohana_ORM {
 		parent::clear();
 
 		$this->empty_fields();
+		$this->empty_change_log_ids();
 
 		return $this;
 	} // function clear
