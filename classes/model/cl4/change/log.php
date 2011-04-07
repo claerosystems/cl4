@@ -43,6 +43,14 @@ class Model_cl4_Change_Log extends ORM {
 			'search_flag' => TRUE,
 			'view_flag' => TRUE,
 		),
+		'first_change_log_id' => array(
+			'field_type' => 'text',
+			'list_flag' => TRUE,
+			'edit_flag' => TRUE,
+			'search_flag' => TRUE,
+			'view_flag' => TRUE,
+			'is_nullable' => FALSE,
+		),
 		'user_id' => array(
 			'field_type' => 'select',
 			'list_flag' => TRUE,
@@ -127,6 +135,12 @@ class Model_cl4_Change_Log extends ORM {
 	protected $_max_changed_length = 5000;
 
 	/**
+	* @var  int  The first change log record ID that occured during this instance of PHP
+	* The first record will not have the first_change_log_id field set
+	*/
+	public static $first_change_log_id;
+
+	/**
 	 * Labels for columns
 	 *
 	 * @return  array
@@ -135,6 +149,7 @@ class Model_cl4_Change_Log extends ORM {
 		return array(
 			'id' => 'ID',
 			'event_timestamp' => 'Event Timestamp',
+			'first_change_log_id' => 'First Change Log ID',
 			'user_id' => 'User',
 			'table_name' => 'Table Name',
 			'record_pk' => 'Record Primary Key',
@@ -159,6 +174,10 @@ class Model_cl4_Change_Log extends ORM {
 			$data['user_id'] = $this->get_user_id();
 		}
 
+		if ( ! array_key_exists('first_change_log_id', $data) && Model_Change_Log::$first_change_log_id !== NULL) {
+			$data['first_change_log_id'] = Model_Change_Log::$first_change_log_id;
+		}
+
 		// shorten any changed fields that are longer than _max_changed_length
 		if (array_key_exists('changed', $data)) {
 			if (is_array($data['changed']) && $this->_max_changed_length !== NULL) {
@@ -172,8 +191,14 @@ class Model_cl4_Change_Log extends ORM {
 			$data['changed'] = serialize($data['changed']);
 		} // if
 
-		return $this->values($data)
+		$this->values($data)
 			->save();
+
+		if (Model_Change_Log::$first_change_log_id === NULL) {
+			Model_Change_Log::$first_change_log_id = $this->id;
+		}
+
+		return $this;
 	} // function add_change_log
 
 	/**
