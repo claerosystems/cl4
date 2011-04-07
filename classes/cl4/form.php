@@ -1029,7 +1029,7 @@ class cl4_Form extends Kohana_Form {
 	*
 	* @todo  Make this a recursive function to make it simpler
 	*/
-	public function array_to_fields($fields) {
+	public static function array_to_fields($fields) {
 		$form_html = '';
 
 		foreach ($fields as $name1 => $value1) {
