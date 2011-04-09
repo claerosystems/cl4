@@ -103,8 +103,9 @@ class cl4_ORM_Select extends ORM_FieldType {
 	} // function
 
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-		if ($value != 0) {
-			return Arr::get($source, $value);
+		$found_value = Arr::get($source, $value);
+		if ($found_value !== NULL) {
+			return $found_value;
 		} else {
 			return 0;
 		}
