@@ -38,7 +38,7 @@ class cl4_ORM_File extends ORM_FieldType {
 
 		$destination_folder = cl4File::get_file_path($file_options['destination_folder'], $orm_model->table_name(), $column_name, $file_options);
 
-        if ( ! $orm_model->is_field_name_array()) {
+		if ( ! $orm_model->is_field_name_array()) {
 			$remove_checkbox_name = $orm_model->field_name_prefix() . $column_name . '_remove_file';
 		} else {
 			$remove_checkbox_name = $column_name . '_remove_file';
@@ -55,7 +55,9 @@ class cl4_ORM_File extends ORM_FieldType {
 
 		// check to see if a file name has been passed and therefore copy the file
 		$post_value = Arr::get($post, $column_name);
-		if ( ! empty($post_value)) {
+		if ($file_options['disable_file_upload']) {
+			// don't save the file column because we don't want to upload a file in this case
+		} else if ( ! empty($post_value)) {
 			// 20100921 CSN not sure when we get here, the post normally wouldn't have the field in it, just $_FILES?
 			// 20101027 CSN this must be when we want to pass the function a path manually
 			// todo: when doing this, we'll need to have some options/flags on the file to determine if this is allowed and from where
