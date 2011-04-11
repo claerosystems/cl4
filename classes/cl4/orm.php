@@ -288,7 +288,7 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* Allows setting of a specific option using a path
-	* Becareful when using this: check what done in set_options() to ensure there isn't special functionality for an option
+	* Be careful when using this: check what is done in set_options() to ensure there isn't special functionality for an option
 	*
 	* @chainable
 	* @param  string  $option_path  The path to the option
@@ -2416,6 +2416,21 @@ class cl4_ORM extends Kohana_ORM {
 	}
 
 	/**
+	* put your comment there...
+	*
+	* @param  string  $column_name  The column name
+	* @param  string  $option_path  The path to the option within the _table_columns array
+	* @param  mixed   $value        The value to set the option to
+	*/
+	public function set_table_columns($column_name, $option_path, $value = NULL) {
+		if ($this->table_column_exists($column_name)) {
+			Arr::set_path($this->_table_columns[$column_name], $option_path, $value);
+		}
+
+		return $this;
+	}
+
+	/**
 	* Sets a field option for a table column
 	*
 	* @param  string  $column_name  The column name
@@ -2428,11 +2443,7 @@ class cl4_ORM extends Kohana_ORM {
 	* @uses  Arr::set_path()
 	*/
 	public function set_field_option($column_name, $option_path, $value = NULL) {
-		if ($this->table_column_exists($column_name)) {
-			Arr::set_path($this->_table_columns[$column_name]['field_options'], $option_path, $value);
-		}
-
-		return $this;
+		return $this->set_table_columns($column_name, 'field_options' . Arr::$delimiter . $option_path);
 	}
 
 	/**

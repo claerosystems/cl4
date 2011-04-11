@@ -239,12 +239,15 @@ return array(
 				'name' => NULL, // will be set in get_editable_list() if not provided
 				'id' => NULL, // will be set in get_editable_list() if not provided
 			),
-			// todo: (20110405 CSN this does not appear to work yet, I have marked it with todo) table options that will be passed to HTMLTable
-			'table_options' => array(
+			// table options that will be passed to HTMLTable in MULTIORM ONLY
+			'table_options_multiorm' => array(
 				'table_attributes' => array(
 					'class' => 'cl4_content',
 				),
 			),
+			// todo: implement this for ORM as per above
+			//'table_options' => array(),
+
 			// the per row links/icons
 			'per_row_links' => array(
 				'view' => TRUE,     // view button

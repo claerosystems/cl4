@@ -202,7 +202,7 @@ class cl4_MultiORM {
 		$this->set_target_route();
 		$target_route = Route::get($this->_options['target_route']);
 		$list_options = $this->_options['editable_list_options'];
-		$table_options = $list_options['table_options'];
+		$table_options = $list_options['table_options_multiorm'];
 		$display_order = $this->_model->display_order();
 
 		// Find out how many words we limit textareas to
