@@ -239,7 +239,7 @@ return array(
 				'name' => NULL, // will be set in get_editable_list() if not provided
 				'id' => NULL, // will be set in get_editable_list() if not provided
 			),
-			// table options that will be passed to HTMLTable
+			// todo: (20110405 CSN this does not appear to work yet, I have marked it with todo) table options that will be passed to HTMLTable
 			'table_options' => array(
 				'table_attributes' => array(
 					'class' => 'cl4_content',
