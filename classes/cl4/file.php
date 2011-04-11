@@ -84,7 +84,7 @@ class cl4_File {
 		$return = array(
 			'error' => NULL,
 			'dest_file' => NULL,
-            'dest_file_path' => NULL,
+			'dest_file_path' => NULL,
 			'user_file' => NULL,
 			'mime_type' => NULL,
 			'size' => NULL,
@@ -108,12 +108,12 @@ class cl4_File {
 			throw new cl4_Exception_File('The destination folder for the uploaded file doesn\'t exist: :dest_folder:', array(':dest_folder:' => $destination_folder), cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
 		} // if
 
-        // no files received
-        if ( ! isset($_FILES)) {
+		// no files received
+		if ( ! isset($_FILES)) {
 			throw new cl4_Exception_File('The $_FILES array is not set, therefore no files were saved', NULL, cl4_Exception_File::NO_FILES_RECEIVED);
-        }
+		}
 
-        // get the upload file info
+		// get the upload file info
 		if (is_array($files_array_loc)) {
 			// we are dealing with an array post so the FILES array will also be in an array (with a very poor layout)
 
@@ -141,7 +141,7 @@ class cl4_File {
 			throw new cl4_Exception_File('The field :name: in the $_FILES array was not set, so no file was processed', array(':name:' => $files_array_loc), cl4_Exception_File::FILE_NOT_SET);
 		}
 
-        // check to see if there was error
+		// check to see if there was error
 		if ($file_data['error'] > 0) {
 			// create a message based on the error
 			// error details: (http://php.net/manual/en/features.file-upload.errors.php)
@@ -173,7 +173,7 @@ class cl4_File {
 		} // if
 
 		// set all the file information except for destination
-        $path_info = pathinfo($file_data['name']);
+		$path_info = pathinfo($file_data['name']);
 		$file_info = array(
 			'user_file' => $file_data['name'],
 			'orig_file' => $file_data['name'],
@@ -188,8 +188,8 @@ class cl4_File {
 		$return['size'] = $file_info['size'];
 
 		// get the mime type, couldn't find a better way to do this for now, this is just using the extension
-        $file_info['mime_type'] = File::mime_by_ext($file_info['ext']);
-        $return['mime_type'] = $file_info['mime_type'];
+		$file_info['mime_type'] = File::mime_by_ext($file_info['ext']);
+		$return['mime_type'] = $file_info['mime_type'];
 
 		// ensure it's an uploaded file
 		if ( ! is_uploaded_file($file_info['tmp_file'])) {
@@ -602,7 +602,7 @@ class cl4_File {
 	} // function copy
 
 	/**
-	*   Copies the file from it's currently location to a new location
+	*   Copies the file from its current location to a new location
 	*
 	* @param  string  $file         a path to a file to copy
 	* @param  string  $destination  Where to copy the file to (uses additional options within object to determine the path)
@@ -631,8 +631,8 @@ class cl4_File {
 				'ext' => $options['filename_to_lower'] ? strtolower($path_info['extension']) : $path_info['extension'],
 			);
 
-            $destination_filename_options = array(
-                'force_extension' => $options['force_extension'],
+			$destination_filename_options = array(
+				'force_extension' => $options['force_extension'],
 				'clean_filename' => $options['clean_filename'],
 				'filename_to_lower' => $options['filename_to_lower'],
 			);
