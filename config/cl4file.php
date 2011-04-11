@@ -90,5 +90,7 @@ return array(
 		'allowed_extensions' => array('pdf', 'gif', 'jpg', 'jpeg', 'png'),
 		// the view that's used in ORM_File::edit() to produce the formatting for the file input, remove and file link
 		'edit_view' => 'cl4/orm_file',
+		// if set to TRUE, the columns of type 'file' will not look for a file to upload
+		'disable_file_upload' => FALSE,
 	),
 );
