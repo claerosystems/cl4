@@ -197,7 +197,9 @@ class cl4_ModelCreate {
 			$default_meta_data = Arr::merge($default_meta_data, $default_meta_data_field_type);
 
 			// now set some other stuff based on the field type (mostly attributes)
+			$loop_through_field_attributes = FALSE; // if this is set to true, then
 			if ($meta_data['field_type'] == 'text') {
+				$loop_through_field_attributes = TRUE;
 				if (isset($column_data['character_maximum_length'])) {
 					$meta_data['field_attributes']['maxlength'] = intval($column_data['character_maximum_length']);
 				} else if (isset($column_data['display'])) {
@@ -237,14 +239,16 @@ class cl4_ModelCreate {
 			// add the cl4 meta data
 			$model_code .= TAB . TAB . '\'' . $column_name . '\' => array(' . EOL;
 			foreach ($meta_data as $key => $data) {
-				// filter out optional fields for now, just include required
-				if ( ! array_key_exists($key, $default_meta_data) || $data !== $default_meta_data[$key] || in_array($key, array('field_type', 'display_order'))) {
+				// only add the fields that don't exist in the default, are not the default, are field type or field attributes (and we have to loop through field attributes, probably for maxlength)
+				if ( ! array_key_exists($key, $default_meta_data) || $data !== $default_meta_data[$key] || $key == 'field_type' || ($key == 'field_attributes' && $loop_through_field_attributes)) {
 					$model_code .= TAB . TAB . TAB . "'" . $key . "' => ";
-					if (is_array($data)) {
 
+					if (is_array($data)) {
 						$model_code .= 'array(' . EOL;
 						foreach ($data as $sub_key => $sub_data) {
-							if ( ! array_key_exists($sub_key, $default_meta_data[$key]) || $sub_data !== $default_meta_data[$key][$sub_key]) {
+							if ( ! array_key_exists($sub_key, $default_meta_data[$key]) || $sub_data !== $default_meta_data[$key][$sub_key]
+								// special case: add the maxlength attribute because it's important when generating fields
+								|| ($key == 'field_attributes' && $sub_key == 'maxlength')) {
 								$model_code .= TAB . TAB . TAB . TAB . "'" . $sub_key . "' => ";
 								if (is_array($sub_data)) {
 
