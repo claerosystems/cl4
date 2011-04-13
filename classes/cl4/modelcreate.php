@@ -228,7 +228,7 @@ class cl4_ModelCreate {
 				if (count($tables) > 0) {
 					$has_one_code .= EOL;
 					$has_one_code .= TAB . TAB . '\'' . $column_name_wo_id . '\' => array(' . EOL;
-					$has_one_code .= TAB . TAB . TAB . '\'model\' => \'' . str_replace('_', '', $column_name_wo_id) . '\',' . EOL;
+					$has_one_code .= TAB . TAB . TAB . '\'model\' => \'' . $column_name_wo_id . '\',' . EOL;
 					$has_one_code .= TAB . TAB . TAB . '\'through\' => \'' . $column_name_wo_id . '\',' . EOL;
 					$has_one_code .= TAB . TAB . TAB . '\'foreign_key\' => \'id\',' . EOL;
 					$has_one_code .= TAB . TAB . TAB . '\'far_key\' => \'' . $column_name . '\',' . EOL;
