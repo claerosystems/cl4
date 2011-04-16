@@ -2416,11 +2416,16 @@ class cl4_ORM extends Kohana_ORM {
 	}
 
 	/**
-	* put your comment there...
+	* Sets a column_value value in the _table_columns property, such as edit_flag, view_flag or field_type
 	*
 	* @param  string  $column_name  The column name
 	* @param  string  $option_path  The path to the option within the _table_columns array
 	* @param  mixed   $value        The value to set the option to
+	*
+	* @chainable
+	* @return ORM
+	*
+	* @uses  Arr::set_path()
 	*/
 	public function set_table_columns($column_name, $option_path, $value = NULL) {
 		if ($this->table_column_exists($column_name)) {
