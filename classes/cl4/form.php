@@ -795,7 +795,7 @@ class cl4_Form extends Kohana_Form {
 	 * @param   array   html attributes
 	 * @return  string
 	 */
-	public static function phone($name, $value = NULL, array $attributes = NULL, array $options = array()) {
+	public static function phone($name, $value = NULL, array $attributes = array(), array $options = array()) {
 		$default_options = array(
 			'country_code_size' => 3,
 			'country_code_max_length' => 3,
