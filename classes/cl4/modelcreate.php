@@ -292,13 +292,13 @@ class cl4_ModelCreate {
 		// add auto-update fields placeholders
 		$model_code .= EOL;
 		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * @var  array  $_created_column  The time this row was created.' . EOL;
+		$model_code .= TAB . ' * @var  array  $_created_column  The date and time this row was created.' . EOL;
 		$model_code .= TAB . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
 		$model_code .= TAB . ' */' . EOL;
 		$model_code .= TAB . ( ! isset($columns['date_created']) ? '//' : '') . 'protected $_created_column = array(\'column\' => \'date_created\', \'format\' => \'Y-m-j H:i:s\');'. EOL;
 		$model_code .= EOL;
 		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * @var  array  $_updated_column  The time this row was updated.' . EOL;
+		$model_code .= TAB . ' * @var  array  $_updated_column  The date and time this row was updated.' . EOL;
 		$model_code .= TAB . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
 		$model_code .= TAB . ' */' . EOL;
 		$model_code .= TAB . ( ! isset($columns['date_modified']) ? '//' : '') . 'protected $_updated_column = array(\'column\' => \'date_modified\', \'format\' => TRUE);' . EOL;
