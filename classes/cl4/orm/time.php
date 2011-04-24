@@ -168,7 +168,7 @@ class cl4_ORM_Time extends ORM_FieldType {
 	 * @return string
 	 */
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-		return ($value == '0000-00-00' || $value == '0000-00-00 00:00:00' || $value == ' 00:00:00' ? '' : Date::formatted_time($value, ORM_Time::TIMESTAMP_FORMAT));
+		return (Form::check_date_empty_value($value) ? '' : Date::formatted_time($value, ORM_Time::TIMESTAMP_FORMAT));
 	}
 
 	/**
