@@ -52,7 +52,7 @@ class cl4_Form extends Kohana_Form {
 		} else {
 			$unix = strtotime($value);
 			$date = date(Form::DATE_FORMAT, $unix);
-			$hour = date('g', $unix);
+			$hour = date(($options['24_hour'] ? 'G' : 'g'), $unix); // G retrieves the 24 hour hour, g retrieves the 12 hour hour
 			$min = date('i', $unix);
 			$sec = date('s', $unix);
 			$modulation = date('a', $unix);
