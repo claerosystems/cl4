@@ -24,14 +24,14 @@ class cl4_Form extends Kohana_Form {
 	 * `boolean` | show_seconds | Setting this FALSE will change the seconds field to a hidden field. | `TRUE`
 	 * `boolean` | 24_hour      | Setting this to TRUE will hide the modulation field. | `FALSE`
 	 *
-	 * @param   string  input name
-	 * @param   string  input value false will set the field to be empty, this the default; if the value is a valid date time (according to strtotime()) it will be displayed as the value of the field
-	 * @param   array   html attributes
+	 * @param   string  $name        Input name; the values returned will be an the $_REQUEST array of the date, hour, minute, possibly second and modulation
+	 * @param   string  $value       Input value; NULL, 0000-00-00, 00:00:00 or 0000-00-00 00:00:00 will all make the fields blank; otherwise it will use strtotime() to get the time out of the string
+	 * @param   array   $attributes  HTML Attributes to apply to all of the inputs
+	 * @param   array   $options     Array of options
+	 *
 	 * @return  View
 	 */
-	public static function datetime($name, $value = FALSE, array $attributes = NULL, array $options = array()) {
-		$html = '';
-
+	public static function datetime($name, $value = NULL, array $attributes = NULL, array $options = array()) {
 		$options += array(
 			'view' => 'cl4/form/datetime',
 			'show_seconds' => TRUE,
@@ -60,6 +60,106 @@ class cl4_Form extends Kohana_Form {
 
 		// add the date field
 		$fields['date'] = Form::input_with_suffix_size($name, $date, $attributes, 'cl4_date_field', 'date', 10, 10);
+
+		$time_fields = Form::time_fields($name, $hour, $min, $sec, $modulation, $attributes, $options);
+		$fields = array_merge($fields, $time_fields);
+
+		return View::factory($options['view'], array(
+			'fields' => $fields,
+			'options' => $options,
+		));
+	} // function datetime
+
+	/**
+	 * Creates up to 4 fields for a time input that uses the MySQL time format (hh:mm:ss)
+	 *
+	 *     echo Form::time('start_time','13:53:42');
+	 *
+	 * Options:
+	 *
+	 * Type      | Option       | Description                                    | Default Value
+	 * ----------|--------------|------------------------------------------------|---------------
+	 * `string`  | view         | The view to use to generate the combination of fields for a date time. | `"cl4/form/datetime"`
+	 * `boolean` | show_seconds | Setting this FALSE will change the seconds field to a hidden field. | `TRUE`
+	 * `boolean` | 24_hour      | Setting this to TRUE will hide the modulation field. | `FALSE`
+	 *
+	 * @param   string  $name        Input name; the values returned will be an the $_REQUEST array of the hour, minute, possibly second and modulation
+	 * @param   string  $value       Input value; NULL, 0000-00-00, 00:00:00 or 0000-00-00 00:00:00 will all make the fields blank; otherwise it will attempt to explode the value on ":" to time the hour, minute, and second, if it doesn't, the field will be empty
+	 * @param   array   $attributes  HTML Attributes to apply to all of the inputs
+	 * @param   array   $options     Array of options
+	 *
+	 * @return  View
+	 */
+	public static function time($name, $value = NULL, array $attributes = NULL, array $options = array()) {
+		$options += array(
+			'view' => 'cl4/form/time',
+			'show_seconds' => TRUE,
+			'24_hour' => TRUE,
+		);
+
+		$fields = array();
+
+		// check if the time is empty
+		if (Form::check_date_empty_value($value)) {
+			// the value is empty or something that triggers empty
+			$value = '';
+		} else {
+			$time_parts = explode(':', $value);
+		}
+
+		// generate the time default values based on the time
+		if ($value == '' || count($time_parts) != 3) {
+			$hour = $min = $sec = $modulation = '';
+		} else {
+			list($hour, $min, $sec) = $time_parts;
+			if ( ! $options['24_hour']) {
+				if ($hour > 12) {
+					$hour -= 12;
+					$modulation = 'pm';
+				} else {
+					$modulation = 'am';
+				}
+			} else {
+				$modulation = NULL;
+			}
+		} // if
+
+		$time_fields = Form::time_fields($name, $hour, $min, $sec, $modulation, $attributes, $options);
+		$fields = array_merge($fields, $time_fields);
+
+		return View::factory($options['view'], array(
+			'fields' => $fields,
+			'options' => $options,
+		));
+	} // function time
+
+	/**
+	 * Generates the time fields for Form::datetime() and Form::time()
+	 *
+	 * Options:
+	 *
+	 * Type      | Option       | Description                                    | Default Value
+	 * ----------|--------------|------------------------------------------------|---------------
+	 * `boolean` | show_seconds | Setting this FALSE will change the seconds field to a hidden field. | `TRUE`
+	 * `boolean` | 24_hour      | Setting this to TRUE will hide the modulation field. | `FALSE`
+	 *
+	 * @param  string  $name        Input name; the values returned will be an the $_REQUEST array of the hour, minute, possibly second and modulation
+	 * @param  string  $hour        The hour value
+	 * @param  string  $min         The minute value
+	 * @param  string  $sec         The second value
+	 * @param  string  $modulation  The value of the modulation field (am or pm)
+	 * @param  array   $attributes  HTML Attributes to apply to all of the inputs
+	 * @param  array   $options     Array of options
+	 *
+	 * @return  array
+	 */
+	public static function time_fields($name, $hour, $min, $sec, $modulation = NULL, array $attributes = NULL, array $options = array()) {
+		$options += array(
+			'show_seconds' => TRUE,
+			'24_hour' => FALSE,
+		);
+
+		$fields = array();
 
 		$time_fields = array('hour', 'min', 'sec');
 		foreach ($time_fields as $field_name) {
@@ -91,14 +191,11 @@ class cl4_Form extends Kohana_Form {
 			$attributes = Form::increment_tabindex($attributes);
 			$modulation_attributes = HTML::set_class_attribute($attributes, 'cl4_date_field-modulation');
 			if ( ! empty($modulation_attributes['id'])) $modulation_attributes['id'] .= '-modulation';
-			$fields['am_pm'] = Form::radios($name . '[modulation]', array('am' => 'AM', 'pm' => 'PM'), $modulation, $modulation_attributes);
+			$fields['am_pm'] = Form::radios($name . '[modulation]', array('am' => 'AM', 'pm' => 'PM'), strtolower($modulation), $modulation_attributes);
 		}
 
-		return View::factory($options['view'], array(
-			'fields' => $fields,
-			'options' => $options,
-		));
-	} // function datetime
+		return $fields;
+	} // function time_fields
 
 	public static function radios_sql($name, $source, $selected = NULL, array $attributes = NULL, array $options = array()) {
 		if (is_string($source) && stripos($source, 'select') !== false) {
@@ -988,7 +1085,7 @@ class cl4_Form extends Kohana_Form {
 	* @return  boolean
 	*/
 	public static function check_date_empty_value($date) {
-		return ($date == '0000-00-00' || $date == '0000-00-00 00:00:00' || $date === NULL);
+		return ($date == '0000-00-00' || $date == '0000-00-00 00:00:00' || $date == '00:00:00' || $date === NULL);
 	}
 
 	/**
