@@ -22,6 +22,7 @@ class cl4_Form extends Kohana_Form {
 	 * ----------|--------------|------------------------------------------------|---------------
 	 * `string`  | view         | The view to use to generate the combination of fields for a date time. | `"cl4/form/datetime"`
 	 * `boolean` | show_seconds | Setting this FALSE will change the seconds field to a hidden field. | `TRUE`
+	 * `boolean` | 24_hour      | Setting this to TRUE will hide the modulation field. | `FALSE`
 	 *
 	 * @param   string  input name
 	 * @param   string  input value false will set the field to be empty, this the default; if the value is a valid date time (according to strtotime()) it will be displayed as the value of the field
@@ -34,6 +35,7 @@ class cl4_Form extends Kohana_Form {
 		$options += array(
 			'view' => 'cl4/form/datetime',
 			'show_seconds' => TRUE,
+			'24_hour' => FALSE,
 		);
 
 		$fields = array();
@@ -85,10 +87,12 @@ class cl4_Form extends Kohana_Form {
 			$fields[$field_name] = Form::input_with_suffix_size($name, $value, $attributes, 'cl4_date_field', $field_name, 2, 2, $field_type);
 		}
 
-		$attributes = Form::increment_tabindex($attributes);
-		$modulation_attributes = HTML::set_class_attribute($attributes, 'cl4_date_field-modulation');
-		if ( ! empty($modulation_attributes['id'])) $modulation_attributes['id'] .= '-modulation';
-		$fields['am_pm'] = Form::radios($name . '[modulation]', array('am' => 'AM', 'pm' => 'PM'), $modulation, $modulation_attributes);
+		if ( ! $options['24_hour']) {
+			$attributes = Form::increment_tabindex($attributes);
+			$modulation_attributes = HTML::set_class_attribute($attributes, 'cl4_date_field-modulation');
+			if ( ! empty($modulation_attributes['id'])) $modulation_attributes['id'] .= '-modulation';
+			$fields['am_pm'] = Form::radios($name . '[modulation]', array('am' => 'AM', 'pm' => 'PM'), $modulation, $modulation_attributes);
+		}
 
 		return View::factory($options['view'], array(
 			'fields' => $fields,

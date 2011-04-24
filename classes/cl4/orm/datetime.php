@@ -15,12 +15,12 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 
 		// check to see if the data passed looks like it is from the Form::datetime() post fields and convert as needed
 		if (is_array($value) && array_key_exists('date', $value)) {
-			$value['hour'] 	= array_key_exists('hour', $value) 	? $value['hour'] : 0;
-			$value['min']	= array_key_exists('min', $value) 	? $value['min']  : 0;
-			$value['sec']	= array_key_exists('sec', $value) 	? $value['sec']  : 0;
+			$value['hour'] = array_key_exists('hour', $value) ? $value['hour'] : 0;
+			$value['min']  = array_key_exists('min', $value)  ? $value['min']  : 0;
+			$value['sec']  = array_key_exists('sec', $value)  ? $value['sec']  : 0;
 
-			// add 12 hours to the hour because it's PM
-			if (array_key_exists('modulation', $value) && strtolower($value['modulation']) == 'pm') {
+			// add 12 hours to the hour because it's PM, but only when we are not receiving a 24 hour time
+			if ( ! $options['24_hour'] && array_key_exists('modulation', $value) && strtolower($value['modulation']) == 'pm') {
 				$value['hour'] += 12;
 			}
 
