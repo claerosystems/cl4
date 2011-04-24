@@ -1004,10 +1004,11 @@ class cl4_Form extends Kohana_Form {
 	* @param  string  $suffix        Suffix for the field. Used in the CSS class, ID and field name (in square brackets for field name)
 	* @param  int     $size          The size of the input
 	* @param  int     $max_length    The max length of the input
+	* @param  string  $field_type    The type of field, must be a Form method
 	*
 	* @return  string  HTML output
 	*/
-	public static function input_with_suffix_size($name, $value, $attributes, $class_prefix, $suffix, $size = 10, $max_length = 10) {
+	public static function input_with_suffix_size($name, $value, $attributes, $class_prefix, $suffix, $size = 10, $max_length = 10, $field_type = 'input') {
 		$attributes = HTML::set_class_attribute($attributes, $class_prefix . '-' . $suffix);
 		if ( ! empty($attributes['id'])) $attributes['id'] .= '-' . $suffix;
 
@@ -1015,7 +1016,7 @@ class cl4_Form extends Kohana_Form {
 		$attributes['size'] = $size;
 		$attributes['maxlength'] = $max_length;
 
-		return Form::input($name . '[' . $suffix . ']', $value, $attributes);
+		return Form::$field_type($name . '[' . $suffix . ']', $value, $attributes);
 	} // function input_with_suffix_size
 
 	/**
