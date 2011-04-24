@@ -5,9 +5,9 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 	 * @const string The format to output datetimes as.
 	 */
 	const TIMESTAMP_FORMAT = 'M j, Y H:i:s';
-	
+
 	public static function edit($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
-		return Form::datetime($html_name, $value, $attributes);
+		return Form::datetime($html_name, $value, $attributes, $options);
 	}
 
 	public static function save($post, $column_name, array $options = array(), ORM $orm_model = NULL) {
@@ -190,7 +190,7 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 			),
 		);
 	}
-	
+
 	/**
 	 * Convert a datetime of some form to a human-viewable value.
 	 *
@@ -204,7 +204,7 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
 		return ($value == '0000-00-00' || $value == '0000-00-00 00:00:00') ? '' : Date::formatted_time($value, ORM_Datetime::TIMESTAMP_FORMAT);
 	}
-	
+
 	/**
 	 * Converts a datetime of some form to a human-viewable value that is ready to be inserted into HTML.
 	 *
@@ -221,7 +221,7 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 		if ( ! isset($options['nbsp'])) {
 			$options['nbsp'] = false;
 		}
-		
+
 		return ORM_Datetime::prepare_html(ORM_Datetime::view($value, $column_name, $orm_model, $options), $options['nbsp']);
 	}
 } // class
