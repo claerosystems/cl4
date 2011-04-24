@@ -56,6 +56,10 @@ class cl4_Form extends Kohana_Form {
 			$min = date('i', $unix);
 			$sec = date('s', $unix);
 			$modulation = date('a', $unix);
+			// if all the values are 0, then the time is 00:00:00 but there is a date
+			if ($hour == '0' && $min == '00' && $sec == '00') {
+				$hour = $min = $sec = '';
+			}
 		}
 
 		// add the date field
