@@ -12,20 +12,28 @@ class cl4_Form extends Kohana_Form {
 
 	/**
 	 * Creates a dynamic form date time input that uses the MySQL date and time format (YYYY-MM-DD hh:mm:ss)
-	 * A field has the class on it "datefield" which can be used to attach a date picker; the default included with claerolib is the jQuery UI date picker
+	 * A field has the class on it "datefield" which can be used to attach a date picker; the default included with claerolib is the jQuery UI date picker.
 	 *
-	 *	 echo Form::datetime('start_date','2010-08-16 00:00:00');
+	 *     echo Form::datetime('start_date','2010-08-16 00:00:00');
+	 *
+	 * Options:
+	 *
+	 * Type      | Option       | Description                                    | Default Value
+	 * ----------|--------------|------------------------------------------------|---------------
+	 * `string`  | view         | The view to use to generate the combination of fields for a date time. | `"cl4/form/datetime"`
+	 * `boolean` | show_seconds | Setting this FALSE will change the seconds field to a hidden field. | `TRUE`
 	 *
 	 * @param   string  input name
 	 * @param   string  input value false will set the field to be empty, this the default; if the value is a valid date time (according to strtotime()) it will be displayed as the value of the field
 	 * @param   array   html attributes
-	 * @return  string
+	 * @return  View
 	 */
 	public static function datetime($name, $value = FALSE, array $attributes = NULL, array $options = array()) {
 		$html = '';
 
 		$options += array(
 			'view' => 'cl4/form/datetime',
+			'show_seconds' => TRUE,
 		);
 
 		$fields = array();
@@ -57,6 +65,8 @@ class cl4_Form extends Kohana_Form {
 			$attributes['size'] = 2;
 			$attributes['maxlength'] = 2;
 
+			$field_type = 'input';
+
 			switch ($field_name) {
 				case 'hour' :
 					$value = $hour;
@@ -66,10 +76,13 @@ class cl4_Form extends Kohana_Form {
 					break;
 				case 'sec' :
 					$value = $sec;
+					if ( ! $options['show_seconds']) {
+						$field_type = 'hidden';
+					}
 					break;
 			} // switch
 
-			$fields[$field_name] = Form::input_with_suffix_size($name, $value, $attributes, 'cl4_date_field', $field_name, 2, 2);
+			$fields[$field_name] = Form::input_with_suffix_size($name, $value, $attributes, 'cl4_date_field', $field_name, 2, 2, $field_type);
 		}
 
 		$attributes = Form::increment_tabindex($attributes);
