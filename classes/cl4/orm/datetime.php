@@ -11,6 +11,10 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 	}
 
 	public static function save($post, $column_name, array $options = array(), ORM $orm_model = NULL) {
+		$options += array(
+			'24_hour' => FALSE,
+		);
+
 		$value = Arr::get($post, $column_name);
 
 		// check to see if the data passed looks like it is from the Form::datetime() post fields and convert as needed
@@ -207,7 +211,7 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 	 * @return string
 	 */
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-		return ($value == '0000-00-00' || $value == '0000-00-00 00:00:00') ? '' : Date::formatted_time($value, ORM_Datetime::TIMESTAMP_FORMAT);
+		return ($value == '0000-00-00' || $value == '0000-00-00 00:00:00' || $value == ' 00:00:00' ? '' : Date::formatted_time($value, ORM_Datetime::TIMESTAMP_FORMAT));
 	}
 
 	/**
