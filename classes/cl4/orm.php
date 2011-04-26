@@ -194,6 +194,16 @@ class cl4_ORM extends Kohana_ORM {
 	} // function where_expiry
 
 	/**
+	* Returns TRUE if the module has an expiry column,
+	* base on $this->_expires_column.
+	*
+	* @return  boolean
+	*/
+	public function has_expiry() {
+		return ( ! empty($this->_expires_column));
+	}
+
+	/**
 	 * Creates and returns a new model.
 	 * Adds the cl4 'options' parameter.
 	 *
@@ -253,7 +263,72 @@ class cl4_ORM extends Kohana_ORM {
 		if (empty($this->_table_name_display)) {
 			$this->_table_name_display = $this->_object_name;
 		} // if
-	} // function
+	} // function __construct
+
+	/**
+	 * Handles retrieval of all model values, relationships, and metadata.
+	 * This is the same as Kohana_ORM::__get() but for the has_many part it checks for an expiry column.
+	 *
+	 * @param   string $column Column name
+	 * @return  mixed
+	 */
+	public function __get($column) {
+		if (array_key_exists($column, $this->_object)) {
+			return $this->_object[$column];
+		} elseif (isset($this->_related[$column])) {
+			// Return related model that has already been fetched
+			return $this->_related[$column];
+		} elseif (isset($this->_belongs_to[$column])) {
+			$model = $this->_related($column);
+
+			// Use this model's column and foreign model's primary key
+			$col = $model->_table_name.'.'.$model->_primary_key;
+			$val = $this->_object[$this->_belongs_to[$column]['foreign_key']];
+
+			$model->where($col, '=', $val)->find();
+
+			return $this->_related[$column] = $model;
+		} elseif (isset($this->_has_one[$column])) {
+			$model = $this->_related($column);
+
+			// Use this model's primary key value and foreign model's column
+			$col = $model->_table_name.'.'.$this->_has_one[$column]['foreign_key'];
+			$val = $this->pk();
+
+			$model->where($col, '=', $val)->find();
+
+			return $this->_related[$column] = $model;
+		} elseif (isset($this->_has_many[$column])) {
+			$model = ORM::factory($this->_has_many[$column]['model']);
+
+			if (isset($this->_has_many[$column]['through'])) {
+				// Grab has_many "through" relationship table
+				$through = $this->_has_many[$column]['through'];
+
+				// Join on through model's target foreign key (far_key) and target model's primary key
+				$join_col1 = $through.'.'.$this->_has_many[$column]['far_key'];
+				$join_col2 = $model->_table_name.'.'.$model->_primary_key;
+
+				$model->join($through)->on($join_col1, '=', $join_col2);
+				if (ORM::factory($through)->has_expiry()) {
+					$model->on_expiry($through);
+				}
+
+				// Through table's source foreign key (foreign_key) should be this model's primary key
+				$col = $through.'.'.$this->_has_many[$column]['foreign_key'];
+				$val = $this->pk();
+			} else {
+				// Simple has_many relationship, search where target model's foreign key is this model's primary key
+				$col = $model->_table_name.'.'.$this->_has_many[$column]['foreign_key'];
+				$val = $this->pk();
+			}
+
+			return $model->where($col, '=', $val);
+		} else {
+			throw new Kohana_Exception('The :property property does not exist in the :class class',
+				array(':property' => $column, ':class' => get_class($this)));
+		}
+	} // function __get
 
 	/**
 	 * Update the options with the given set.  This will override any options already set, and if none are set
