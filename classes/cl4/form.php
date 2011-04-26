@@ -409,6 +409,7 @@ class cl4_Form extends Kohana_Form {
 				$_options['first_checkbox'] = $first_checkbox;
 
 				if ($options['orientation'] == 'table') {
+					// $col is increment inside checkbox_layout_table() and passed by reference
 					$html .= Form::checkbox_layout_table($name, $col, $label, $checkbox_value, in_array($checkbox_value, $checked), $_attributes, $_options);
 				} else {
 					$html .= Form::checkbox_layout($name, $label, $checkbox_value, in_array($checkbox_value, $checked), $_attributes, $_options);
@@ -456,7 +457,7 @@ class cl4_Form extends Kohana_Form {
 		return $html;
 	} // function
 
-	public static function checkbox_layout_table($name, $col, $label = '', $value, $checked = FALSE, array $attributes = NULL, array $options = array()) {
+	public static function checkbox_layout_table($name, & $col, $label = '', $value, $checked = FALSE, array $attributes = NULL, array $options = array()) {
 		$html = '';
 
 		$default_options = array(
