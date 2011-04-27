@@ -184,6 +184,7 @@ return array(
 			'class' => 'cl4_form',
 		),
 		'field_name_prefix' => 'c_record', // for all fields, default is c_record
+		'custom_field_name_prefix' => NULL, // if set and field_name_include_array is TRUE, then this will be used before the column name
 		'field_name_include_array' => TRUE, // if set to TRUE, then a post array will be use, example: c_record[table_name][0][column_name]
 		'add_autofocus' => TRUE, // if TRUE, the first field in the model will have the autofocus attribute added to it
 		/**

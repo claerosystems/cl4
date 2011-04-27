@@ -854,12 +854,16 @@ class cl4_ORM extends Kohana_ORM {
 	* May include square brackets to make a post array
 	* The field doesn't have to be a column in the table or _table_columns
 	*
-	* @param mixed $column_name
-	* @return string
+	* @param  string  $column_name  The column name
+	* @return  string
 	*/
 	public function get_field_html_name($column_name) {
 		if ($this->_options['field_name_include_array']) {
-			return $this->_options['field_name_prefix'] . '[' . $this->_table_name . '][' . $this->_record_number . '][' . $column_name . ']';
+			if ($this->_options['custom_field_name_prefix'] != NULL) {
+				return $this->_options['custom_field_name_prefix'] . '[' . $column_name . ']';
+			} else {
+				return $this->_options['field_name_prefix'] . '[' . $this->_table_name . '][' . $this->_record_number . '][' . $column_name . ']';
+			}
 		} else {
 			return $this->_options['field_name_prefix'] . $column_name;
 		}
