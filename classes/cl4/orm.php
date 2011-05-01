@@ -214,7 +214,7 @@ class cl4_ORM extends Kohana_ORM {
 	 */
 	public static function factory($model, $id = NULL, $options = array()) {
 		// Set class name
-		$model = 'Model_'.ucfirst($model);
+		$model = 'Model_' . ucfirst($model);
 
 		return new $model($id, $options);
 	} // function factory
