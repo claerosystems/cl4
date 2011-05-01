@@ -1588,7 +1588,7 @@ class cl4_ORM extends Kohana_ORM {
 			// skip the primary key as we've delt with above
 			if (($column_name == $this->_primary_key)
 			// if the edit flag it set to false and the column is not in ignored columns
-			||  ! $column_meta['edit_flag']
+			|| ( ! $column_meta['edit_flag'])
 			// if the mode is edit and view in edit mode is true
 			|| ($this->_mode == 'edit' && $column_meta['view_in_edit_mode'])) {
 				$save_field = FALSE;
@@ -1714,8 +1714,6 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function remove
-
-
 
 	/**
 	* Returns TRUE when a SELECT SQL parameter has already been added
@@ -2114,6 +2112,82 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function save_through
+
+	/**
+	* Save multiple related has_many records as found in the post with more than just a far and foreign key
+	* Also adds and/or deletes the through record
+	* Uses the "id" key in the data array to determine if it's a new or existing record
+	*
+	* @param  string  $alias           The alias (key) in the _has_many property
+	* @param  string  $request_loc     The location in the post of the data (if this isn't the normal c_record.table_name it may not work for files)
+	* @param  mixed   $delete_through  Determines if the through record is deleted: TRUE (default) will delete it, "only" or "only_through" will only delete the through record and not the main one
+	*
+	* @return  ORM
+	*/
+	public function save_has_many($alias, $request_loc, $delete_through = TRUE) {
+		// foreign key needs to be a var because of the way it's used
+		$foreign_key = $this->_has_many[$alias]['foreign_key'];
+
+		// determine if we were passed an array location or the just the data
+		if ( ! Arr::is_array($request_loc)) {
+			$post_records = Arr::path($_REQUEST, $request_loc, array());
+		} else {
+			$post_records = $request_loc;
+		}
+
+		// retrieve the current records
+		$current_records = $this->$alias->find_all()->as_array('id');
+
+		// loop through the passed data and determine if it's a new record or existing based on the "id" key
+		foreach ($post_records as $post_record) {
+			// new records
+			if ( ! isset($post_record['id']) || ! isset($current_records[$post_record['id']])) {
+				if (isset($this->_has_many[$alias]['through'])) {
+					$_record = ORM::factory($this->_has_many[$alias]['model'])
+						->save_values($post_record)
+						->save();
+
+					$_through = ORM::factory($this->_has_many[$alias]['through'])
+						->values(array(
+							$foreign_key => $this->pk(),
+							$this->_has_many[$alias]['far_key'] => $_record->pk(),
+						))
+						->save();
+				} else {
+					$_record = ORM::factory($this->_has_many[$alias]['model'])
+						->save_values($post_record);
+					$_record->$foreign_key = $this->pk();
+					$_record->save();
+				}
+
+			// existing record
+			} else {
+				$_record = ORM::factory($this->_has_many[$alias]['model'], $post_record['id'])
+					->save_values($post_record)
+					->save();
+				unset($current_records[$post_record['id']]);
+			}
+		} // foreach
+
+		// delete any records that weren't in the passed data
+		if ( ! empty($current_records)) {
+			foreach ($current_records as $_record) {
+				if ($delete_through === TRUE || $delete_through == 'only' || $delete_through == 'only_through') {
+					ORM::factory($this->_has_many[$alias]['through'], array(
+							$foreign_key => $this->pk(),
+							$this->_has_many[$alias]['far_key'] => $_record->pk(),
+						))
+						->delete();
+				}
+
+				if ($delete_through === TRUE || $delete_through === FALSE || ($delete_through != 'only' && $delete_through != 'only_through')) {
+					$_record->delete();
+				}
+			} // foreach
+		} // if
+
+		return $this;
+	} // function save_has_many
 
 	/**
 	* Checks to see if the column name exists in the _table_columns array
