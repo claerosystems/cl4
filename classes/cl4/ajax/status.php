@@ -46,7 +46,7 @@ class cl4_AJAX_Status {
 	const VALIDATION_ERROR = 6;
 
 	/**
-	* JSON encodes the passed array
+	* JSON encodes the passed array and returns it
 	* If no status key is found in the array, status will be set to AJAX_Status::SUCCESSFUL
 	*
 	* @param  array  $data  The data to return json encoded
