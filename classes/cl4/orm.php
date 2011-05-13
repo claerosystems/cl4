@@ -1179,7 +1179,7 @@ class cl4_ORM extends Kohana_ORM {
 	 * @param   string  $column_name  the name of the field in the model
 	 * @return  string  the HTML for the given fieldname, based on the model
 	 */
-	public function get_field($column_name = NULL) {
+	public function get_field($column_name) {
 		if ( ! isset($this->_field_html[$column_name]['field']) && ! isset($this->_form_fields_hidden[$column_name])) {
 			$this->prepare_form($column_name);
 		}
