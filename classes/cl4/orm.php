@@ -120,6 +120,10 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* @var  array  Array of field help: array('column_name' => array('mode' => [text], ... 'all' => [text]))
+	* help (tips) to be displayed below each field
+	* use 'all' to display the same help for all the fields or customize it for each mode using the appropriate key
+	* see the view cl4/field_help for the layout of these
+	* use JavaScript to move these into a tool tip or only show when that field is focused
 	*/
 	protected $_field_help = array();
 
