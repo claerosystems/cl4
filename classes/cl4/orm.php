@@ -120,6 +120,10 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* @var  array  Array of field help: array('column_name' => array('mode' => [text], ... 'all' => [text]))
+	* help (tips) to be displayed below each field
+	* use 'all' to display the same help for all the fields or customize it for each mode using the appropriate key
+	* see the view cl4/field_help for the layout of these
+	* use JavaScript to move these into a tool tip or only show when that field is focused
 	*/
 	protected $_field_help = array();
 
@@ -1188,7 +1192,7 @@ class cl4_ORM extends Kohana_ORM {
 	 * @param   string  $column_name  the name of the field in the model
 	 * @return  string  the HTML for the given fieldname, based on the model
 	 */
-	public function get_field($column_name = NULL) {
+	public function get_field($column_name) {
 		if ( ! isset($this->_field_html[$column_name]['field']) && ! isset($this->_form_fields_hidden[$column_name])) {
 			$this->prepare_form($column_name);
 		}
