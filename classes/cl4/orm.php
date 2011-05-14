@@ -685,7 +685,8 @@ class cl4_ORM extends Kohana_ORM {
 		} else if ( ! empty($process_column_name) && is_string($process_column_name)) {
 			$process_columns = array($process_column_name);
 		} else {
-			$process_columns = array_keys($this->_table_columns);
+			// merge the columns in table_columns and the aliases in has_many so we can do the checks for both fields and related tables
+			$process_columns = array_merge(array_keys($this->_table_columns), array_keys($this->_has_many));
 
 			// determine which field is the first one that is visible and not a hidden field
 			foreach ($this->_display_order as $column_name) {
@@ -718,6 +719,9 @@ class cl4_ORM extends Kohana_ORM {
 				// only through an exception when the column is also not in the has_many array because it maybe processed below
 				if ( ! isset($this->_has_many[$column_name])) {
 					throw new Kohana_Exception('The column name :column_name: sent to prepare is not in _table_columns', array(':column_name:' => $column_name));
+				// just skip, don't throw an exception when the column is in the has_many array
+				} else {
+					continue;
 				}
 			}
 
@@ -806,6 +810,11 @@ class cl4_ORM extends Kohana_ORM {
 		// @todo: handle case where we have a belongs to and has many but we only want to display the associated records (eg. atttach a file to a record)
 		if ($this->_mode != 'search') {
 			foreach ($this->_has_many as $alias => $relation_data) {
+				// skip any has many relationships not in the process columns array
+				if ( ! in_array($alias, $process_columns)) {
+					continue;
+				}
+
 				switch($this->_mode) {
 					case 'view':
 						$show_field = $relation_data['view_flag'];
