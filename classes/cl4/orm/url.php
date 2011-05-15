@@ -27,9 +27,14 @@ class cl4_ORM_URL extends cl4_ORM_Text {
 		// ensure the nbps option is set
 		$options += array(
 			'nbsp' => FALSE,
+			'add_http' => TRUE,
 		);
 
 		$url = ORM_FieldType::view($value, $column_name, $orm_model, $options);
+
+		if ($options['add_http'] && UTF8::strpos($url, 'http://') === FALSE && UTF8::strpos($url, 'http://') === FALSE) {
+			$url = 'http://' . $url;
+		}
 
 		return HTML::anchor($url, ORM_FieldType::prepare_html($url, $options['nbsp']));
 	} // function view_html
