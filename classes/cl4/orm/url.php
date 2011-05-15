@@ -28,6 +28,7 @@ class cl4_ORM_URL extends cl4_ORM_Text {
 		$options += array(
 			'nbsp' => FALSE,
 			'add_http' => TRUE,
+			'a_attributes' => array(),
 		);
 
 		$url = ORM_FieldType::view($value, $column_name, $orm_model, $options);
@@ -36,6 +37,6 @@ class cl4_ORM_URL extends cl4_ORM_Text {
 			$url = 'http://' . $url;
 		}
 
-		return HTML::anchor($url, ORM_FieldType::prepare_html($url, $options['nbsp']));
+		return HTML::anchor($url, ORM_FieldType::prepare_html($url, $options['nbsp']), $options['a_attributes']);
 	} // function view_html
 } // class
