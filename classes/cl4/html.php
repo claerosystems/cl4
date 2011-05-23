@@ -87,7 +87,7 @@ class cl4_HTML extends Kohana_HTML {
 	 *
 	 *     echo HTML::chars($username);
 	 *
-	 * @param   string   string to convert
+	 * @param   string/array   string to convert
 	 * @param   boolean  encode existing entities
 	 * @param   boolean  convert keys as well (default FALSE)
 	 * @return  string
