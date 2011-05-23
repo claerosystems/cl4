@@ -70,26 +70,17 @@ class cl4_File {
 	} // function
 
 	/**
-	*   Validates uploaded file and then moves it to the destination if specified
+	*   Validates uploaded file and then moves it to the destination if specified using upload_file()
 	*
-	* @param   mixed   $files_array_loc  The name of the field within the $_FILES array; Can also be an array where the values are the location of the file in the $_FILES array when using a post array
-	*                                    So $_FILES[c_record][name][table_name][0][column_name] would be array('c_record', 'table_name', 0, 'column_name')
-	*                                    When using an array, the keys can't have periods because it uses Arr::path() to find the value
-	* @param   string  $destination      The destination file name (minus path) (can be null if there isn't going to be a name change or using timestamp)
-	* @param   array   $options          Options as found in config/cl4file
+	* @param   mixed   $files_array_loc      The name of the field within the $_FILES array; Can also be an array where the values are the location of the file in the $_FILES array when using a post array
+	*                                        So $_FILES[c_record][name][table_name][0][column_name] would be array('c_record', 'table_name', 0, 'column_name')
+	*                                        When using an array, the keys can't have periods because it uses Arr::path() to find the value
+	* @param   string  $destination_folder   The destination folder
+	* @param   array   $options              (optional) Options as found in config/cl4file
 	*
 	* @return  array
 	*/
 	public function upload($files_array_loc, $destination_folder, array $options = array()) {
-		$return = array(
-			'error' => NULL,
-			'dest_file' => NULL,
-			'dest_file_path' => NULL,
-			'user_file' => NULL,
-			'mime_type' => NULL,
-			'size' => NULL,
-		);
-
 		// reset the options if they are passed (otherwise they have been set in the construct())
 		if ( ! empty($options)) $this->set_options($options);
 
@@ -172,6 +163,33 @@ class cl4_File {
 			throw new cl4_Exception_File('PHP File Upload Error (:error:) ' . $msg, array(':error:' => $file_data['error']), cl4_Exception_File::PHP_FILE_UPLOAD_ERROR);
 		} // if
 
+		// ensure it's an uploaded file
+		if ( ! is_uploaded_file($file_data['tmp_name'])) {
+			throw new cl4_Exception_File('File received is not an uploaded file: :file:', array(':file:' => $file_data['tmp_name']), cl4_Exception_File::NOT_UPLOADED_FILE);
+		}
+
+		return $this->upload_file($file_data, $destination_folder);
+	} // function upload
+
+	/**
+	* This methog moves a file in to the correct location for a file column.
+	*
+	* This code was originally in upload() but it was separated out so that we could use this new method for files that
+	* were not uploaded directly via POST (e.g. from an archive file or FTP, etc.).
+	*
+	* @param mixed $file_data             the file data ($file_data['name'], $file_data['tmpname'], $file_data['size'])
+	* @param mixed $destination_folder    the destination folder
+	*/
+	public function upload_file($file_data, $destination_folder) {
+		$return = array(
+			'error' => NULL,
+			'dest_file' => NULL,
+			'dest_file_path' => NULL,
+			'user_file' => NULL,
+			'mime_type' => NULL,
+			'size' => NULL,
+		);
+
 		// set all the file information except for destination
 		$path_info = pathinfo($file_data['name']);
 		$file_info = array(
@@ -190,11 +208,6 @@ class cl4_File {
 		// get the mime type, couldn't find a better way to do this for now, this is just using the extension
 		$file_info['mime_type'] = File::mime_by_ext($file_info['ext']);
 		$return['mime_type'] = $file_info['mime_type'];
-
-		// ensure it's an uploaded file
-		if ( ! is_uploaded_file($file_info['tmp_file'])) {
-			throw new cl4_Exception_File('File received is not an uploaded file: :file:', array(':file:' => $file_info['tmp_file']), cl4_Exception_File::NOT_UPLOADED_FILE);
-		}
 
 		// check the mime type or extension if we need to
 		// checking hasn't been disabled so do some
@@ -242,7 +255,8 @@ class cl4_File {
 
 		// try moving the file
 		try {
-			if (move_uploaded_file($file_info['tmp_file'], $file_info['dest_file_path'])) {
+			// 20110412 CSN changed this to rename() from move_uploaded_file() because we are not always dealing with uploaded files here and there is a check in upload() for uplaoded files
+			if (rename($file_info['tmp_file'], $file_info['dest_file_path'])) {
 				$return['dest_file'] = $file_info['dest_file'];
 				$return['dest_file_path'] = $file_info['dest_file_path'];
 			}
@@ -253,7 +267,7 @@ class cl4_File {
 		}
 
 		return $return;
-	} // function upload
+	}
 
 	/**
 	* If $html is TRUE, this returns an HTML formatted string prefixed with with a message regarding allowed file types based on config/mime_description

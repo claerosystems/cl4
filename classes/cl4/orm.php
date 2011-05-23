@@ -120,6 +120,10 @@ class cl4_ORM extends Kohana_ORM {
 
 	/**
 	* @var  array  Array of field help: array('column_name' => array('mode' => [text], ... 'all' => [text]))
+	* help (tips) to be displayed below each field
+	* use 'all' to display the same help for all the fields or customize it for each mode using the appropriate key
+	* see the view cl4/field_help for the layout of these
+	* use JavaScript to move these into a tool tip or only show when that field is focused
 	*/
 	protected $_field_help = array();
 
@@ -214,7 +218,7 @@ class cl4_ORM extends Kohana_ORM {
 	 */
 	public static function factory($model, $id = NULL, $options = array()) {
 		// Set class name
-		$model = 'Model_'.ucfirst($model);
+		$model = 'Model_' . ucfirst($model);
 
 		return new $model($id, $options);
 	} // function factory
@@ -685,7 +689,8 @@ class cl4_ORM extends Kohana_ORM {
 		} else if ( ! empty($process_column_name) && is_string($process_column_name)) {
 			$process_columns = array($process_column_name);
 		} else {
-			$process_columns = array_keys($this->_table_columns);
+			// merge the columns in table_columns and the aliases in has_many so we can do the checks for both fields and related tables
+			$process_columns = array_merge(array_keys($this->_table_columns), array_keys($this->_has_many));
 
 			// determine which field is the first one that is visible and not a hidden field
 			foreach ($this->_display_order as $column_name) {
@@ -718,6 +723,9 @@ class cl4_ORM extends Kohana_ORM {
 				// only through an exception when the column is also not in the has_many array because it maybe processed below
 				if ( ! isset($this->_has_many[$column_name])) {
 					throw new Kohana_Exception('The column name :column_name: sent to prepare is not in _table_columns', array(':column_name:' => $column_name));
+				// just skip, don't throw an exception when the column is in the has_many array
+				} else {
+					continue;
 				}
 			}
 
@@ -806,6 +814,11 @@ class cl4_ORM extends Kohana_ORM {
 		// @todo: handle case where we have a belongs to and has many but we only want to display the associated records (eg. atttach a file to a record)
 		if ($this->_mode != 'search') {
 			foreach ($this->_has_many as $alias => $relation_data) {
+				// skip any has many relationships not in the process columns array
+				if ( ! in_array($alias, $process_columns)) {
+					continue;
+				}
+
 				switch($this->_mode) {
 					case 'view':
 						$show_field = $relation_data['view_flag'];
@@ -929,12 +942,16 @@ class cl4_ORM extends Kohana_ORM {
 	* May include square brackets to make a post array
 	* The field doesn't have to be a column in the table or _table_columns
 	*
-	* @param mixed $column_name
-	* @return string
+	* @param  string  $column_name  The column name
+	* @return  string
 	*/
 	public function get_field_html_name($column_name) {
 		if ($this->_options['field_name_include_array']) {
-			return $this->_options['field_name_prefix'] . '[' . $this->_table_name . '][' . $this->_record_number . '][' . $column_name . ']';
+			if ($this->_options['custom_field_name_prefix'] != NULL) {
+				return $this->_options['custom_field_name_prefix'] . '[' . $column_name . ']';
+			} else {
+				return $this->_options['field_name_prefix'] . '[' . $this->_table_name . '][' . $this->_record_number . '][' . $column_name . ']';
+			}
 		} else {
 			return $this->_options['field_name_prefix'] . $column_name;
 		}
@@ -1175,7 +1192,7 @@ class cl4_ORM extends Kohana_ORM {
 	 * @param   string  $column_name  the name of the field in the model
 	 * @return  string  the HTML for the given fieldname, based on the model
 	 */
-	public function get_field($column_name = NULL) {
+	public function get_field($column_name) {
 		if ( ! isset($this->_field_html[$column_name]['field']) && ! isset($this->_form_fields_hidden[$column_name])) {
 			$this->prepare_form($column_name);
 		}
@@ -1584,7 +1601,7 @@ class cl4_ORM extends Kohana_ORM {
 			// skip the primary key as we've delt with above
 			if (($column_name == $this->_primary_key)
 			// if the edit flag it set to false and the column is not in ignored columns
-			||  ! $column_meta['edit_flag']
+			|| ( ! $column_meta['edit_flag'])
 			// if the mode is edit and view in edit mode is true
 			|| ($this->_mode == 'edit' && $column_meta['view_in_edit_mode'])) {
 				$save_field = FALSE;
@@ -1710,8 +1727,6 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function remove
-
-
 
 	/**
 	* Returns TRUE when a SELECT SQL parameter has already been added
@@ -2110,6 +2125,82 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function save_through
+
+	/**
+	* Save multiple related has_many records as found in the post with more than just a far and foreign key
+	* Also adds and/or deletes the through record
+	* Uses the "id" key in the data array to determine if it's a new or existing record
+	*
+	* @param  string  $alias           The alias (key) in the _has_many property
+	* @param  string  $request_loc     The location in the post of the data (if this isn't the normal c_record.table_name it may not work for files)
+	* @param  mixed   $delete_through  Determines if the through record is deleted: TRUE (default) will delete it, "only" or "only_through" will only delete the through record and not the main one
+	*
+	* @return  ORM
+	*/
+	public function save_has_many($alias, $request_loc, $delete_through = TRUE) {
+		// foreign key needs to be a var because of the way it's used
+		$foreign_key = $this->_has_many[$alias]['foreign_key'];
+
+		// determine if we were passed an array location or the just the data
+		if ( ! Arr::is_array($request_loc)) {
+			$post_records = Arr::path($_REQUEST, $request_loc, array());
+		} else {
+			$post_records = $request_loc;
+		}
+
+		// retrieve the current records
+		$current_records = $this->$alias->find_all()->as_array('id');
+
+		// loop through the passed data and determine if it's a new record or existing based on the "id" key
+		foreach ($post_records as $post_record) {
+			// new records
+			if ( ! isset($post_record['id']) || ! isset($current_records[$post_record['id']])) {
+				if (isset($this->_has_many[$alias]['through'])) {
+					$_record = ORM::factory($this->_has_many[$alias]['model'])
+						->save_values($post_record)
+						->save();
+
+					$_through = ORM::factory($this->_has_many[$alias]['through'])
+						->values(array(
+							$foreign_key => $this->pk(),
+							$this->_has_many[$alias]['far_key'] => $_record->pk(),
+						))
+						->save();
+				} else {
+					$_record = ORM::factory($this->_has_many[$alias]['model'])
+						->save_values($post_record);
+					$_record->$foreign_key = $this->pk();
+					$_record->save();
+				}
+
+			// existing record
+			} else {
+				$_record = ORM::factory($this->_has_many[$alias]['model'], $post_record['id'])
+					->save_values($post_record)
+					->save();
+				unset($current_records[$post_record['id']]);
+			}
+		} // foreach
+
+		// delete any records that weren't in the passed data
+		if ( ! empty($current_records)) {
+			foreach ($current_records as $_record) {
+				if ($delete_through === TRUE || $delete_through == 'only' || $delete_through == 'only_through') {
+					ORM::factory($this->_has_many[$alias]['through'], array(
+							$foreign_key => $this->pk(),
+							$this->_has_many[$alias]['far_key'] => $_record->pk(),
+						))
+						->delete();
+				}
+
+				if ($delete_through === TRUE || $delete_through === FALSE || ($delete_through != 'only' && $delete_through != 'only_through')) {
+					$_record->delete();
+				}
+			} // foreach
+		} // if
+
+		return $this;
+	} // function save_has_many
 
 	/**
 	* Checks to see if the column name exists in the _table_columns array

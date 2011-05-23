@@ -32,19 +32,6 @@ return array(
 		'field_options' => array(
 			'default_value' => NULL, // the default value for the field when there is nothing else
 		),
-		/**
-		* help (tips) to be displayed below each field
-		* use 'all' to display the same help for all the fields or customize it for each mode using the appropriate key
-		* see the view cl4/field_help for the layout of these
-		* use JavaScript to move these into a tool tip or only show when that field is focused
-		*/
-		'field_help' => array(
-			'all' => NULL,
-			'edit' => NULL,
-			'add' => NULL,
-			'view' => NULL,
-			'search' => NULL,
-		),
 	),
 	// this should contain arrays of field type specific meta data; if the field type or key is not set in here, the default_meta_data will be used
 	'default_meta_data_field_type' => array(
@@ -125,6 +112,12 @@ return array(
 				),
 			),
 		),
+		'url' => array(
+			'field_attributes' => array( //
+				'maxlength' => 255,
+				'size' => 30,
+			),
+		),
 	),
 
 	// default options for relationships, merged in during set_options()
@@ -184,6 +177,7 @@ return array(
 			'class' => 'cl4_form',
 		),
 		'field_name_prefix' => 'c_record', // for all fields, default is c_record
+		'custom_field_name_prefix' => NULL, // if set and field_name_include_array is TRUE, then this will be used before the column name
 		'field_name_include_array' => TRUE, // if set to TRUE, then a post array will be use, example: c_record[table_name][0][column_name]
 		'add_autofocus' => TRUE, // if TRUE, the first field in the model will have the autofocus attribute added to it
 		/**
