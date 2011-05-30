@@ -2614,7 +2614,7 @@ class cl4_ORM extends Kohana_ORM {
 	* @uses  Arr::set_path()
 	*/
 	public function set_field_option($column_name, $option_path, $value = NULL) {
-		return $this->set_table_columns($column_name, 'field_options' . Arr::$delimiter . $option_path);
+		return $this->set_table_columns($column_name, 'field_options' . Arr::$delimiter . $option_path, $value);
 	}
 
 	/**
