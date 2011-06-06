@@ -277,7 +277,6 @@ echo '</body></html>';
 
 	/**
 	* Returns the value from the POST or GET based on the array keys, if it exists
-	* Also applies Security::xss_clean()
 	* If the value is NULL and $type is NULL then NULL will be returned
 	*
 	* @param  array  $array_keys array keys to the location in the request
