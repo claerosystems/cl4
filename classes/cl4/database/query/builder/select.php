@@ -70,4 +70,16 @@ class cl4_Database_Query_Builder_Select extends Kohana_Database_Query_Builder_Se
 
 		return $this;
 	} // function reset_offset
+
+	/**
+	* Removes all of the group by's on the current query
+	* Useful when doing a count on a search query
+	*
+	* @return  $this
+	*/
+	public function reset_group_by() {
+		$this->_group_by = array();
+
+		return $this;
+	} // function reset_group_by
 } // class cl4_Database_Query_Builder_Select
