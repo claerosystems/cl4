@@ -1352,14 +1352,14 @@ class cl4_ORM extends Kohana_ORM {
 					throw new Kohana_Exception('The source method is unknown: :source:', array(':source:' => $options['source']));
 					break;
 			} // switch
-
-			if ($value !== NULL) {
-				// return NULL if the value doesn't exist in the array
-				return Arr::get($this->_lookup_data[$column_name], $value);
-			} else {
-				return $this->_lookup_data[$column_name];
-			}
 		} // if
+
+		if ($value !== NULL) {
+			// return NULL if the value doesn't exist in the array
+			return Arr::get($this->_lookup_data[$column_name], $value);
+		} else {
+			return $this->_lookup_data[$column_name];
+		}
 	} // function get_source_data
 
 	/**
