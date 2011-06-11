@@ -7,18 +7,20 @@ try {
 	Kohana::load(Kohana::find_file('vendor', 'tcpdf/fpdi2tcpdf_bridge'));
 	Kohana::load(Kohana::find_file('vendor', 'tcpdf/fpdi'));
 } catch (Exception $e) {
-	// produce error for user
-	if (Kohana::$errors) {
-		echo 'Unable to find TCPDF and related files. Ensure it\'s in a vendor folder and doesn\'t have any errors';
-	} else {
-		echo 'There was a problem generating the PDF. Please contact the system administrator.';
-	}
-	// throw and then catch an exception so an error is logged and then throw the exception again
-	try {
-		throw new Kohana_Exception('Unable to find TCPDF and related files. Ensure it\'s in a vendor folder and doesn\'t have any errors');
-	} catch (Exception $e) {
-		cl4::exception_handler($e);
-		throw $e;
+	if (empty($_SERVER['REDIRECT_SCRIPT_URL']) || UTF8::strpos($_SERVER['REDIRECT_SCRIPT_URL'], '/guide/api') !== 0) {
+		// produce error for user
+		if (Kohana::$errors) {
+			echo 'Unable to find TCPDF and related files. Ensure it\'s in a vendor folder and doesn\'t have any errors';
+		} else {
+			echo 'There was a problem generating the PDF. Please contact the system administrator.';
+		}
+		// throw and then catch an exception so an error is logged and then throw the exception again
+		try {
+			throw new Kohana_Exception('Unable to find TCPDF and related files. Ensure it\'s in a vendor folder and doesn\'t have any errors');
+		} catch (Exception $e) {
+			cl4::exception_handler($e);
+			throw $e;
+		}
 	}
 } // try
 
