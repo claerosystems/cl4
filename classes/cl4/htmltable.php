@@ -192,6 +192,20 @@ class cl4_HTMLTable {
 	} // function reset_options
 
 	/**
+	* Sets an option within the object
+	* You may want to call reset_options() after using this
+	*
+	* @param  string  $path   The path to the option
+	* @param  mixed   $value  The new value of the option
+	*
+	* @return  HTMLTable
+	*/
+	public function set_option($path, $value) {
+		Arr::set_path($this->options, $path, $value);
+		return $this;
+	}
+
+	/**
 	* Add or merge HTML tr or td tag attributes. Can set an attribute for a row or a cell.
 	* Uses HTML::merge_attributes to merge the attributes. Some, for example, classes are appended.
 	*
