@@ -573,7 +573,7 @@ class cl4_HTMLTable {
 	/**
 	* Check to see if the given column number is within a column span for this row in the table
 	*
-	* @return  boolean  true if it is, false otherwise
+	* @return  boolean  TRUE if it is, FALSE otherwise
 	*/
 	protected function in_col_span($col_num, $row_num) {
 		$columns_in_span = array();

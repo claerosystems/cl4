@@ -13,8 +13,7 @@ class cl4_ORM extends Kohana_ORM {
 	 * Callable database methods
 	 * @var array
 	 */
-	protected static $_db_methods = array
-	(
+	protected static $_db_methods = array(
 		'where', 'and_where', 'or_where', 'where_open', 'and_where_open', 'or_where_open', 'where_close',
 		'and_where_close', 'or_where_close', 'distinct', 'select', 'from', 'join', 'on', 'group_by',
 		'having', 'and_having', 'or_having', 'having_open', 'and_having_open', 'or_having_open',
