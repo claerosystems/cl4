@@ -1639,11 +1639,12 @@ class cl4_ORM extends Kohana_ORM {
 
 		// now deal with any data for has_many relationships where the edit flag is true
 		foreach ($this->_has_many as $alias => $relation_data) {
+			$post_loc = $this->alias_post_loc($alias);
 			// only deal with relationships that have the edit_flag set as true
-			if ($relation_data['edit_flag'] && ! empty($post[$this->_options['field_name_prefix']][$alias])) {
+			if ($relation_data['edit_flag'] && ! empty($post[$this->_options['field_name_prefix']][$post_loc])) {
 				// add an empty array so save() will include it while saving
 				$this->_related_save_data[$alias] = array();
-				foreach ($post[$this->_options['field_name_prefix']][$alias] as $related_value) {
+				foreach ($post[$this->_options['field_name_prefix']][$post_loc] as $related_value) {
 					// @todo figure out what this should be instead of empty() because empty will skip values that maybe needed/wanted
 					if ( ! empty($related_value)) {
 						$this->_related_save_data[$alias][] = $related_value;
@@ -1654,6 +1655,22 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function save_values_related
+
+	/**
+	* Returns the post location for a _has_many relationship
+	* Uses the post_loc if not empty, otherwise just the alias (key)
+	*
+	* @param  string  $alias  The alias (key) in has_many
+	*
+	* @return  string
+	*/
+	public function alias_post_loc($alias) {
+		if ( ! empty($this->_has_many[$alias]['post_loc'])) {
+			return $this->_has_many[$alias]['post_loc'];
+		} else {
+			return $alias;
+		}
+	}
 
 	/**
 	 * Adds a new relationship to between this model and another.
