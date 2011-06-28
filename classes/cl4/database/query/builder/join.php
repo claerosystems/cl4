@@ -48,7 +48,7 @@ class cl4_Database_Query_Builder_Join extends Kohana_Database_Query_Builder_Join
 			$table_name = '';
 		}
 
-		$this->on($table_name . $column, '=', $status);
+		$this->on($table_name . $column, '=', DB::expr(Database::instance()->escape($status)));
 
 		return $this;
 	} // function on_active

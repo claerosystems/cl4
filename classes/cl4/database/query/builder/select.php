@@ -30,7 +30,7 @@ class cl4_Database_Query_Builder_Select extends Kohana_Database_Query_Builder_Se
 	* @return  $this
 	*/
 	public function on_active($table_name = NULL, $column = 'active_flag', $status = 1) {
-		$this->_last_join->on_active($table_name, $column, $default);
+		$this->_last_join->on_active($table_name, $column, $status);
 
 		return $this;
 	} // function on_active
