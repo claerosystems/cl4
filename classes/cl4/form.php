@@ -59,6 +59,10 @@ class cl4_Form extends Kohana_Form {
 			// if all the values are 0, then the time is 00:00:00 but there is a date
 			if ($hour == '0' && $min == '00' && $sec == '00') {
 				$hour = $min = $sec = '';
+			} else {
+				$hour = sprintf('%' . ($options['24_hour'] ? '02' : '') . 'd', $hour);
+				$min = sprintf('%02d', $min);
+				$sec = sprintf('%02d', $sec);
 			}
 		}
 

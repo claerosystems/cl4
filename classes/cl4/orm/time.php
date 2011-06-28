@@ -28,7 +28,7 @@ class cl4_ORM_Time extends ORM_FieldType {
 				$value['hour'] += 12;
 			}
 
-			$orm_model->$column_name = sprintf('%0.2d:%0.2d:%0.2d', $value['hour'], $value['min'], $value['sec']);
+			$orm_model->$column_name = sprintf('%' . ($options['24_hour'] ? '02' : '') . 'd:%02d:%02d', $value['hour'], $value['min'], $value['sec']);
 		} else if ( ! is_array($value)) {
 			$orm_model->$column_name = $value;
 		} else if ($options['is_nullable']) {

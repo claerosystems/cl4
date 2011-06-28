@@ -28,7 +28,11 @@ class cl4_ORM_Datetime extends ORM_FieldType {
 				$value['hour'] += 12;
 			}
 
-			$orm_model->$column_name = sprintf('%s %0.2d:%0.2d:%0.2d', $value['date'], $value['hour'], $value['min'], $value['sec']);
+			if ( ! empty($value['date']) || ! empty($value['hour']) || ! empty($value['min']) || ! empty($value['sec'])) {
+				$orm_model->$column_name = sprintf('%s %02d:%02d:%02d', $value['date'], $value['hour'], $value['min'], $value['sec']);
+			} else {
+				$orm_model->$column_name = '';
+			}
 		} else if ( ! is_array($value)) {
 			$orm_model->$column_name = $value;
 		} else if ($options['is_nullable']) {
