@@ -1658,6 +1658,73 @@ class cl4_ORM extends Kohana_ORM {
 	} // function save_values_related
 
 	/**
+	* Adds the data from the to _related_save_data
+	*
+	* @param  string  $alias  The alias (key) in _has_many
+	* @param  array   $post   The optional post data to use, defaults to using $_POST
+	*
+	* @return  ORM
+	*/
+	public function add_save_related($alias, $post = NULL) {
+		if ($post === NULL) {
+			$post = $_POST;
+		}
+
+		$post_loc = $this->alias_post_loc($alias);
+		if ( ! empty($post[$this->_options['field_name_prefix']][$post_loc])) {
+			$this->_related_save_data[$alias] = array();
+			foreach ($post[$this->_options['field_name_prefix']][$post_loc] as $related_value) {
+				// @todo figure out what this should be instead of empty() because empty will skip values that maybe needed/wanted
+				if ( ! empty($related_value)) {
+					$this->_related_save_data[$alias][] = $related_value;
+				}
+			}
+		}
+
+		return $this;
+	} // function add_save_related
+
+	/**
+	* Returns an array of models with the data merged between the database and post
+	* It uses the "id" key to determine if the field is in the post
+	*
+	* @param  string  $alias  The alias (key) in _has_many
+	* @param  array   $existing  The optional existing records (instead of finding them based on the ids in the post)
+	*
+	* @return  array
+	*/
+	public function get_save_related($alias, $existing = NULL) {
+		$return = array();
+
+		if ( ! empty($this->_related_save_data[$alias])) {
+			$ids = array();
+			foreach ($this->_related_save_data[$alias] as $i => $data) {
+				if ( ! empty($data['id'])) {
+					$ids[] = $data['id'];
+				}
+			}
+
+			if ($existing === NULL && ! empty($ids)) {
+				$existing = ORM::factory($this->_has_many[$alias]['model'])
+					->where('id', 'IN', $ids)
+					->find_all()
+					->as_array('id');
+			}
+
+			foreach ($this->_related_save_data[$alias] as $i => $data) {
+				if ( ! empty($data['id']) && ! empty($existing[$data['id']])) {
+					$return[$i] = $existing[$data['id']]->values($data);
+				} else {
+					$return[$i] = ORM::factory($this->_has_many[$alias]['model'])
+						->values($data);
+				}
+			} // foreach
+		} // if
+
+		return $return;
+	} // function get_save_related
+
+	/**
 	* Returns the post location for a _has_many relationship
 	* Uses the post_loc if not empty, otherwise just the alias (key)
 	*
