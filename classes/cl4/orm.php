@@ -2729,4 +2729,19 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	}
+
+	/**
+	* Sets the valid status.
+	* If set to FALSE, then before a record is added or updated, it will first be validated.
+	* This is useful when you're updating a record from another record and the record doesn't validate.
+	*
+	* @param  bool  $status  Defaults to true
+	*
+	* @return  ORM
+	*/
+	public function is_valid($status = TRUE) {
+		$this->_valid = (bool) $status;
+
+		return $this;
+	}
 } // class
