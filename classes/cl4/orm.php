@@ -251,7 +251,8 @@ class cl4_ORM extends Kohana_ORM {
 	 * Prepares the model database connection and loads the object.
 	 * Adds the cl4 $options parameter.
 	 *
-	 * @param   mixed  parameter for find or object to load
+	 * @param   mixed  $id       Parameter for find or object to load
+	 * @param   array  $options  Options to set in the Model
 	 * @return  void
 	 */
 	public function __construct($id = NULL, array $options = array()) {
