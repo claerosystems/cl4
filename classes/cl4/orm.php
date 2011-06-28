@@ -1685,8 +1685,11 @@ class cl4_ORM extends Kohana_ORM {
 	} // function add_save_related
 
 	/**
-	* Returns an array of models with the data merged between the database and post
-	* It uses the "id" key to determine if the field is in the post
+	* Returns an array of models with the data merged between the database and post.
+	* For relationships without a through table, it supports multiple fields on the sub table
+	* and uses the "id" field to determine if the record is in the post (remove the "id" key to signify it's been deleted).
+	* For relationships without a through table, it returns an array of Models.
+	* For relationships with a through table, it returns the data as found in the _related_save_data property/array.
 	*
 	* @param  string  $alias  The alias (key) in _has_many
 	* @param  array   $existing  The optional existing records (instead of finding them based on the ids in the post)
@@ -1697,28 +1700,35 @@ class cl4_ORM extends Kohana_ORM {
 		$return = array();
 
 		if ( ! empty($this->_related_save_data[$alias])) {
-			$ids = array();
-			foreach ($this->_related_save_data[$alias] as $i => $data) {
-				if ( ! empty($data['id'])) {
-					$ids[] = $data['id'];
+			// no through table/model in the relationship
+			if (empty($this->_has_many[$alias]['through'])) {
+				$ids = array();
+				foreach ($this->_related_save_data[$alias] as $i => $data) {
+					if ( ! empty($data['id'])) {
+						$ids[] = $data['id'];
+					}
 				}
-			}
 
-			if ($existing === NULL && ! empty($ids)) {
-				$existing = ORM::factory($this->_has_many[$alias]['model'])
-					->where('id', 'IN', $ids)
-					->find_all()
-					->as_array('id');
-			}
-
-			foreach ($this->_related_save_data[$alias] as $i => $data) {
-				if ( ! empty($data['id']) && ! empty($existing[$data['id']])) {
-					$return[$i] = $existing[$data['id']]->values($data);
-				} else {
-					$return[$i] = ORM::factory($this->_has_many[$alias]['model'])
-						->values($data);
+				if ($existing === NULL && ! empty($ids)) {
+					$existing = ORM::factory($this->_has_many[$alias]['model'])
+						->where('id', 'IN', $ids)
+						->find_all()
+						->as_array('id');
 				}
-			} // foreach
+
+				foreach ($this->_related_save_data[$alias] as $i => $data) {
+					if ( ! empty($data['id']) && ! empty($existing[$data['id']])) {
+						$return[$i] = $existing[$data['id']]->values($data);
+					} else {
+						$return[$i] = ORM::factory($this->_has_many[$alias]['model'])
+							->values($data);
+					}
+				} // foreach
+
+			// has a through relationship
+			} else if (array_key_exists($alias, $this->_related_save_data)) {
+				$return = $this->_related_save_data[$alias];
+			} // if
 		} // if
 
 		return $return;
