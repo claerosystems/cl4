@@ -38,11 +38,12 @@ class cl4_Pagination extends Kohana_Pagination {
 				$this->current_page = (int) $this->config['current_page']['page'];
 			} else {
 				switch ($this->config['current_page']['source']) {
-					case 'query_string':
+					case 'query_string' :
+					case 'query_string2' :
 						$this->current_page = (isset($_GET[$this->config['current_page']['key']]) ? (int) $_GET[$this->config['current_page']['key']] : 1);
 						break;
 
-					case 'route':
+					case 'route' :
 						$this->current_page = (int) Request::current()->param($this->config['current_page']['key'], 1);
 						break;
 				} // switch
@@ -71,7 +72,7 @@ class cl4_Pagination extends Kohana_Pagination {
 
 		// Chainable method
 		return $this;
-	} // function
+	} // function setup
 
 	/**
 	* Returns the number of items on the page
@@ -80,5 +81,36 @@ class cl4_Pagination extends Kohana_Pagination {
 	*/
 	public function get_items_on_page() {
 		return $this->items_on_page;
-	} // function
+	}
+
+	/**
+	 * Generates the full URL for a certain page.
+	 * Note: This is exactly the same as Kohana_Pagination::url() except for the extra option
+	 * of where to get the URL from so it's possible to exclude the query string from the current URL
+	 *
+	 * @param   integer  page number
+	 * @return  string   page URL
+	 */
+	public function url($page = 1) {
+		// Clean the page number
+		$page = max(1, (int) $page);
+
+		// No page number in URLs to first page
+		if ($page === 1 && ! $this->config['first_page_in_url']) {
+			$page = NULL;
+		}
+
+		switch ($this->config['current_page']['source']) {
+			case 'query_string' :
+				return URL::site(Request::current()->uri()) . URL::query(array($this->config['current_page']['key'] => $page));
+
+			case 'query_string2' :
+				return URL::site(Request::current()->route()->uri()) . URL::query(array($this->config['current_page']['key'] => $page));
+
+			case 'route' :
+				return URL::site(Request::current()->uri(array($this->config['current_page']['key'] => $page))) . URL::query();
+		}
+
+		return '#';
+	} // function url
 } // class
