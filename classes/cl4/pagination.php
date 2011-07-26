@@ -10,6 +10,38 @@ class cl4_Pagination extends Kohana_Pagination {
 	// the number of items on the page
 	protected $items_on_page = NULL;
 
+	/**
+	 * Retrieves a pagination config group from the config file. One config group can
+	 * refer to another as its parent, which will be recursively loaded.
+	 * Note: This is exactly the same as Kohana_Pagination::config_group() but uses Kohana v3.2's new method of loading the config
+	 *
+	 * @param   string  pagination config group; "default" if none given
+	 * @return  array   config settings
+	 */
+	public function config_group($group = 'default') {
+		// Load the pagination config file
+		$config_file = Kohana::$config->load('pagination');
+
+		// Initialize the $config array
+		$config['group'] = (string) $group;
+
+		// Recursively load requested config groups
+		while (isset($config['group']) AND isset($config_file->$config['group'])) {
+			// Temporarily store config group name
+			$group = $config['group'];
+			unset($config['group']);
+
+			// Add config group values, not overwriting existing keys
+			$config += $config_file->$group;
+		}
+
+		// Get rid of possible stray config group names
+		unset($config['group']);
+
+		// Return the merged config group settings
+		return $config;
+	} // function config_group
+
     /**
 	 * Loads configuration settings into the object and (re)calculates pagination if needed.
 	 * Allows you to update config settings after a Pagination object has been constructed.
