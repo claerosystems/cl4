@@ -10,20 +10,6 @@
  */
 class cl4_ORM extends Kohana_ORM {
 	/**
-	 * Callable database methods
-	 * @var array
-	 */
-	protected static $_db_methods = array(
-		'where', 'and_where', 'or_where', 'where_open', 'and_where_open', 'or_where_open', 'where_close',
-		'and_where_close', 'or_where_close', 'distinct', 'select', 'from', 'join', 'on', 'group_by',
-		'having', 'and_having', 'or_having', 'having_open', 'and_having_open', 'or_having_open',
-		'having_close', 'and_having_close', 'or_having_close', 'order_by', 'limit', 'offset', 'cached',
-		// cl4 custom
-		'on_expiry', 'on_active',
-		'where_expiry', 'where_active',
-	);
-
-	/**
 	* this is the array of options
 	* @var    string
 	*/
@@ -181,20 +167,6 @@ class cl4_ORM extends Kohana_ORM {
 
 		return parent::_build($type);
 	} // function _build
-
-	/**
-	* Adds the expiry where clause
-	*
-	* @return  ORM
-	*/
-	public function where_expiry() {
-		$this->_db_pending[] = array(
-			'name' => 'where_expiry',
-			'args' => array($this->_table_name, $this->_expires_column['column'], $this->_expires_column['default'])
-		);
-
-		return $this;
-	} // function where_expiry
 
 	/**
 	* Returns TRUE if the module has an expiry column,
@@ -2744,4 +2716,81 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	}
+
+	/**
+	* Adds a new expiry column condition for joining, similar to:
+	*
+	*     expiry_date = 0
+	*
+	* @param  string  $table_name  The table name, default: none, just use the column name
+	* @param  string  $column      The column name, default: expiry_date
+	* @param  mixed   $default     The default value, default: 0
+	*
+	* @return  ORM
+	*/
+	public function on_expiry($table_name = NULL, $column = 'expiry_date', $default = 0) {
+		// Add pending database call which is executed after query type is determined
+		$this->_db_pending[] = array(
+			'name' => 'on_expiry',
+			'args' => array($table_name, $column, $default),
+		);
+
+		return $this;
+	} // function on_expiry
+
+	/**
+	* Adds a new active flag condition for joining, similar to:
+	*
+	*     active_flag = 1
+	*
+	* @param  string  $table_name  The table name, default: none, just use the column name
+	* @param  string  $column      The column name, default: active_flag
+	* @param  mixed   $status      The status value to check for, default: 1
+	*
+	* @return  $this
+	*/
+	public function on_active($table_name = NULL, $column = 'active_flag', $status = 1) {
+		// Add pending database call which is executed after query type is determined
+		$this->_db_pending[] = array(
+			'name' => 'on_expiry',
+			'args' => array($table_name, $column, $status),
+		);
+
+		return $this;
+	} // function on_expiry
+
+	/**
+	* Adds the expiry where clause
+	*
+	* @return  ORM
+	*/
+	public function where_expiry() {
+		$this->_db_pending[] = array(
+			'name' => 'where_expiry',
+			'args' => array($this->_table_name, $this->_expires_column['column'], $this->_expires_column['default'])
+		);
+
+		return $this;
+	} // function where_expiry
+
+	/**
+	* Adds an active flag where clause similar to:
+	*
+	*     active_flag = 1
+	*
+	* @param  string  $table_name  The table name, default: none, just use the column name
+	* @param  string  $column      The column name, default: active_flag
+	* @param  mixed   $status      The status value to check for, default: 1
+	*
+	* @return  $this
+	*/
+	public function where_active($table_name = NULL, $column = 'active_flag', $status = 1) {
+		// Add pending database call which is executed after query type is determined
+		$this->_db_pending[] = array(
+			'name' => 'where_active',
+			'args' => array($table_name, $column, $status),
+		);
+
+		return $this;
+	} // function where_active
 } // class
