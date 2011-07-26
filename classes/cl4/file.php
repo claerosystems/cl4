@@ -41,7 +41,7 @@ class cl4_File {
 	*/
 	public function set_options($options) {
 		// get the default options from the config file
-		$default_options = Kohana::config('cl4file.options');
+		$default_options = Kohana::$config->load('cl4file.options');
 
 		// merge the defaults with the passed options (add defaults where values are missing)
 		$this->options = $options;
@@ -280,7 +280,7 @@ class cl4_File {
 		if (isset($this) && $options === NULL) {
 			$options = $this->options;
 		} else {
-			$options += Kohana::config('cl4file.options');
+			$options += Kohana::$config->load('cl4file.options');
 		}
 
 		if ($html) {
@@ -295,11 +295,11 @@ class cl4_File {
 			}
 
 			// load the registred mime types from the config file
-			$described_mime_types = Kohana::config('mime_description');
+			$described_mime_types = Kohana::$config->load('mime_description');
 
 			if ($options['ext_check_only']) {
 				// only checking by extension so we need to get the extension to mime type array
-				$mime_types = Kohana::config('mimes');
+				$mime_types = Kohana::$config->load('mimes');
 
 				// loop through allowed extensions, looking for a description for 1 of the mime types
 				foreach ($options['allowed_extensions'] as $ext) {
@@ -689,7 +689,7 @@ class cl4_File {
 	* removes the extenion as the key (uses numeric extensions)
 	*/
 	public static function get_all_mime_types() {
-		$ext_to_mime = Kohana::config('mimes');
+		$ext_to_mime = Kohana::$config->load('mimes');
 
 		$mimes = array();
 		foreach ($ext_to_mime as $ext => $mimeArray) {

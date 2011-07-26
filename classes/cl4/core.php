@@ -171,7 +171,7 @@ echo '</body></html>';
 	* @return  string
 	*/
 	public static function get_error_email($mail_config = 'default') {
-		return Kohana::config('cl4mail.' . $mail_config . '.error_email');
+		return Kohana::$config->load('cl4mail.' . $mail_config . '.error_email');
 	}
 
 	/**

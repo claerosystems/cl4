@@ -54,8 +54,8 @@ class cl4_Mail extends PHPMailer {
 		}
 
 		// Set default options
-		$config_options = Kohana::config('cl4mail.' . $config);
-		$default_options = Kohana::config('cl4mail.default');
+		$config_options = Kohana::$config->load('cl4mail.' . $config);
+		$default_options = Kohana::$config->load('cl4mail.default');
 		$config_options += $default_options;
 		$options += $config_options;
 

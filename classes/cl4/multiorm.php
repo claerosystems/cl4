@@ -132,7 +132,7 @@ class cl4_MultiORM {
 	*/
 	public function set_options(array $options = array()) {
 		// get the default options from the config file
-		$default_options = Kohana::config('cl4orm.default_options');
+		$default_options = Kohana::$config->load('cl4orm.default_options');
 
 		// merge the defaults with the passed options (add defaults where values are missing)
 		$this->_options = Arr::merge($default_options, $options);
@@ -206,7 +206,7 @@ class cl4_MultiORM {
 		$display_order = $this->_model->display_order();
 
 		// Find out how many words we limit textareas to
-		$textarea_word_limit = Kohana::config('cl4orm.default_options.editable_list_options.textarea_word_limit');
+		$textarea_word_limit = Kohana::$config->load('cl4orm.default_options.editable_list_options.textarea_word_limit');
 
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
 

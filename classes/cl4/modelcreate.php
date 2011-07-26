@@ -20,7 +20,7 @@ class cl4_ModelCreate {
 	*/
 	public static function create_model($table_name, $options = array()) {
 		// set up the default options
-		$default_options = Kohana::config('cl4orm.default_options');
+		$default_options = Kohana::$config->load('cl4orm.default_options');
 
 		// figure out database configuration name to use
 		$db_name = isset($options['db_group']) ? $options['db_group'] : $default_options['db_group'];
@@ -99,10 +99,10 @@ class cl4_ModelCreate {
 		foreach ($columns as $column_name => $column_data) {
 			// now that we know the field type, lets merge in some defaults
 			// global field type defaults
-			$meta_data = Kohana::config('cl4orm.default_meta_data');
+			$meta_data = Kohana::$config->load('cl4orm.default_meta_data');
 
 			// model create defaults
-			$model_create_defaults = (array) Kohana::config('cl4modelcreate.default_meta_data');
+			$model_create_defaults = (array) Kohana::$config->load('cl4modelcreate.default_meta_data');
 
 			// merge the global model create and global defaults
 			$meta_data = Arr::merge($meta_data, $model_create_defaults);
@@ -182,15 +182,15 @@ class cl4_ModelCreate {
 			$meta_data['is_nullable'] = $column_data['is_nullable'];
 
 			// get the model create defaults for the field type and then merge with the current values
-			$model_create_detaults_field_type = (array) Kohana::config('cl4modelcreate.default_meta_data_field_type.' . $meta_data['field_type']);
+			$model_create_detaults_field_type = (array) Kohana::$config->load('cl4modelcreate.default_meta_data_field_type.' . $meta_data['field_type']);
 			$meta_data = Arr::merge($model_create_detaults_field_type, $meta_data);
 
 			// now that we know the field type, lets merge in some defaults
 			// global field type defaults
-			$default_meta_data = Kohana::config('cl4orm.default_meta_data');
+			$default_meta_data = Kohana::$config->load('cl4orm.default_meta_data');
 
 			// get the defaults for the field type
-			$default_meta_data_field_type = (array) Kohana::config('cl4orm.default_meta_data_field_type.' . $meta_data['field_type']);
+			$default_meta_data_field_type = (array) Kohana::$config->load('cl4orm.default_meta_data_field_type.' . $meta_data['field_type']);
 
 			// merge everything together
 			$meta_data = Arr::merge($default_meta_data, $default_meta_data_field_type, $meta_data);

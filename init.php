@@ -13,7 +13,7 @@ if ( ! isset($lang_options)) {
 	$lang_options = '(en-ca|fr-ca)';
 }
 
-$routes = Kohana::config('cl4.routes');
+$routes = Kohana::$config->load('cl4.routes');
 
 if ($routes['login']) {
 	// login page

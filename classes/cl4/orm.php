@@ -237,7 +237,7 @@ class cl4_ORM extends Kohana_ORM {
 		}
 
 		// only store the options that are not the default when serializing to keep the size down
-		$default_options = Kohana::config('cl4orm.default_options');
+		$default_options = Kohana::$config->load('cl4orm.default_options');
 		foreach ($this->_options as $key => $value) {
 			if ( ! array_key_exists($key, $default_options) || $this->_options[$key] !== $default_options[$key]) {
 				$data['_options'][$key] = $this->_options[$key];
@@ -346,7 +346,7 @@ class cl4_ORM extends Kohana_ORM {
 	*/
 	public function set_options(array $options = array()) {
 		// get the default options from the config file
-		$default_options = Kohana::config('cl4orm.default_options');
+		$default_options = Kohana::$config->load('cl4orm.default_options');
 
 		// merge the defaults with the passed options (add defaults where values are missing)
 		$this->_options = Arr::merge($default_options, $this->_options, $options);
@@ -397,12 +397,12 @@ class cl4_ORM extends Kohana_ORM {
 	*/
 	public function set_column_defaults(array $options = array()) {
 		// get the default meta data from the config file
-		$default_meta_data = (array) Kohana::config('cl4orm.default_meta_data');
-		$default_meta_data_field_type = (array) Kohana::config('cl4orm.default_meta_data_field_type');
+		$default_meta_data = (array) Kohana::$config->load('cl4orm.default_meta_data');
+		$default_meta_data_field_type = (array) Kohana::$config->load('cl4orm.default_meta_data_field_type');
 
 		// if there is field type specific meta data for file, then get the cl4file options and merge them with the file field type ones
 		if ( ! empty($default_meta_data_field_type['file'])) {
-			$file_options = Kohana::config('cl4file.options');
+			$file_options = Kohana::$config->load('cl4file.options');
 			foreach ($file_options as $key => $value) {
 				// only merge the ones that aren't set so we don't merge things like allowed types and allowed extensions
 				if ( ! array_key_exists($key, $default_meta_data_field_type['file']['field_options']['file_options'])) {
@@ -479,7 +479,7 @@ class cl4_ORM extends Kohana_ORM {
 	*/
 	public function set_relationship_defaults(array $options = array()) {
 		// get the config options
-		$default_relation_options = (array) Kohana::config('cl4orm.default_relation_options');
+		$default_relation_options = (array) Kohana::$config->load('cl4orm.default_relation_options');
 
 		// get the options for has_many from the passed in options
 		$has_many_options = Arr::get($options, 'has_many', array());
