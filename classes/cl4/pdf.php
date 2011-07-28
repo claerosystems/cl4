@@ -18,7 +18,7 @@ try {
 		try {
 			throw new Kohana_Exception('Unable to find TCPDF and related files. Ensure it\'s in a vendor folder and doesn\'t have any errors');
 		} catch (Exception $e) {
-			cl4::exception_handler($e);
+			Kohana_Exception::caught_handler($e);
 			throw $e;
 		}
 	}
