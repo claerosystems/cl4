@@ -250,7 +250,9 @@ class cl4_ORM extends Kohana_ORM {
 	 */
 	public function __get($column) {
 		if (array_key_exists($column, $this->_object)) {
-			return $this->_object[$column];
+			return (in_array($column, $this->_serialize_columns))
+				? $this->_unserialize_value($this->_object[$column])
+				: $this->_object[$column];
 		} elseif (isset($this->_related[$column])) {
 			// Return related model that has already been fetched
 			return $this->_related[$column];
@@ -258,7 +260,7 @@ class cl4_ORM extends Kohana_ORM {
 			$model = $this->_related($column);
 
 			// Use this model's column and foreign model's primary key
-			$col = $model->_table_name.'.'.$model->_primary_key;
+			$col = $model->_object_name.'.'.$model->_primary_key;
 			$val = $this->_object[$this->_belongs_to[$column]['foreign_key']];
 
 			$model->where($col, '=', $val)->find();
@@ -268,7 +270,7 @@ class cl4_ORM extends Kohana_ORM {
 			$model = $this->_related($column);
 
 			// Use this model's primary key value and foreign model's column
-			$col = $model->_table_name.'.'.$this->_has_one[$column]['foreign_key'];
+			$col = $model->_object_name.'.'.$this->_has_one[$column]['foreign_key'];
 			$val = $this->pk();
 
 			$model->where($col, '=', $val)->find();
@@ -283,7 +285,7 @@ class cl4_ORM extends Kohana_ORM {
 
 				// Join on through model's target foreign key (far_key) and target model's primary key
 				$join_col1 = $through.'.'.$this->_has_many[$column]['far_key'];
-				$join_col2 = $model->_table_name.'.'.$model->_primary_key;
+				$join_col2 = $model->_object_name.'.'.$model->_primary_key;
 
 				$model->join($through)->on($join_col1, '=', $join_col2);
 				if (ORM::factory($through)->has_expiry()) {
@@ -295,7 +297,7 @@ class cl4_ORM extends Kohana_ORM {
 				$val = $this->pk();
 			} else {
 				// Simple has_many relationship, search where target model's foreign key is this model's primary key
-				$col = $model->_table_name.'.'.$this->_has_many[$column]['foreign_key'];
+				$col = $model->_object_name.'.'.$this->_has_many[$column]['foreign_key'];
 				$val = $this->pk();
 			}
 
@@ -1814,7 +1816,7 @@ class cl4_ORM extends Kohana_ORM {
 	 * @return ORM|Database_Result
 	 */
 	protected function _load_result($multiple = FALSE) {
-		$this->_db_builder->from($this->_table_name);
+		$this->_db_builder->from(array($this->_table_name, $this->_object_name));
 
 		if ($multiple === FALSE) {
 			// Only fetch 1 record
@@ -1824,14 +1826,14 @@ class cl4_ORM extends Kohana_ORM {
 		// Select all columns by default
 		if ( ! $this->is_select_applied()) {
 			// Select all columns by default
-			$this->_db_builder->select($this->_table_name.'.*');
+			$this->_db_builder->select($this->_object_name.'.*');
 		}
 
-		if ( ! isset($this->_db_applied['order_by']) AND ! empty($this->_sorting)) {
+		if ( ! isset($this->_db_applied['order_by']) && ! empty($this->_sorting)) {
 			foreach ($this->_sorting as $column => $direction) {
 				if (strpos($column, '.') === FALSE) {
 					// Sorting column for use in JOINs
-					$column = $this->_table_name.'.'.$column;
+					$column = $this->_object_name.'.'.$column;
 				}
 
 				$this->_db_builder->order_by($column, $direction);
@@ -1956,6 +1958,7 @@ class cl4_ORM extends Kohana_ORM {
 
 		// All changes have been saved
 		$this->_changed = array();
+		$this->_original_values = $this->_object;
 
 		// ****** here up is directly from Kohana_ORM::create() *********
 
@@ -2083,6 +2086,7 @@ class cl4_ORM extends Kohana_ORM {
 
 		// All changes have been saved
 		$this->_changed = array();
+		$this->_original_values = $this->_object;
 
 		// ****** here up is directly from Kohana_ORM::update() *********
 
@@ -2357,8 +2361,8 @@ class cl4_ORM extends Kohana_ORM {
 	*
 	* @see ORM::delete_files()
 	*
-	* @param mixed $id the primary key id of the record to delete
-	* @return the number of rows affected: 1 if it worked, 0 if no record was deleted (not exists, etc.)
+	* @param  int  $id  The primary key id of the record to delete; if not passed, then the primary key of the current model will be used
+	* @return  The number of rows affected: 1 if it worked, 0 if no record was deleted (not exists, etc.)
 	*/
 	public function delete($id = NULL) {
 		$num_affected = 0;
@@ -2718,6 +2722,15 @@ class cl4_ORM extends Kohana_ORM {
 	}
 
 	/**
+	 * Returns the value of the primary value (not the primary key)
+	 *
+	 * @return mixed Primary Value
+	 */
+	public function primary_val() {
+		return $this->_primary_val;
+	}
+
+	/**
 	* Adds a new expiry column condition for joining, similar to:
 	*
 	*     expiry_date = 0
@@ -2767,7 +2780,7 @@ class cl4_ORM extends Kohana_ORM {
 	public function where_expiry() {
 		$this->_db_pending[] = array(
 			'name' => 'where_expiry',
-			'args' => array($this->_table_name, $this->_expires_column['column'], $this->_expires_column['default'])
+			'args' => array($this->_object_name, $this->_expires_column['column'], $this->_expires_column['default'])
 		);
 
 		return $this;
