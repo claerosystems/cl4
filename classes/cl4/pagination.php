@@ -140,7 +140,7 @@ class cl4_Pagination extends Kohana_Pagination {
 				return URL::site(Request::current()->route()->uri()) . URL::query(array($this->config['current_page']['key'] => $page));
 
 			case 'route' :
-				return URL::site(Request::current()->uri(array($this->config['current_page']['key'] => $page))) . URL::query();
+				return URL::site(Request::current()->route()->uri(array($this->config['current_page']['key'] => $page))) . URL::query();
 		}
 
 		return '#';
