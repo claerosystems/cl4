@@ -9,12 +9,14 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 	* Otherwise, it will echo out the message cl4.error_on_page.
 	* If in production, the error will be logged and if $production_error_display is TRUE (default) a message the view as defined in
 	* cl4.production_error_view (config) will be displayed.
+	* If using JSON, consider setting $display_error to FALSE to no interupt the output of the JSON
 	*
 	* @param  Exception  $e
 	* @param  boolean    $production_error_display  If, when in production, the production error view should be displayed
+	* @param  boolean    $display_error             If TRUE and in development, the error will be echo'd out (in addition to logged)
 	* @return  boolean
 	*/
-	public static function handler(Exception $e, $production_error_display = TRUE) {
+	public static function handler(Exception $e, $production_error_display = TRUE, $display_error = TRUE) {
         try {
 			// Get the exception information
 			$type    = get_class($e);
@@ -75,27 +77,29 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 
 			// only echo out the message when errors is set to true (probably in debug)
 			if (Kohana::$environment == Kohana::DEVELOPMENT) {
-				if ( ! headers_sent()) {
-					// Make sure the proper http header is sent
-					$http_header_status = ($e instanceof HTTP_Exception) ? $code : 500;
+				if ($display_error) {
+					if ( ! headers_sent()) {
+						// Make sure the proper http header is sent
+						$http_header_status = ($e instanceof HTTP_Exception) ? $code : 500;
 
-					header('Content-Type: '.Kohana_Exception::$error_view_content_type.'; charset='.Kohana::$charset, TRUE, $http_header_status);
-				}
+						header('Content-Type: '.Kohana_Exception::$error_view_content_type.'; charset='.Kohana::$charset, TRUE, $http_header_status);
+					}
 
-				// Start an output buffer
-				ob_start();
+					// Start an output buffer
+					ob_start();
 
-				// Include the exception HTML
-				if ($view_file = Kohana::find_file('views', Kohana_Exception::$error_view)) {
-					include $view_file;
-				} else {
-					throw new Kohana_Exception('Error view file does not exist: views/:file', array(
-						':file' => Kohana_Exception::$error_view,
-					));
-				}
+					// Include the exception HTML
+					if ($view_file = Kohana::find_file('views', Kohana_Exception::$error_view)) {
+						include $view_file;
+					} else {
+						throw new Kohana_Exception('Error view file does not exist: views/:file', array(
+							':file' => Kohana_Exception::$error_view,
+						));
+					}
 
-				// Display the contents of the output buffer
-				echo ob_get_clean();
+					// Display the contents of the output buffer
+					echo ob_get_clean();
+				} // if
 
 			// If not echoing errors (not in development)
 			} else {
@@ -191,12 +195,12 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 	* so that you can display your own error message.
 	* Likely used within the catch of a try/catch.
 	*
-	*
 	* @param  Exception  $e
 	* @param  boolean    $production_error_display  If, when in production, the production error view should be displayed
+	* @param  boolean    $display_error             If TRUE and in development, the error will be echo'd out (in addition to logged)
 	* @return  boolean
 	*/
-	public static function caught_handler(Exception $e, $production_error_display = FALSE) {
-		return Kohana_Exception::handler($e, $production_error_display);
+	public static function caught_handler(Exception $e, $production_error_display = FALSE, $display_error = TRUE) {
+		return Kohana_Exception::handler($e, $production_error_display, $display_error);
 	}
 } // class cl4_cl4_Exception
