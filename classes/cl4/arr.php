@@ -46,4 +46,25 @@ class cl4_Arr extends Kohana_Arr {
 
 		return $string_result;
 	} // function explode_on_multiple
+
+	/**
+	* Removes all of the keys found in $unwanted_keys from $array recursively.
+	* The value maybe NULL.
+	*
+	* @param  array  $array          The array to remove the keys from; passed by reference
+	* @param  mixed  $unwanted_keys  The keys to remove
+	*/
+	public static function recursive_unset(&$array, $unwanted_keys) {
+		foreach ($unwanted_keys as $unwanted_key) {
+			if (array_key_exists($unwanted_key, $array)) {
+				unset($array[$unwanted_key]);
+			}
+		}
+
+	    foreach ($array as &$value) {
+	        if (is_array($value)) {
+	            recursive_unset($value, $unwanted_keys);
+	        }
+	    }
+	} // function recursive_unset
 } // class
