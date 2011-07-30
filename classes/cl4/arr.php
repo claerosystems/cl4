@@ -87,5 +87,5 @@ class cl4_Arr extends Kohana_Arr {
 		}
 
 		return $class;
-	} // function object_to_array
+	} // function stdclass_to_array
 } // class
