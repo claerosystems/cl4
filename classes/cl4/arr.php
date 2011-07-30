@@ -63,7 +63,7 @@ class cl4_Arr extends Kohana_Arr {
 
 	    foreach ($array as &$value) {
 	        if (is_array($value)) {
-	            recursive_unset($value, $unwanted_keys);
+	            Arr::recursive_unset($value, $unwanted_keys);
 	        }
 	    }
 	} // function recursive_unset
