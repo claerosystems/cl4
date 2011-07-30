@@ -67,4 +67,25 @@ class cl4_Arr extends Kohana_Arr {
 	        }
 	    }
 	} // function recursive_unset
+
+	/**
+	* Converts a stdClass object to an associative array.
+	*
+	* @param  stdClass  $class  The stdClass you want to convert
+	* @return  array
+	*/
+	public static function stdclass_to_array(stdClass $class){
+		// Typecast to (array) automatically converts stdClass -> array.
+		$class = (array) $class;
+
+		// Iterate through the former properties looking for any stdClass properties.
+		// Recursively apply (array).
+		foreach($class as $key => $value){
+			if (is_object($value) && get_class($value) === 'stdClass') {
+				$class[$key] = Arr::stdclass_to_array($value);
+			}
+		}
+
+		return $class;
+	} // function object_to_array
 } // class
