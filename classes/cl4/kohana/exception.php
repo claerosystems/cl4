@@ -127,10 +127,10 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 						ob_start();
 
 						echo '<html>
-	<head>
-		<title>Error on ' . LONG_NAME . ' ' . APP_VERSION . '</title>
-	</head>
-	<body>';
+<head>
+	<title>Error on ' . LONG_NAME . ' ' . APP_VERSION . '</title>
+</head>
+<body>';
 
 						// Include the exception HTML
 						if ($view_file = Kohana::find_file('views', Kohana_Exception::$error_view)) {
@@ -141,7 +141,7 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 							));
 						}
 
-	echo '</body></html>';
+						echo '</body></html>';
 
 						// Display the contents of the output buffer
 						$full_error = ob_get_clean();
