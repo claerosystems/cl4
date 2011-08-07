@@ -78,10 +78,10 @@ class cl4_Arr extends Kohana_Arr {
 		// Typecast to (array) automatically converts stdClass -> array.
 		$class = (array) $class;
 
-		// Iterate through the former properties looking for any stdClass properties.
+		// Iterate through the former properties looking for any arrays or objects
 		// Recursively apply (array).
 		foreach($class as $key => $value){
-			if (is_object($value) && get_class($value) === 'stdClass') {
+			if (is_object($value) || is_array($value)) {
 				$class[$key] = Arr::stdclass_to_array($value);
 			}
 		}
