@@ -2806,4 +2806,17 @@ class cl4_ORM extends Kohana_ORM {
 
 		return $this;
 	} // function where_active
+
+	/**
+	* Unserializes the value of the column.
+	* Exactly the same as Kohana_ORM, but includes the second column
+	* to ensure associative arrays are not returned as stdClass.
+	*
+	* @param  string  $value  The value to JSON decode
+	*
+	* @return  mixed
+	*/
+	protected function _unserialize_value($value) {
+		return json_decode($value, TRUE);
+	}
 } // class
