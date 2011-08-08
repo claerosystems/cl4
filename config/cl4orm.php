@@ -53,6 +53,7 @@ return array(
 					*  - sql: a SELECT statement retrieving the label and value
 					*  - table_name: the table name for the db table
 					*  - array: an array of data where the key is the value and the value is the label
+					*  - method: allows the use of a method or function to retrieve the source values; works very similar to the validation rules when using a method
 					*/
 					'data' => NULL,
 					'value' => 'id',

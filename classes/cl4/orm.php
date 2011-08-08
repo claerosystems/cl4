@@ -1322,6 +1322,34 @@ class cl4_ORM extends Kohana_ORM {
 					} // if
 					break;
 
+				case 'method' :
+					list($method, $params) = $options['data'];
+					if ( ! is_string($method)) {
+						// This is a lambda function
+						$this->_lookup_data[$column_name] = call_user_func_array($method, $params);
+
+					} elseif (method_exists($this, $method)) {
+						$this->_lookup_data[$column_name] = $this->$method($params);
+
+					} elseif (strpos($method, '::') === FALSE) {
+						// Use a function call
+						$function = new ReflectionFunction($method);
+
+						// Call $function($this[$field], $param, ...) with Reflection
+						$this->_lookup_data[$column_name] = $function->invokeArgs($params);
+
+					} else {
+						// Split the class and method of the rule
+						list($class, $_method) = explode('::', $method, 2);
+
+						// Use a static method call
+						$_method = new ReflectionMethod($class, $_method);
+
+						// Call $Class::$method($this[$field], $param, ...) with Reflection
+						$this->_lookup_data[$column_name] = $_method->invokeArgs(NULL, $params);
+					}
+					break;
+
 				default :
 					throw new Kohana_Exception('The source method is unknown: :source:', array(':source:' => $options['source']));
 					break;
