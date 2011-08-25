@@ -16,7 +16,7 @@ try {
 		}
 		// throw and then catch an exception so an error is logged and then throw the exception again
 		try {
-			throw new Kohana_Exception('Unable to find TCPDF and related files. Ensure it\'s in a vendor folder and doesn\'t have any errors');
+			throw new Kohana_Exception('Unable to find TCPDF and related files. Ensure it\'s in a vendor folder and doesn\'t have any errors: ' . Kohana_Exception::text($e));
 		} catch (Exception $e) {
 			Kohana_Exception::caught_handler($e);
 			throw $e;
