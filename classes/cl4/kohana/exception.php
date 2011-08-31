@@ -108,7 +108,7 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 					ob_start();
 
 					// Include the production error view
-					if ($view_file = Kohana::find_file('views', Kohana::$config->load('cl4.production_error_view'))) {
+					if ($view_file = Kohana::find_file('views', (is_object(Kohana::$config) ? Kohana::$config->load('cl4.production_error_view') : 'cl4/production_error'))) {
 						include $view_file;
 					} else {
 						throw new Kohana_Exception('Error view file does not exist: views/:file', array(
@@ -121,7 +121,7 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 				}
 
 				// send an email with the error
-				if (Kohana::$config->load('cl4.email_exceptions')) {
+				if ((is_object(Kohana::$config) && Kohana::$config->load('cl4.email_exceptions')) || FALSE) {
 					try {
 						// Start an output buffer
 						ob_start();
