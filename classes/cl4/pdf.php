@@ -651,6 +651,7 @@ class cl4_PDF extends FPDI {
 	*/
 	public function RememberXY() {
 		$this->rememberedXY[] = array($this->GetX(), $this->GetY());
+		end($this->rememberedXY);
 		return key($this->rememberedXY);
 	} // function RememberXY
 
