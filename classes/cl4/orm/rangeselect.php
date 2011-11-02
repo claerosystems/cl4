@@ -74,6 +74,10 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 		}
 	}
 
+	/**
+	 * @todo consider if we should look for the select_none, select_all, etc options and what should be done with them.
+	 * @param unknown_type $options
+	 */
 	protected static function get_range($options) {
 		$default_options = array(
 			'start' => 1,
@@ -81,7 +85,12 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 			'increment' => 1,
 		);
 		$options += array_merge($default_options, $options);
+		$array = range($options['start'], $options['end'], $options['increment']);
 
-		return range($options['start'], $options['end'], $options['increment']);
+		if ( ! empty($options['add_values'])) {
+			$array = array_keys($options['add_values']);
+		}
+
+		return $array;
 	}
 } // class
