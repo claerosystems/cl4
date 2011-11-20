@@ -188,7 +188,7 @@ class cl4_PDF extends FPDI {
 		if (empty($this->pagegroups)) {
 			$pagenumtxt = 'Page '.$this->getAliasNumPage().' / '.$this->getAliasNbPages();
 		} else {
-			$pagenumtxt = 'Page  '.$this->getPageNumGroupAlias().' / '.$this->getPageGroupAlias();
+			$pagenumtxt = 'Page '.$this->getPageNumGroupAlias().' / '.$this->getPageGroupAlias();
 		}
 		$this->SetY($cur_y);
 		//Print page number
