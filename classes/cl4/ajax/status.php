@@ -45,7 +45,7 @@ class cl4_AJAX_Status {
 	*/
 	const VALIDATION_ERROR = 6;
 	/**
-	* @var  int  6: There was a validation error; will use the validation class and functionality in ajax.js
+	* @var  int  7: The site is currently unavailable based on the UNAVAILABLE_FLAG constant
 	*/
 	const SITE_UNAVAILABLE = 7;
 
