@@ -44,6 +44,10 @@ class cl4_AJAX_Status {
 	* @var  int  6: There was a validation error; will use the validation class and functionality in ajax.js
 	*/
 	const VALIDATION_ERROR = 6;
+	/**
+	* @var  int  6: There was a validation error; will use the validation class and functionality in ajax.js
+	*/
+	const SITE_UNAVAILABLE = 7;
 
 	/**
 	* JSON encodes the passed array and returns it

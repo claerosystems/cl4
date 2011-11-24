@@ -35,6 +35,16 @@ if ($routes['account']) {
 	));
 }
 
+if ($routes['cl4base']) {
+	// login page
+	Route::set('cl4base', '(<lang>/)base/<action>', array('lang' => $lang_options, 'action' => '(unavailable)'))
+		->defaults(array(
+			'lang' => DEFAULT_LANG,
+			'controller' => 'base',
+			'action' => 'unavailable',
+	));
+}
+
 if ($routes['cl4admin']) {
 	// claero admin
 	// Most cases: /dbadmin/user/edit/2

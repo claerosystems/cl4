@@ -4,6 +4,7 @@ return array(
 	'routes' => array(
 		'login' => TRUE,
 		'account' => TRUE,
+		'cl4base' => TRUE,
 		'cl4admin' => TRUE,
 	),
 	// view used when there is an error in production
