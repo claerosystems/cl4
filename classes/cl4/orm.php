@@ -2014,7 +2014,8 @@ class cl4_ORM extends Kohana_ORM {
 		foreach ($this->_table_columns as $column_name => $column_info) {
 			if (array_key_exists($column_name, $data) && $column_info['field_type'] == 'file') {
 				$file_options = $column_info['field_options']['file_options'];
-				if ($file_options['name_change_method'] == 'id' || $file_options['name_change_method'] == 'pk') {
+				if ($file_options['disable_file_upload'] !== TRUE &&
+						($file_options['name_change_method'] == 'id' || $file_options['name_change_method'] == 'pk')) {
 					// move the file to it's id based filename and set the value in the model
 					$file_options['orm_model'] = $this;
 					$dest_file_data = cl4File::move_to_id_path($this->get_filename_with_path($column_name), $this->pk(), $file_options['destination_folder'], $file_options);
@@ -2685,6 +2686,8 @@ class cl4_ORM extends Kohana_ORM {
 	* @param  string  $column_name  The column name
 	* @param  string  $option_path  The path to the option within the _table_columns array
 	* @param  mixed   $value        The value to set the option to
+	*
+	* @example $land_file->set_table_columns('filename', 'field_options.file_options.disable_file_upload', TRUE);
 	*
 	* @chainable
 	* @return ORM
