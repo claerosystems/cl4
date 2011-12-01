@@ -71,7 +71,7 @@ class Model_cl4_List extends ORM {
 	 */
 	public function filters() {
 		return array(
-		    TRUE => array(array('trim')),
+		    'name' => array(array('trim')),
 		);
 	}
 } // class
