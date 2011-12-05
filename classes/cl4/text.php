@@ -4,7 +4,7 @@ class cl4_Text extends Kohana_Text {
 	/**
 	 * Automatically applies "p" and "br" markup to text.
 	 * Basically [nl2br](http://php.net/nl2br) on steroids.
-	 * Same as Kohana_Text::auto_p() but uses <br> instead of <br /> for HTML5
+	 * Same as Kohana_Text::auto_p() but uses `<br>` instead of `<br />` for HTML5.
 	 *
 	 *     echo Text::auto_p($text);
 	 *
