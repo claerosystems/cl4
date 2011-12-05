@@ -121,6 +121,7 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 					echo ob_get_clean();
 				}
 
+				$airbrake_notified = FALSE;
 				if (is_object(Kohana::$config)) {
 					$airbrake_config = Kohana::$config->load('airbrake');
 					if ( ! empty($airbrake_config['airbrake_notifier_api_key'])) {
@@ -130,6 +131,7 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 							Airbrake_Notifier::instance()
 								->exception($e)
 								->notify();
+							$airbrake_notified = TRUE;
 							Kohana::$log->add(Log::INFO, 'Airbrake notified')->write();
 						} catch (Exception $e) {
 							Kohana::$log->add(Log::ERROR, 'There was a problem notifying Airbrake: ' . $e->getMessage());
@@ -137,8 +139,8 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 					}
 				}
 
-				// send an email with the error
-				if ((is_object(Kohana::$config) && Kohana::$config->load('cl4.email_exceptions')) || FALSE) {
+				// send an email with the error if airbrake hasn't been notified
+				if ( ! $airbrake_notified && (is_object(Kohana::$config) && Kohana::$config->load('cl4.email_exceptions')) || FALSE) {
 					try {
 						// Start an output buffer
 						ob_start();
