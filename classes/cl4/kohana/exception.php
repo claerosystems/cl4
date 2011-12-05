@@ -9,7 +9,8 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 	* Otherwise, it will echo out the message cl4.error_on_page.
 	* If in production, the error will be logged and if $production_error_display is TRUE (default) a message the view as defined in
 	* cl4.production_error_view (config) will be displayed.
-	* If using JSON, consider setting $display_error to FALSE to no interupt the output of the JSON
+	* If using JSON, consider setting $display_error to FALSE to no interrupt the output of the JSON.
+	* If config/airbrake.airbrake_notifier_api_key is not empty (set to an Airbrake API key) Airbrake will also be notified when not in development.
 	*
 	* @param  Exception  $e
 	* @param  boolean    $production_error_display  If, when in production, the production error view should be displayed
@@ -118,6 +119,22 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 
 					// Display the contents of the output buffer
 					echo ob_get_clean();
+				}
+
+				if (is_object(Kohana::$config)) {
+					$airbrake_config = Kohana::$config->load('airbrake');
+					if ( ! empty($airbrake_config['airbrake_notifier_api_key'])) {
+						try {
+							Airbrake_Notifier::$api_key = $airbrake_config['airbrake_notifier_api_key'];
+
+							Airbrake_Notifier::instance()
+								->exception($e)
+								->notify();
+							Kohana::$log->add(Log::INFO, 'Airbrake notified')->write();
+						} catch (Exception $e) {
+							Kohana::$log->add(Log::ERROR, 'There was a problem notifying Airbrake: ' . $e->getMessage());
+						}
+					}
 				}
 
 				// send an email with the error
