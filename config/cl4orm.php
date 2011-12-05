@@ -20,6 +20,8 @@ return array(
 		// this can be used for fields that aren't editable but should still be displayed in edit mode
 		// fields that have this flag set to TRUE, it will also not be set through save_values() when in edit mode
 		'view_in_edit_mode' => FALSE,
+		// same as view_in_edit_mode but for adding a record
+		'view_in_add_mode' => FALSE,
 		/**
 		* determines if the field can be set to NULL; TRUE means that it can be set to NULL; FALSE means that it can't
 		* this is used most often in situations where the field is not received in the post because the field wasn't display although still editable

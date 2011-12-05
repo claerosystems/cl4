@@ -733,7 +733,7 @@ class cl4_ORM extends Kohana_ORM {
 					$field_value = $this->$column_name;
 				}
 
-				if ($this->_mode == 'edit' && $column_info['view_in_edit_mode']) {
+				if (($this->_mode == 'edit' && $column_info['view_in_edit_mode']) || ($this->_mode == 'add' && $column_info['view_in_add_mode'])) {
 					$_field_type_class_function = 'view_html';
 				} else {
 					$_field_type_class_function = $field_type_class_function;
