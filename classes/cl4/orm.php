@@ -2796,12 +2796,12 @@ class cl4_ORM extends Kohana_ORM {
 	public function on_active($table_name = NULL, $column = 'active_flag', $status = 1) {
 		// Add pending database call which is executed after query type is determined
 		$this->_db_pending[] = array(
-			'name' => 'on_expiry',
+			'name' => 'on_active',
 			'args' => array($table_name, $column, $status),
 		);
 
 		return $this;
-	} // function on_expiry
+	} // function on_active
 
 	/**
 	* Adds the expiry where clause
