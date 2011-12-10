@@ -1,4 +1,5 @@
-<?php
+<?php defined('SYSPATH') or die ('No direct script access.');
+
 /**
  * Airbrake notifier class.
  * Used within cl4_Exception to notify Airbrake of an error.
