@@ -261,13 +261,15 @@ class cl4_File {
 				$return['dest_file_path'] = $file_info['dest_file_path'];
 			}
 		} catch (Exception $e) {
-			throw new cl4_Exception_File('The uploaded file :user_file: could not be moved to :dest_file: with move_uploaded_file(), the error was: `' . $e->getMessage() . '`', array(
+			throw new cl4_Exception_File('The uploaded file (user filename: :user_file:, tmp name: :tmp_file:) could not be moved to :dest_file: with rename(), the error was: :msg:', array(
 				':user_file:' => $file_info['user_file'],
-				':dest_file:' => $file_info['dest_file']), cl4_Exception_File::MOVE_UPLOADED_FILE_FAILED);
+				':tmp_file:' => $file_info['tmp_file'],
+				':dest_file:' => $file_info['dest_file'],
+				':msg:' => $e->getMessage()), cl4_Exception_File::MOVE_UPLOADED_FILE_FAILED);
 		}
 
 		return $return;
-	}
+	} // function upload_file
 
 	/**
 	* If $html is TRUE, this returns an HTML formatted string prefixed with with a message regarding allowed file types based on config/mime_description
