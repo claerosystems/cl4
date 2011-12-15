@@ -16,7 +16,6 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 		$range = ORM_RangeSelect::get_range($options);
 
 		$value = Arr::get($post, $column_name);
-
 		$value = in_array($value, $range) ? $value : NULL;
 
 		if ($value !== NULL || $options['is_nullable']) {
@@ -75,8 +74,13 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 	}
 
 	/**
+	 * Returns an array with all the keys for a range select.
+	 * The keys will different from the values, unlike the keys (option values) in the HTML select.
+	 * Use the resulting array only for checking for a valid value
+	 *
 	 * @todo consider if we should look for the select_none, select_all, etc options and what should be done with them.
-	 * @param unknown_type $options
+	 * @param  array  $options  Options array
+	 * @return  array
 	 */
 	protected static function get_range($options) {
 		$default_options = array(
@@ -84,13 +88,15 @@ class cl4_ORM_RangeSelect extends ORM_FieldType {
 			'end' => 10,
 			'increment' => 1,
 		);
-		$options += array_merge($default_options, $options);
+		$options += $default_options;
+
 		$array = range($options['start'], $options['end'], $options['increment']);
 
-		if ( ! empty($options['add_values'])) {
-			$array = array_keys($options['add_values']);
+		// add the keys from add_values array to the range array
+		if ( ! empty($options['add_values']) && is_array($options['add_values'])) {
+			$array = array_merge($array, array_keys($options['add_values']));
 		}
 
 		return $array;
-	}
+	} // function get_range
 } // class
