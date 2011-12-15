@@ -2254,6 +2254,7 @@ class cl4_ORM extends Kohana_ORM {
 		foreach ($post_records as $post_record) {
 			// new records
 			if ( ! isset($post_record['id']) || ! isset($current_records[$post_record['id']])) {
+				// has through table
 				if (isset($this->_has_many[$alias]['through'])) {
 					$_record = ORM::factory($this->_has_many[$alias]['model'])
 						->save_values($post_record)
@@ -2265,11 +2266,17 @@ class cl4_ORM extends Kohana_ORM {
 							$this->_has_many[$alias]['far_key'] => $_record->pk(),
 						))
 						->save();
+
+					$this->add_change_log_ids($_record->change_log_ids());
+					$this->add_change_log_ids($_through->change_log_ids());
+
+				// no through table
 				} else {
 					$_record = ORM::factory($this->_has_many[$alias]['model'])
-						->save_values($post_record);
-					$_record->$foreign_key = $this->pk();
-					$_record->save();
+						->save_values($post_record)
+						->set($foreign_key, $this->pk())
+						->save();
+					$this->add_change_log_ids($_record->change_log_ids());
 				}
 
 			// existing record
@@ -2277,6 +2284,7 @@ class cl4_ORM extends Kohana_ORM {
 				$_record = ORM::factory($this->_has_many[$alias]['model'], $post_record['id'])
 					->save_values($post_record)
 					->save();
+				$this->add_change_log_ids($_record->change_log_ids());
 				unset($current_records[$post_record['id']]);
 			}
 		} // foreach
@@ -2285,15 +2293,17 @@ class cl4_ORM extends Kohana_ORM {
 		if ( ! empty($current_records)) {
 			foreach ($current_records as $_record) {
 				if ($delete_through === TRUE || $delete_through == 'only' || $delete_through == 'only_through') {
-					ORM::factory($this->_has_many[$alias]['through'], array(
+					$_delete_record = ORM::factory($this->_has_many[$alias]['through'], array(
 							$foreign_key => $this->pk(),
 							$this->_has_many[$alias]['far_key'] => $_record->pk(),
-						))
-						->delete();
+						));
+					$_delete_record->delete();
+					$this->add_change_log_ids($_delete_record->change_log_ids());
 				}
 
 				if ($delete_through === TRUE || $delete_through === FALSE || ($delete_through != 'only' && $delete_through != 'only_through')) {
 					$_record->delete();
+					$this->add_change_log_ids($_delete_record->change_log_ids());
 				}
 			} // foreach
 		} // if
