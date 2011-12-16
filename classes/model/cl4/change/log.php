@@ -162,6 +162,8 @@ class Model_cl4_Change_Log extends ORM {
 
 	/**
 	* Add a change log record.
+	* Note: This uses serialize() instead of json_encode() because json_encode() doesn't support storing PHP objects.
+	* And PHP objects maybe passed in when using things like DB::expr().
 	*
 	* @see  ORM::update() or ORM::create() to see how to use this
 	*
@@ -188,6 +190,7 @@ class Model_cl4_Change_Log extends ORM {
 				} // foreach
 			} // if
 
+			// see note on the method as to why we use serialize() instead of json_encode()
 			$data['changed'] = serialize($data['changed']);
 		} // if
 
