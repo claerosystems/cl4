@@ -30,7 +30,7 @@ if ($any_visible) {
 
 	foreach ($display_order as $column) {
 		if (isset($form_field_html[$column])) {
-			$table->add_row(array($form_field_html[$column]['label'], $form_field_html[$column]['field']));
+			$table->add_row(array($form_field_html[$column]['label'], $form_field_html[$column]['field'], $form_field_html[$column]['help']));
 		}
 	} // foreach
 

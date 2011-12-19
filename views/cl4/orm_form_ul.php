@@ -25,7 +25,7 @@ if ($any_visible) {
 		<li>
 			<ul>
 				<li class="field_label"><?php echo $form_field_html[$column]['label']; ?></li>
-				<li class="field_value"><?php echo $form_field_html[$column]['field']; ?></li>
+				<li class="field_value"><?php echo $form_field_html[$column]['field'], $form_field_html[$column]['help']; ?></li>
 			</ul>
 		</li>
 <?php } // if
