@@ -69,7 +69,7 @@ class cl4_CSV {
 					$this->filename = $temp_file . '.csv';
 
 					// Remove the file because the tempnam() function actually creates the file, but it's without an extension, so we'll delete the one without an extension
-					unlink($tempFile);
+					unlink($temp_file);
 				} catch (Exception $e) {
 					throw $e;
 				}
