@@ -244,6 +244,6 @@ class cl4_Mail extends PHPMailer {
 	* @return bool status of AddAddress()
 	*/
 	public function add_log_bcc() {
-		return $this->AddAddress($this->log_email);
+		return $this->AddBCC($this->log_email);
 	}
 } // class cl4_Mail
