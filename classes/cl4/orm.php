@@ -848,6 +848,7 @@ class cl4_ORM extends Kohana_ORM {
 					$this->_field_html[$alias] = array(
 						'label' => $relation_data['field_label'],
 						'field' => $field_html,
+						'help' => '',
 					);
 				} // if
 			} // foreach
