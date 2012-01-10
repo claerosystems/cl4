@@ -39,7 +39,7 @@ class cl4_PDF extends FPDI {
 	*   Used in KeepTogether()
 	*   @var	bool
 	*/
-	protected $rolledBackFlag = false;
+	protected $rolledBackFlag = FALSE;
 
 	/**
 	*   The number of times the KeepTogether() has been run during the current loop
@@ -211,33 +211,39 @@ class cl4_PDF extends FPDI {
 	*   @return	 bool	false if content is not on 1 page, true if the content is on 1 page or will not fit on 1 page and has been added anyway
 	*/
 	public function KeepTogether() {
-		++$this->runCount;
+		++ $this->runCount;
 
-		if ($this->runCount > 1) { // we have moved to the next page
-			if ($this->rolledBackFlag || $this->getPage() == $this->start_transaction_page) { // the content is longer than 1 page, so just add
+		// it's been run more than once
+		if ($this->runCount > 1) {
+			// the content is longer than 1 page, so just add
+			if ($this->rolledBackFlag || $this->getPage() == $this->start_transaction_page) {
 				$this->commitTransaction();
 				$this->runCount = 0;
-				$this->rolledBackFlag = false;
-				return true;
+				$this->rolledBackFlag = FALSE;
+				return TRUE;
 			}
 
-			$this->rolledBackFlag = true;
 			$this->rollbackTransaction($this);
-			if ($this->tMargin != $this->GetY()) $this->AddPage(); // we are already at the top of a page, so we don't want to add a page so we don't end up with a blank page
+			$this->rolledBackFlag = TRUE;
+			// we are already at the top of a page, so we don't want to add a page so we don't end up with a blank page
+			if ($this->tMargin != $this->GetY()) $this->AddPage();
 			$this->startTransaction();
-			return false;
+			return FALSE;
 
-		} else if (!$this->rolledBackFlag) { // no rollback has happened and therefore no content has been added, so return false so the content will be added
+		// no rollback has happened (and run count == 1 from above) and therefore no content has been added
+		// so return false so the content will be added (the code inside the while will be executed)
+		} else if ( ! $this->rolledBackFlag) {
 			$this->startTransaction();
-			return false;
+			return FALSE;
 
-		} else { // no roll back needed
+		// no rollback needed
+		} else {
 			$this->commitTransaction();
 			$this->runCount = 0;
-			$this->rolledBackFlag = false;
-			return true;
+			$this->rolledBackFlag = FALSE;
+			return TRUE;
 		}
-	} // function KeepTogether()
+	} // function KeepTogether
 
 	/**
 	*   Overrides the commitTransaction() of TCPDF and sets the start_transaction_page property to 0 again as the default one doesn't do that
