@@ -684,6 +684,7 @@ class cl4_Form extends Kohana_Form {
 			'select_all' => FALSE,
 			'select_none' => FALSE,
 			'add_values' => NULL,
+			'add_values_after' => NULL,
 			'db_instance' => NULL,
 			'update_size' => TRUE,
 			'source_value' => Form::$default_source_value,
@@ -745,6 +746,14 @@ class cl4_Form extends Kohana_Form {
 				Arr::unshift($source, $key, $value);
 			}
 		} // if
+
+		// if there are any additional values to add after, add them
+		if (is_array($options['add_values_after'])) {
+			foreach ($options['add_values_after'] as $value => $option) {
+				// $name could be an array allowing the addition of optgroup's
+				$source[$value] = $option;
+			}
+		}
 
 		// if the size is more than the number of options (as long as there is more than 1) then reduce the size to the same as the number of options
 		if ($options['update_size'] && isset($attributes['multiple']) && $attributes['multiple'] == 'multiple') {
