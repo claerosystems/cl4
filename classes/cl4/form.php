@@ -503,6 +503,7 @@ class cl4_Form extends Kohana_Form {
 
 		$default_options = array(
 			'clean_date' => FALSE,
+			'default_current_date' => FALSE,
 		);
 		$options += $default_options;
 
@@ -516,7 +517,11 @@ class cl4_Form extends Kohana_Form {
 
 		// check if the value of the date is actually empty
 		if (Form::check_date_empty_value($value)) {
-			$value = '';
+			if ($options['default_current_date']) {
+				$value = date(Form::DATE_FORMAT);
+			} else {
+				$value = '';
+			}
 		} else if ($options['clean_date']) {
 			$unix = strtotime($value);
 			$value = date(Form::DATE_FORMAT, $unix);
