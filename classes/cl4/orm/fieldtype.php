@@ -195,7 +195,7 @@ class cl4_ORM_FieldType {
 	* @return string
 	*/
 	public static function get_sql_table_name($orm_model) {
-		return $orm_model !== NULL ? $orm_model->table_name() . '.' : '';
+		return $orm_model !== NULL ? $orm_model->object_name() . '.' : '';
 	}
 
 	/**
