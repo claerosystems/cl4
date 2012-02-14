@@ -571,6 +571,13 @@ class cl4_HTMLTable {
 	} // function get_html
 
 	/**
+	 * return the last row number added to the table
+	 */
+	public function get_row_number() {
+		return $this->last_row_number;
+	}
+
+	/**
 	* Check to see if the given column number is within a column span for this row in the table
 	*
 	* @return  boolean  TRUE if it is, FALSE otherwise
