@@ -574,7 +574,7 @@ class cl4_HTMLTable {
 	 * return the last row number added to the table
 	 */
 	public function get_row_number() {
-		return $this->last_row_number;
+		return $this->last_row_number - 1;
 	}
 
 	/**
