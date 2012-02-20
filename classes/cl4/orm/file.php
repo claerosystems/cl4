@@ -58,46 +58,7 @@ class cl4_ORM_File extends ORM_FieldType {
 		if ($file_options['disable_file_upload']) {
 			// don't save the file column because we don't want to upload a file in this case
 		} else if ( ! empty($post_value)) {
-			// 20100921 CSN not sure when we get here, the post normally wouldn't have the field in it, just $_FILES?
-			// 20101027 CSN this must be when we want to pass the function a path manually
-			// todo: when doing this, we'll need to have some options/flags on the file to determine if this is allowed and from where
-			throw new Kohana_Exception('Passing file paths to save is not supported yet');
-			/*
-			// we have been passed a file path, so we want to copy the file
-			if (isset($file_options['filename_change']) && in_array($file_options['filename_change'], $supported_name_change_methods)) {
-				$destinationFile = $file_options['desination_file'];
-			} else {
-				$destinationFile = null; // default, no destination
-			}
-
-			$file = new ClaeroFile($file_options);
-
-			// this line is key as it copies the file from the its current location to the destination
-			$file->Copy($data[$columnName], $destinationFile);
-
-			if ($file->GetStatus() && $file->GetChange()) {
-				echo kohana::debug($file->GetFileData());
-				exit;
-				//PrintR($claeroFile->GetFileData());
-				$insertFieldNames[] = $columnName;
-				$insertValues[] = $file->GetDestFile();
-				++$numInsertFields;
-				$fileColumns[] = $columnName;
-
-				if ($metaData['file_options']['original_filename_column'] != false) {
-					// insert original filename into the column designated by $metaData['file_options']['original_filename_column']
-					$insertFieldNames[] = $metaData['file_options']['original_filename_column'];
-					$insertValues[] = $file->GetFileData('user_file');
-					++$numInsertFields;
-					$fileColumns[] = $metaData['file_options']['original_filename_column'];
-				} // if
-
-			} else if (!$file->GetStatus()) {
-				$this->status = false;
-				trigger_error('File System Error: Could not copy the file to it\'s new path: ' . $claeroFile->GetMessages(' '), E_USER_ERROR);
-				$this->_message[] = $file->GetMessages();
-			} // if
-			*/
+			throw new Kohana_Exception('Passing file paths is not allowed');
 
 		// see if the file is in the post
 		} else if (isset($_FILES[$column_name]) && ! empty($_FILES[$column_name]['tmp_name'])) {
