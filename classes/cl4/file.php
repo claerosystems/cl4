@@ -198,12 +198,22 @@ class cl4_File {
 			'tmp_file' => $file_data['tmp_name'],
 			'filename_no_ext' => $this->options['lowercase_filename'] ? strtolower($path_info['filename']) : $path_info['filename'],
 			// check to make sure the extension isn't empty because sometimes mac users don't have extensions on their files
-			'ext' => $this->options['lowercase_filename'] && ! empty($path_info['extension']) ? strtolower($path_info['extension']) : $path_info['extension'],
+			'ext' => $ext,
 			'size' => $file_data['size'],
 			'record_pk' => ( ! empty($this->options['record_pk']) ? $this->options['record_pk'] : NULL),
 		);
 		$return['user_file'] = $file_info['user_file'];
 		$return['size'] = $file_info['size'];
+
+		// the extension maybe not be set/empty so check for it before strtolower()
+		if ( ! empty($path_info['extension'])) {
+			$file_info['ext'] = $path_info['extension'];
+		} else {
+			$file_info['ext'] = '';
+		}
+		if ($this->options['lowercase_filename'] && ! empty($file_info['ext'])) {
+			$file_info['ext'] = strtolower($path_info['extension']);
+		}
 
 		// get the mime type, couldn't find a better way to do this for now, this is just using the extension
 		$file_info['mime_type'] = File::mime_by_ext($file_info['ext']);
