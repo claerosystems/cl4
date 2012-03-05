@@ -78,10 +78,10 @@ class cl4_Mail extends PHPMailer {
 		if ( ! empty($options['log_email'])) $this->log_email = $options['log_email'];
 
 		// Set the values of the user table where the user's email and name can be retrieved from
-		if ( ! empty($options['model'])) $this->user_table['model'] = $options['model'];
-		if ( ! empty($options['email_field'])) $this->user_table['email_field'] = $options['email_field'];
-		if ( ! empty($options['first_name_field'])) $this->user_table['first_name_field'] = $options['first_name_field'];
-		if ( ! empty($options['last_name_field'])) $this->user_table['last_name_field'] = $options['last_name_field'];
+		if ( ! empty($options['user_table']['model'])) $this->user_table['model'] = $options['user_table']['model'];
+		if ( ! empty($options['user_table']['email_field'])) $this->user_table['email_field'] = $options['user_table']['email_field'];
+		if ( ! empty($options['user_table']['first_name_field'])) $this->user_table['first_name_field'] = $options['user_table']['first_name_field'];
+		if ( ! empty($options['user_table']['last_name_field'])) $this->user_table['last_name_field'] = $options['user_table']['last_name_field'];
 
 		// If we're using PHP's built-in mailer
 		if (empty($options['mailer']) || $options['mailer'] == 'sendmail') {
