@@ -36,7 +36,7 @@ if ($routes['account']) {
 }
 
 if ($routes['cl4base']) {
-	// login page
+	// unavailable page
 	Route::set('cl4base', '(<lang>/)base/<action>', array('lang' => $lang_options, 'action' => '(unavailable)'))
 		->defaults(array(
 			'lang' => DEFAULT_LANG,
