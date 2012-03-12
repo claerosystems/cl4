@@ -17,12 +17,10 @@ class Model_cl4_Change_Log extends ORM {
 	);
 
 	// relationships
-	protected $_has_one = array(
+	protected $_belongs_to = array(
 		'user' => array(
 			'model' => 'user',
-			'through' => 'user',
-			'foreign_key' => 'id',
-			'far_key' => 'user_id',
+			'foreign_key' => 'user_id',
 		),
 	);
 
