@@ -2297,7 +2297,9 @@ class cl4_ORM extends Kohana_ORM {
 		// delete any records that weren't in the passed data
 		if ( ! empty($current_records)) {
 			foreach ($current_records as $_record) {
-				if ($delete_through === TRUE || $delete_through == 'only' || $delete_through == 'only_through') {
+				// only delete the through record if it's set in the _has_many relationship
+				// and $delete_through is one of the "true" values
+				if (isset($this->_has_many[$alias]['through']) && ($delete_through === TRUE || $delete_through == 'only' || $delete_through == 'only_through')) {
 					$_delete_record = ORM::factory($this->_has_many[$alias]['through'], array(
 							$foreign_key => $this->pk(),
 							$this->_has_many[$alias]['far_key'] => $_record->pk(),
@@ -2306,9 +2308,10 @@ class cl4_ORM extends Kohana_ORM {
 					$this->add_change_log_ids($_delete_record->change_log_ids());
 				}
 
+				// don't delete the main record if $delete_through is set to "only" or "only_through"
 				if ($delete_through === TRUE || $delete_through === FALSE || ($delete_through != 'only' && $delete_through != 'only_through')) {
 					$_record->delete();
-					$this->add_change_log_ids($_delete_record->change_log_ids());
+					$this->add_change_log_ids($_record->change_log_ids());
 				}
 			} // foreach
 		} // if
