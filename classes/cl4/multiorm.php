@@ -401,25 +401,25 @@ class cl4_MultiORM {
 					'class' => 'cl4_button_link_form cl4_multiple_edit' . $button_class,
 				));
 			} // if
-/* commented out for now, until implemented
+
 			if ($list_options['top_bar_buttons']['export_all']) {
-				$link = '';
 				$top_row_buttons .= Form::submit(NULL, __('Export All'), array(
-					'data-cl4_form_action' => '/' . $link,
+					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'export')) . '?export_all=1',
+					'data-cl4_form_target' => '_blank',
 					'class' => 'cl4_button_link_form ' . $button_class,
 				));
 			} // if
 
 			// set up export selected button
 			if ($list_options['top_bar_buttons']['export_selected']) {
-				$link = '';
 				$top_row_buttons .= Form::submit(NULL, __('Export Selected'), array(
-					'data-cl4_form_action' => '/' . $link,
+					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_object_name, 'action' => 'export')),
+					'data-cl4_form_target' => '_blank',
 					'disabled' => 'disabled',
 					'class' => ' cl4_button_link_form cl4_export_selected ' . $button_class,
 				));
 			} // if
-*/
+
 			// set up ADD multiple button and count select
 			if ($list_options['top_bar_buttons']['add_multiple']) {
 				$add_multiple_uniqid = uniqid('cl4_add_multiple_button_');
@@ -1002,6 +1002,180 @@ class cl4_MultiORM {
 	public function records_saved() {
 		return $this->_records_saved;
 	}
+
+	/**
+	 * Returns a CSV object containing the data from the table, with the same filters as currently used on list or a list of specific ids.
+	 *
+	 * @return  CSV
+	 * @return  PHPExcel
+	 */
+	public function get_export() {
+		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
+		$display_order = $this->_model->display_order();
+
+		// set the search in the model
+		if ( ! empty($this->_search)) {
+			$this->_model->set_search($this->_search);
+		}
+
+		// filter by any ids that are in the model
+		if ( ! empty($this->_ids)) {
+			$this->_model->where($this->_model->primary_key(), 'IN', $this->_ids);
+		}
+
+		// check to see if the column set to sort by is in _table_columns
+		// if it's not, it will use the default sorting specified in _sorting
+		// if nothing is specified in _sorting, Kohana_ORM will use the primary key (likely ID)
+		if ( ! empty($this->_options['sort_by_column']) && isset($this->_table_columns[$this->_object_name][$this->_options['sort_by_column']])) {
+			$this->_model->order_by($this->_options['sort_by_column'], $this->_options['sort_by_order']);
+		} // if
+
+		// find all the records to be displayed on this page
+		$this->_records = $this->_model
+			->find_all();
+
+		// set_search must be run again because find_all() clears the previous query
+		if ( ! empty($this->_search)) {
+			$this->_model->set_search($this->_search);
+		}
+
+		// filter by any ids that are in the model
+		if ( ! empty($this->_ids)) {
+			$this->_model->where($this->_model->primary_key(), 'IN', $this->_ids);
+		}
+
+		$phpexcel_path = Kohana::find_file('vendor', 'phpexcel/PHPExcel');
+		if ($phpexcel_path) {
+			$use_phpexcel = TRUE;
+			Kohana::load($phpexcel_path);
+			$xlsx = new PHPExcel();
+
+			$xlsx->setActiveSheetIndex(0);
+			$xlsx_sheet = $xlsx->getActiveSheet();
+
+		} else {
+			$use_phpexcel = FALSE;
+			$csv = new CSV();
+		}
+
+		// set up the headings and sort links, etc. based on model
+		$i = -1;
+		$headings = array();
+		foreach ($display_order as $column_name) {
+			if ( ! isset($this->_table_columns[$this->_object_name][$column_name])) {
+				continue;
+			}
+
+			$column_data = $this->_table_columns[$this->_object_name][$column_name];
+
+			// only add the column if the list_flag is set to true
+			if ($column_data['view_flag']) {
+				// get the label
+				$headings[] = $this->_model->column_label($column_name);
+			}
+		} // foreach
+
+		// add the headings and bold them
+		if ($use_phpexcel) {
+			$xlsx_col = 0;
+			foreach($headings as $_heading) {
+				$xlsx_sheet->setCellValueByColumnAndRow($xlsx_col, 1, $_heading);
+				++ $xlsx_col;
+			}
+
+			// set all the headings to bold
+			// uses the column counter from the previous foreach
+			$columns = array();
+			for($i = 0; $i <= $xlsx_col; $i ++) {
+				$columns[] = self::number_to_excel_col($i);
+			}
+			foreach ($columns as $column) {
+				$xlsx_sheet->getStyle($column . 1)->getFont()->setBold(TRUE);
+			}
+
+		// add the heading row
+		} else {
+			$csv->add_row($headings);
+		}
+
+		// populate all of the lookup data for fields that are going to be displayed
+		foreach ($this->_table_columns as $_object_name => $columms) {
+			foreach ($columms as $column_name => $meta_data) {
+				if ($meta_data['view_flag'] && array_key_exists('field_options', $meta_data) && is_array($meta_data['field_options']) && array_key_exists('source', $meta_data['field_options'])) {
+					// get the lookup data based on the source info
+					$this->get_source_data($_object_name, $column_name, $meta_data['field_options']['source']);
+				}
+			}
+		} // foreach
+
+		// prepare the data values to generate the results table
+		$primary_key = $this->_model->primary_key();
+		$xlsx_row_num = 2; // start at row 2 because headings in row 1
+		foreach ($this->_records as $num => $record_model) {
+			$id = $record_model->$primary_key;
+
+			$row_data = array();
+			$i = 0;
+
+			// generate the data to be displayed
+			$no_replace_spaces_types = array('checkbox', 'textarea', 'file');
+
+			// todo: implement multiple tables
+			foreach ($display_order as $column_name) {
+				if ( ! isset($this->_table_columns[$this->_object_name][$column_name])) {
+					continue;
+				}
+
+				$column_data = $this->_table_columns[$this->_object_name][$column_name];
+
+				// only add the column if the list_flag is true
+				if ($column_data['view_flag']) {
+					++$i;
+
+					$source = (isset($this->_lookup_data[$this->_object_name][$column_name]) ? $this->_lookup_data[$this->_object_name][$column_name] : NULL);
+					$row_data[$i] = $record_model->get_view_string($column_name, $source);
+				} // if
+			} // foreach
+
+			if ($use_phpexcel) {
+				$col = 0;
+				foreach ($row_data as $col_val) {
+					$xlsx_sheet->setCellValueByColumnAndRow($col, $xlsx_row_num, $col_val);
+					++ $col;
+				}
+
+				++ $xlsx_row_num;
+
+			} else {
+				$csv->add_row($row_data);
+			}
+		} // foreach
+
+		if ($use_phpexcel) {
+			return $xlsx;
+		} else {
+			return $csv;
+		}
+	} // function get_export
+
+	/**
+	 * Runs the related letter for the column in Excel.
+	 * Columns start at 1 => A.
+	 * ie, 5 => E, 159 => FC
+	 *
+	 * @param  int  $num  The number to convert.
+	 * @return  string
+	 */
+	protected static function number_to_excel_col($num) {
+		$numeric = $num % 26;
+		$letter = chr(65 + $numeric);
+		$num2 = intval($num / 26);
+		if ($num2 > 0) {
+			return self::number_to_excel_col($num2 - 1) . $letter;
+		} else {
+			return $letter;
+		}
+	} // function number_to_excel_col
 
 	/**
 	* Returns an array of the values for a column for the current model
