@@ -2643,6 +2643,23 @@ class cl4_ORM extends Kohana_ORM {
 	} // function get_view_html
 
 	/**
+	* Returns the value of the field ready for viewing (uses ORM_FieldType::view()).
+	* The source options need to be passed in to be passed to ORM_FieldType::view().
+	* Uses the options in _table_columns to determine how the field should be rendered.
+	*
+	* @param string $column_name
+	* @param array $source
+	* @return string
+	*/
+	public function get_view_string($column_name, $source = NULL) {
+		$field_type = $this->_table_columns[$column_name]['field_type'];
+
+		$view_html_options = $this->get_view_html_options($column_name);
+
+		return call_user_func(ORM_FieldType::get_field_type_class_name($field_type) . '::view', $this->$column_name, $column_name, $this, $view_html_options, $source);
+	} // function get_view_string
+
+	/**
 	 * Unloads the current object and clears the status.
 	 * Also resets the html field arrays
 	 *
