@@ -88,6 +88,12 @@ class cl4_MultiORM {
 	protected $_search;
 
 	/**
+	* IDs to be used in filtering out for both get_record_order_view() and get_export().
+	* @var array
+	*/
+	protected $_ids;
+
+	/**
 	* @var  ORM_Validation_Exception  Stores an array Validation exceptions from each record in _records after check() is run if any Models don't validate
 	*/
 	protected $_validation_exceptions;
@@ -215,6 +221,11 @@ class cl4_MultiORM {
 			$this->_model->set_search($this->_search);
 		}
 
+		// filter by any ids that are in the model
+		if ( ! empty($this->_ids)) {
+			$this->_model->where($this->_model->primary_key(), 'IN', $this->_ids);
+		}
+
 		// check to see if the column set to sort by is in _table_columns
 		// if it's not, it will use the default sorting specified in _sorting
 		// if nothing is specified in _sorting, Kohana_ORM will use the primary key (likely ID)
@@ -238,6 +249,11 @@ class cl4_MultiORM {
 		// set_search must be run again because find_all() clears the previous query
 		if ( ! empty($this->_search)) {
 			$this->_model->set_search($this->_search);
+		}
+
+		// filter by any ids that are in the model
+		if ( ! empty($this->_ids)) {
+			$this->_model->where($this->_model->primary_key(), 'IN', $this->_ids);
 		}
 
 		// count the records in the find_all query
@@ -594,6 +610,20 @@ class cl4_MultiORM {
 
 		return $this;
 	} // function set_search
+
+	/**
+	 * Adds IDs to the object used in get_record_order_view() and get_export().
+	 *
+	 * @param  array  $ids  Array of IDs.
+	 * @return  ORM
+	 */
+	public function set_ids(array $ids) {
+		if ( ! empty($ids)) {
+			$this->_ids = $ids;
+		}
+
+		return $this;
+	}
 
 	/**
 	* Returns a view for editing multiple records.
