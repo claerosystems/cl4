@@ -991,7 +991,7 @@ class cl4_MultiORM {
 		}
 
 		return $lookup_ids;
-	} // function
+	} // function get_lookup_ids
 
 	/**
 	* Returns an array of data values for this column, use relationships or source meta data in model
@@ -1111,7 +1111,7 @@ class cl4_MultiORM {
 		} // if
 
 		return $this->_lookup_data[$object_name][$column_name];
-	} // function
+	} // function get_source_data
 
 	/**
 	* Returns an array of options that are passed to ORM_FieldType::view_html()
@@ -1132,7 +1132,7 @@ class cl4_MultiORM {
 		}
 
 		return $options;
-	} // function
+	} // function get_view_html_options
 
 	/**
 	* Returns the number of records in the object as found in _records
