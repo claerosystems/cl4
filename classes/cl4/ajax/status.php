@@ -77,4 +77,41 @@ class cl4_AJAX_Status {
 	public static function success() {
 		return AJAX_Status::ajax(array());
 	}
+
+	/**
+	 * Echo's the JSON data.
+	 * If it wasn't a XHR (XMLHttpRequest) request, then it will return the JSON data in a textarea.
+	 * This is useful when using the jQuery Form plugin (http://jquery.malsup.com/form/) as it uses iframes when there are file inputs in form.
+	 *
+	 * @param  string  $json  The JSON string.
+	 * @return  void
+	 */
+	public static function echo_json($json) {
+		// if it's not an XHR request, then it's likely occured through an iframe, likely using jquery.form
+		if ( ! AJAX_Status::is_xhr()) {
+			echo '<textarea>' . HTML::chars($json) . '</textarea>';
+		} else {
+			AJAX_Status::is_json();
+			echo $json;
+		}
+	}
+
+	/**
+	 * Returns TRUE when the request was performed by XMLHttpRequest.
+	 *
+	 * @return  boolean
+	 */
+	public static function is_xhr() {
+		return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
+	}
+
+	/**
+	 * Sets Kohana::$content_type to application/json.
+	 * Use when sending JSON data to the browser.
+	 *
+	 * @return  void
+	 */
+	public static function is_json() {
+		Kohana::$content_type = 'application/json';
+	}
 } // class cl4_AJAX_Status
