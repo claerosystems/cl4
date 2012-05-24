@@ -76,6 +76,7 @@ class cl4_Mail extends PHPMailer {
 		if ( ! empty($options['from'])) $this->From = $options['from'];
 		if ( ! empty($options['from_name'])) $this->FromName = $options['from_name'];
 		if ( ! empty($options['log_email'])) $this->log_email = $options['log_email'];
+		if ( ! empty($options['reply_to']['email'])) $this->AddReplyTo($options['reply_to']['email'], $options['reply_to']['name']);
 
 		// Set the values of the user table where the user's email and name can be retrieved from
 		if ( ! empty($options['user_table']['model'])) $this->user_table['model'] = $options['user_table']['model'];

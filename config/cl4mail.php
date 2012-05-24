@@ -19,6 +19,11 @@ return array(
 			'timeout' => NULL, // Timeout for sending mail
 			'secure' => NULL, // Security, for example GMail uses "tls"
 		),
+		// reply to address & name
+		'reply_to' => array(
+			'email' => NULL,
+			'name' => NULL,
+		),
 
 		// Config for adding a user to To field using a query
 		'user_table' => array(
