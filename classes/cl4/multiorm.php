@@ -494,7 +494,7 @@ class cl4_MultiORM {
 
 			// add custom route links
 			foreach ($list_options['per_row_links_route'] as $route_name => $custom_data) {
-				$route_params = Arr::merge($custom_data['params'], array('id' => $id));
+				$route_params = Arr::merge(array('id' => $id), $custom_data['params']);
 				$html = array_key_exists('html', $custom_uri) ? $custom_uri['html'] : '&nbsp;';
 				$attributes = array_key_exists('attributes', $custom_uri) ? $custom_uri['attributes'] : array();
 				$first_col .= HTML::anchor('/' . Route::get($route_name)->uri($route_params), $html, $attributes);
