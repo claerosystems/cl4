@@ -333,6 +333,29 @@ class cl4_HTMLTable {
 	} // function set_all_td_attribute
 
 	/**
+	* Loops through an array of attributes for multiple columns and sets the attributes on the columns
+	* Example array:
+	*
+	*     array(
+	*          array('class' => 'foo'),
+	*          3 => array('class' => 'bar'),
+	*     )
+	*
+	* @param  array  $attributes  The attributes to set
+	*
+	* @return  HTMLTable
+	*/
+	public function td_attribute_array($attributes) {
+		foreach ($attributes as $column_number => $attributes) {
+			foreach ($attributes as $attribute_name => $attribute_value) {
+				$this->set_all_td_attribute($column_number, $attribute_name, $attribute_value);
+			}
+		}
+
+		return $this;
+	} // function td_attribute_array
+
+	/**
 	* Add a row of data to the table (populate the next row)
 	*
 	* @param  array  $row_data  An array of the data to display
@@ -575,6 +598,18 @@ class cl4_HTMLTable {
 	 */
 	public function get_row_number() {
 		return $this->last_row_number - 1;
+	}
+
+	/**
+	 * Increments the last_row_numbers.
+	 * Allows the skipping of a row number. Useful for add even functionality.
+	 *
+	 * @return  HTMLTable
+	 */
+	public function increment_row_count() {
+		++$this->last_row_number;
+
+		return $this;
 	}
 
 	/**
