@@ -171,7 +171,7 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 						$error_email->Subject = 'Error on ' . LONG_NAME . ' ' . APP_VERSION;
 						$error_email->MsgHTML($error);
 
-						$error_email->AddStringAttachment($full_error, 'error_details.html');
+						$error_email->AddStringAttachment($full_error, 'error_details.html', 'base64', 'text/html');
 
 						$error_email->Send();
 
