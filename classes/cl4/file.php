@@ -261,15 +261,16 @@ class cl4_File {
 			}
 		}
 
-		// try moving the file
+		// try copying the file
 		try {
-			// 20110412 CSN changed this to rename() from move_uploaded_file() because we are not always dealing with uploaded files here and there is a check in upload() for uplaoded files
-			if (rename($file_info['tmp_file'], $file_info['dest_file_path'])) {
+			// use copy so we can run this multiple times on the same uploaded file (incase we want multiple records/files in the end)
+			// the PHP temp file will be removed upon script exit/end
+			if (copy($file_info['tmp_file'], $file_info['dest_file_path'])) {
 				$return['dest_file'] = $file_info['dest_file'];
 				$return['dest_file_path'] = $file_info['dest_file_path'];
 			}
 		} catch (Exception $e) {
-			throw new cl4_Exception_File('The uploaded file (user filename: :user_file:, tmp name: :tmp_file:) could not be moved to :dest_file: with rename(), the error was: :msg:', array(
+			throw new cl4_Exception_File('The uploaded file (user filename: :user_file:, tmp name: :tmp_file:) could not be copied to :dest_file: with copy(), the error was: :msg:', array(
 				':user_file:' => $file_info['user_file'],
 				':tmp_file:' => $file_info['tmp_file'],
 				':dest_file:' => $file_info['dest_file'],
