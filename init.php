@@ -52,7 +52,7 @@ if ($routes['cl4admin']) {
 	// Special case for add_multiple: /dbadmin/demo/add_mulitple/5 (where 5 is the number of records to add)
 	Route::set('cl4admin', '(<lang>/)dbadmin(/<model>(/<action>(/<id>(/<column_name>))))', array(
 		'lang' => $lang_options,
-		'model' => '[a-z_]{0,}',
+		'model' => '[a-z0-9_]{0,}',
 		'action' => '[a-z_]+',
 		'id' => '\d+',
 		'column_name' => '[a-z_]+')
