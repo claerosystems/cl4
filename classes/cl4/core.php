@@ -317,6 +317,6 @@ class cl4_Core extends Kohana_Core {
 		// add the extension field
 		if ( ! empty($phone['extension']))    $formatted_phone .= ' ' . __('ext.') . ' ' . $phone['extension'];
 
-		return $formatted_phone;
+		return UTF8::trim($formatted_phone);
 	} // function format_phone
 } // class
