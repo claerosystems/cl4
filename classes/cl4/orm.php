@@ -1859,7 +1859,7 @@ class cl4_ORM extends Kohana_ORM {
 		// Select all columns by default
 		if ( ! $this->is_select_applied()) {
 			// Select all columns by default
-			$this->_db_builder->select($this->_object_name.'.*');
+			$this->_db_builder->select($this->_build_select());
 		}
 
 		if ( ! isset($this->_db_applied['order_by']) && ! empty($this->_sorting)) {
@@ -1958,7 +1958,7 @@ class cl4_ORM extends Kohana_ORM {
 			throw new Kohana_Exception('Cannot create :model model because it is already loaded.', array(':model' => $this->_object_name));
 
 		// Require model validation before saving
-		if ( ! $this->_valid) {
+		if ( ! $this->_valid || $validation) {
 			$this->check($validation);
 		}
 
@@ -1984,6 +1984,8 @@ class cl4_ORM extends Kohana_ORM {
 		if ( ! array_key_exists($this->_primary_key, $data)) {
 			// Load the insert id as the primary key if it was left out
 			$this->_object[$this->_primary_key] = $this->_primary_key_value = $result[0];
+		} else {
+			$this->_primary_key_value = $this->_object[$this->_primary_key];
 		}
 
 		// Object is now loaded and saved
@@ -2074,17 +2076,17 @@ class cl4_ORM extends Kohana_ORM {
 		if ( ! $this->_loaded)
 			throw new Kohana_Exception('Cannot update :model model because it is not loaded.', array(':model' => $this->_object_name));
 
+		// Run validation if the model isn't valid or we have additional validation rules.
+		if ( ! $this->_valid || $validation) {
+			$this->check($validation);
+		}
+
 		if (empty($this->_changed)) {
 			// save any values find in _related_save_data
 			$this->save_related();
 
 			// Nothing to update
 			return $this;
-		}
-
-		// Require model validation before saving
-		if ( ! $this->_valid) {
-			$this->check($validation);
 		}
 
 		$data = array();
