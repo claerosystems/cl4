@@ -1859,7 +1859,7 @@ class cl4_ORM extends Kohana_ORM {
 		// Select all columns by default
 		if ( ! $this->is_select_applied()) {
 			// Select all columns by default
-			$this->_db_builder->select($this->_build_select());
+			$this->_db_builder->select_array($this->_build_select());
 		}
 
 		if ( ! isset($this->_db_applied['order_by']) && ! empty($this->_sorting)) {
