@@ -1308,6 +1308,34 @@ class cl4_MultiORM {
 					} // if
 					break;
 
+				case 'method' :
+					list($method, $params) = $options['data'];
+					if ( ! is_string($method)) {
+						// This is a lambda function
+						$this->_lookup_data[$object_name][$column_name] = call_user_func_array($method, $params);
+
+					} elseif (method_exists($this, $method)) {
+						$this->_lookup_data[$object_name][$column_name] = $this->$method($params);
+
+					} elseif (strpos($method, '::') === FALSE) {
+						// Use a function call
+						$function = new ReflectionMethod($this->_model, $method);
+
+						// Call $function($this[$field], $param, ...) with Reflection
+						$this->_lookup_data[$object_name][$column_name] = $function->invokeArgs($this->_model, $params);
+
+					} else {
+						// Split the class and method of the rule
+						list($class, $_method) = explode('::', $method, 2);
+
+						// Use a static method call
+						$_method = new ReflectionMethod($class, $_method);
+
+						// Call $Class::$method($this[$field], $param, ...) with Reflection
+						$this->_lookup_data[$object_name][$column_name] = $_method->invokeArgs(NULL, $params);
+					}
+					break;
+
 				default :
 					throw new Kohana_Exception('The source method is unknown: :source:', array(':source:' => $options['source']));
 					break;
