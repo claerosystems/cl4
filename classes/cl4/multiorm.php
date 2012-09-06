@@ -1128,7 +1128,7 @@ class cl4_MultiORM {
 
 				$column_data = $this->_table_columns[$this->_object_name][$column_name];
 
-				// only add the column if the list_flag is true
+				// only add the column if the view_flag is true
 				if ($column_data['view_flag']) {
 					++$i;
 
