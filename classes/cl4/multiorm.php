@@ -850,7 +850,7 @@ class cl4_MultiORM {
 
 		$table_data = array();
 		$table_heading = array();
-		$returnHtml = '';
+		$return_html = '';
 
 		// apply any mandatory search strings
 		$this->add_search_filter();
@@ -881,13 +881,13 @@ class cl4_MultiORM {
 				'heading' => $table_heading,
 				'data' => $table_data,
 			);
-			$returnHtml .= HTMLTable::factory($table_options)->get_html();
+			$return_html .= HTMLTable::factory($table_options)->get_html();
 
 		} catch (Exception $e) {
 			throw $e;
 		}
 
-		return $returnHtml;
+		return $return_html;
 	} // function get_list
 
 	/**
