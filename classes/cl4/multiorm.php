@@ -1006,10 +1006,21 @@ class cl4_MultiORM {
 	/**
 	 * Returns a CSV object containing the data from the table, with the same filters as currently used on list or a list of specific ids.
 	 *
+	 * Type      | Setting    | Description                                    | Default Value
+	 * ----------|------------|------------------------------------------------|---------------
+	 * `boolean` | use_db_values | If TRUE, the actual values from the database will be used (ie, 1, 2, 3) instead of dispalyed user values (ie, 'Yes', 'No', 'Don't Know'). | FALSE
+	 * `boolean` | use_db_column_names | If TRUE, the column names will be used instead of the labels from the model. | FALSE
+	 *
+	 * @param   array  $options  The options for the method.
 	 * @return  CSV
 	 * @return  PHPExcel
 	 */
-	public function get_export() {
+	public function get_export($options = array()) {
+		$options += array(
+			'use_db_values' => FALSE,
+			'use_db_column_names' => FALSE,
+		);
+
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
 		$display_order = $this->_model->display_order();
 
@@ -1070,8 +1081,12 @@ class cl4_MultiORM {
 
 			// only add the column if the list_flag is set to true
 			if ($column_data['view_flag']) {
-				// get the label
-				$headings[] = $this->_model->column_label($column_name);
+				if ($options['use_db_column_names']) {
+					$headings[] = $column_name;
+				} else {
+					// get the label
+					$headings[] = $this->_model->column_label($column_name);
+				}
 			}
 		} // foreach
 
@@ -1132,8 +1147,12 @@ class cl4_MultiORM {
 				if ($column_data['view_flag']) {
 					++$i;
 
-					$source = (isset($this->_lookup_data[$this->_object_name][$column_name]) ? $this->_lookup_data[$this->_object_name][$column_name] : NULL);
-					$row_data[$i] = $record_model->get_view_string($column_name, $source);
+					if ($options['use_db_values']) {
+						$row_data[$i] = $record_model->$column_name;
+					} else {
+						$source = (isset($this->_lookup_data[$this->_object_name][$column_name]) ? $this->_lookup_data[$this->_object_name][$column_name] : NULL);
+						$row_data[$i] = $record_model->get_view_string($column_name, $source);
+					}
 				} // if
 			} // foreach
 
