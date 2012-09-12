@@ -440,11 +440,11 @@ class cl4_MultiORM {
 			} // if
 
 			// set up other actions
-			if ( ! empty($this->_options['top_bar_buttons_custom'])) {
-				if (is_array($this->_options['top_bar_buttons_custom'])) {
-					$top_row_buttons .= implode('', $this->_options['top_bar_buttons_custom']);
+			if ( ! empty($list_options['top_bar_buttons_custom'])) {
+				if (is_array($list_options['top_bar_buttons_custom'])) {
+					$top_row_buttons .= implode('', $list_options['top_bar_buttons_custom']);
 				} else {
-					$top_row_buttons .= $this->_options['top_bar_buttons_custom'];
+					$top_row_buttons .= $list_options['top_bar_buttons_custom'];
 				}
 			} // if
 		} // if
