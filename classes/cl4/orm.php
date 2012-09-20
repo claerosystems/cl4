@@ -169,6 +169,25 @@ class cl4_ORM extends Kohana_ORM {
 	} // function _build
 
 	/**
+	 * Returns an array of columns to include in the select query. Overriden from Kohana to support 'not_in_database' flag
+	 *
+	 * @return array Columns to select
+	 */
+	protected function _build_select()
+	{
+		$columns = array();
+
+		foreach ($this->_table_columns as $column => $_)
+		{
+			if (empty($_['not_in_database'])) {
+				$columns[] = array($this->_object_name.'.'.$column, $column);
+			}
+		}
+
+		return $columns;
+	}
+
+	/**
 	* Returns TRUE if the module has an expiry column,
 	* base on $this->_expires_column.
 	*

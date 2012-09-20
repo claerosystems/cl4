@@ -34,6 +34,7 @@ return array(
 		'field_options' => array(
 			'default_value' => NULL, // the default value for the field when there is nothing else
 		),
+		'not_in_database' => FALSE,
 	),
 	// this should contain arrays of field type specific meta data; if the field type or key is not set in here, the default_meta_data will be used
 	'default_meta_data_field_type' => array(
