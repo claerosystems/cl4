@@ -2,9 +2,11 @@
 
 class cl4_ORM_Radios extends ORM_FieldType {
 	public static function edit($column_name, $html_name, $selected, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
+		$form_method = ( ! empty($options['form_method']) ? $options['form_method'] : 'radios');
+
 		$source = $orm_model->get_source_data($column_name);
 
-		return Form::radios($html_name, $source, $selected, $attributes, $options);
+		return Form::$form_method($html_name, $source, $selected, $attributes, $options);
 	}
 
 	public static function search($column_name, $html_name, $selected, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
