@@ -18,7 +18,7 @@ class cl4_ORM_DateDrop extends cl4_ORM_Date {
  	 * @return string
 	 */
 	public static function edit($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
-		return Form::date_drop($html_name, $value, $attributes);
+		return Form::date_drop($html_name, $value, $attributes, $options);
 	}
 
 	/**
