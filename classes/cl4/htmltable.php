@@ -580,7 +580,7 @@ class cl4_HTMLTable {
 
 			$result_html .= $this->tab . '</tr>' . $this->eol;
 
-		} // for
+		} // foreach
 
 		if (!$this->options['rows_only']){
 			if ($this->options['tbody_close']) $result_html .= '</tbody>' . $this->eol;
