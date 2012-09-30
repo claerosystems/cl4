@@ -397,11 +397,8 @@ class cl4_Form extends Kohana_Form {
 					$_options = $options;
 					$_options['first_checkbox'] = $first_checkbox;
 
-					if ($options['orientation'] == 'table') {
-						$html .= Form::checkbox_layout_table($name, $col, $sub_label, $sub_checkbox_value, in_array($sub_checkbox_value, $checked), $_attributes, $_options);
-					} else {
-						$html .= Form::checkbox_layout($name, $sub_label, $sub_checkbox_value, in_array($sub_checkbox_value, $checked), $_attributes, $_options);
-					}
+					$html .= Form::_checkbox_layout($name, $col, $sub_label, $sub_checkbox_value, $checked, $_attributes, $_options);
+
 					$first_checkbox = FALSE;
 				}
 
@@ -412,12 +409,8 @@ class cl4_Form extends Kohana_Form {
 				$_options = $options;
 				$_options['first_checkbox'] = $first_checkbox;
 
-				if ($options['orientation'] == 'table') {
-					// $col is increment inside checkbox_layout_table() and passed by reference
-					$html .= Form::checkbox_layout_table($name, $col, $label, $checkbox_value, in_array($checkbox_value, $checked), $_attributes, $_options);
-				} else {
-					$html .= Form::checkbox_layout($name, $label, $checkbox_value, in_array($checkbox_value, $checked), $_attributes, $_options);
-				}
+				$html .= Form::_checkbox_layout($name, $col, $label, $checkbox_value, $checked, $_attributes, $_options);
+
 				$first_checkbox = FALSE;
 			}
 		} // foreach source
@@ -429,17 +422,36 @@ class cl4_Form extends Kohana_Form {
 		return $html;
 	} // function
 
+	/**
+	 * Runs one of the checkbox layout methods based on the orientation.
+	 * Called by [Form::checkboxes()]
+	 *
+	 * @return  string
+	 */
+	protected static function _checkbox_layout($name, $col, $label, $checkbox_value, $checked, $attributes, $options) {
+		switch ($options['orientation']) {
+			case 'table' :
+				// $col is increment inside checkbox_layout_table() and passed by reference
+				return Form::checkbox_layout_table($name, $col, $label, $checkbox_value, in_array($checkbox_value, $checked), $attributes, $options);
+				break;
+			case 'ul' :
+				return Form::checkbox_layout_ul($name, $label, $checkbox_value, in_array($checkbox_value, $checked), $attributes, $options);
+				break;
+			default :
+				return Form::checkbox_layout($name, $label, $checkbox_value, in_array($checkbox_value, $checked), $attributes, $options);
+		}
+	}
+
 	public static function checkbox_layout($name, $label = '', $value, $checked = FALSE, array $attributes = NULL, array $options = array()) {
 		$html = '';
 
-		$default_options = array(
+		$options += array(
 			'orientation' => 'horizontal',
 			'table_tag' => TRUE,
 			'add_nbsp' => TRUE,
 			'escape_label' => TRUE,
 			'first_checkbox' => TRUE,
 		);
-		$options += $default_options;
 
 		if (empty($attributes['id'])) {
 			// since we have no ID, but we need one for the labels, so just use a unique id
@@ -461,15 +473,35 @@ class cl4_Form extends Kohana_Form {
 		return $html;
 	} // function
 
+	/**
+	 * Returns an `<li>` with the checkbox and label.
+	 *
+	 * @return  string
+	 */
+	public static function checkbox_layout_ul($name, $label = '', $value, $checked = FALSE, array $attributes = NULL, array $options = array()) {
+		$options += array(
+			'add_nbsp' => TRUE,
+			'escape_label' => TRUE,
+		);
+
+		// since we have no ID, but we need one for the labels, so just use a unique id
+		if (empty($attributes['id'])) {
+			$attributes['id'] = uniqid();
+		}
+
+		$html = '<li>' . Form::checkbox($name, $value, $checked, $attributes) . '<label' . HTML::attributes(array('for' => $attributes['id'])) . '>' . ( ! $options['add_nbsp'] ? '' : '&nbsp;')  . ($options['escape_label'] ? HTML::chars($label) : $label) . '</label></li>';
+
+		return $html;
+	} // function
+
 	public static function checkbox_layout_table($name, & $col, $label = '', $value, $checked = FALSE, array $attributes = NULL, array $options = array()) {
 		$html = '';
 
-		$default_options = array(
+		$options += array(
 			'orientation' => 'table',
 			'add_nbsp' => TRUE,
 			'escape_label' => TRUE,
 		);
-		$options += $default_options;
 
 		if (empty($attributes['id'])) {
 			// since we have no ID, but we need one for the labels, so just use a unique id
