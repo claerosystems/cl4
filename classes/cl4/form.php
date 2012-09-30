@@ -976,7 +976,8 @@ class cl4_Form extends Kohana_Form {
 			'line_max_length' => 8,
 			'extension_size' => 4,
 			'extension_max_length' => 4,
-			'show_country_code' => TRUE, // changes the country code field to a hidden field and removed the + before it
+			'show_country_code' => TRUE, // changes the country code field to a hidden field and removes the + before it
+			'show_extension' => TRUE, // changes the extension to a hidden field and removes the "ext." before it
 		);
 		$options += $default_options;
 
@@ -1022,13 +1023,19 @@ class cl4_Form extends Kohana_Form {
 		}
 		$html .= '-' . Form::input_with_suffix_size($name, $default_data['line'], $_attributes, 'cl4_phone_field', 'line', $options['line_size'], $options['line_max_length']);
 
-		// add the extension field
-		$attributes = Form::increment_tabindex($attributes);
-		$_attributes = $attributes;
-		if ($set_title_attribute) {
-			$_attributes['title'] = 'Extension';
+		if ($options['show_extension']) {
+			// add the extension field
+			$attributes = Form::increment_tabindex($attributes);
+			$_attributes = $attributes;
+			if ($set_title_attribute) {
+				$_attributes['title'] = 'Extension';
+			}
+			$html .= ' ' . __('<span title="Extension">ext.</span>') . ' ' . Form::input_with_suffix_size($name, $default_data['extension'], $_attributes, 'cl4_phone_field', 'extension', $options['extension_size'], $options['extension_max_length']);
+		} else {
+			$_attributes = HTML::set_class_attribute($_attributes, 'cl4_phone_field-extension');
+			if ( ! empty($_attributes['id'])) $_attributes['id'] .= '-extension';
+			$html .= Form::hidden($name . '[extension]', $default_data['extension'], $_attributes);
 		}
-		$html .= ' ' . __('<span title="Extension">ext.</span>') . ' ' . Form::input_with_suffix_size($name, $default_data['extension'], $_attributes, 'cl4_phone_field', 'extension', $options['extension_size'], $options['extension_max_length']);
 
 		return $html;
 	} // function phone
