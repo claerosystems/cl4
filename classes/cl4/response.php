@@ -46,7 +46,7 @@ class cl4_Response extends Kohana_Response {
 			}
 
 			// Get the mime type from the extension of the download file
-			$options['mime_type'] = File::mime_by_ext(pathinfo($download, PATHINFO_EXTENSION));
+			$options['mime_type'] = File::mime_by_ext(strtolower(pathinfo($download, PATHINFO_EXTENSION)));
 		}
 
 		// Send the file
