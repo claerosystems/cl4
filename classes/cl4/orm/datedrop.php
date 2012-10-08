@@ -154,7 +154,7 @@ class cl4_ORM_DateDrop extends cl4_ORM_Date {
 		$value = Arr::get($post, $column_name, $options['default_value']);
 
 		if ($value !== NULL || $options['is_nullable']) {
-			$orm_model->$column_name = $value['year'] . '-' . $value['month'] . '-' . $value['day'] . ' 00:00:00';
+			$orm_model->$column_name = $value['year'] . '-' . $value['month'] . '-' . $value['day'];
 		}
 	} // function save
 } // class
