@@ -616,13 +616,13 @@ class cl4_Form extends Kohana_Form {
 
 			} else {
 				// make month select
-				$monthNums = range(1, 12);
+				$month_nums = range(1, 12);
 				if ($options['use_month_numbers']) {
 					$month_names = array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12');
 				} else {
 					$month_names = array(__('January'), __('February'), __('March'), __('April'), __('May'), __('June'), __('July'), __('August'), __('September'), __('October'), __('November'), __('December'));
 				}
-				$months = array_combine($monthNums, $month_names);
+				$months = array_combine($month_nums, $month_names);
 
 				$html .= Form::select($name . '[month]', $months, $month, $month_attributes);
 			}
