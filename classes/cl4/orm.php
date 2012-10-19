@@ -1840,10 +1840,12 @@ class cl4_ORM extends Kohana_ORM {
 			$through_model->where($this->_has_many[$alias]['far_key'], 'IN', (array) $far_keys);
 		}
 
-		$through_model->find()
-			->delete();
+		$through_models = $through_model->find_all();
 
-		$this->_change_log_ids = array_merge($this->_change_log_ids, $through_model->change_log_ids());
+		foreach ($through_models as $_through_model) {
+			$_through_model->delete();
+			$this->_change_log_ids = array_merge($this->_change_log_ids, $_through_model->change_log_ids());
+		}
 
 		return $this;
 	} // function remove
