@@ -577,6 +577,9 @@ class cl4_Form extends Kohana_Form {
 			'day' => TRUE,
 			'year' => TRUE,
 			'field_type' => 'select',
+			'month_options' => array(),
+			'day_options' => array(),
+			'year_options' => array(),
 		);
 		$options += $default_options;
 
@@ -624,7 +627,7 @@ class cl4_Form extends Kohana_Form {
 				}
 				$months = array_combine($month_nums, $month_names);
 
-				$html .= Form::select($name . '[month]', $months, $month, $month_attributes);
+				$html .= Form::select($name . '[month]', $months, $month, $month_attributes, $options['month_options']);
 			}
 			$html .= ! $options['add_nbsp'] ? '' : '&nbsp;';
 		}
@@ -642,7 +645,7 @@ class cl4_Form extends Kohana_Form {
 				// make day select
 				$days = array_combine(range(1, 31), range(1, 31));
 
-				$html .= Form::select($name . '[day]', $days, $day, $day_attributes);
+				$html .= Form::select($name . '[day]', $days, $day, $day_attributes, $options['day_options']);
 			}
 			$html .= ! $options['add_nbsp'] ? '' : '&nbsp;';
 		}
@@ -666,7 +669,7 @@ class cl4_Form extends Kohana_Form {
 					$years = array_combine(range($options['year_start'], $options['year_end']), range($options['year_start'], $options['year_end']));
 				}
 
-				$html .= Form::select($name . '[year]', $years, $year, $year_attributes);
+				$html .= Form::select($name . '[year]', $years, $year, $year_attributes, $options['year_options']);
 			}
 		}
 
