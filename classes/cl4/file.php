@@ -3,7 +3,7 @@
 /**
 * provides file upload/copy/move features
 */
-class cl4_File {
+class Cl4_File {
 	/**
 	* Options for use within the object
 	* @var array
@@ -91,17 +91,17 @@ class cl4_File {
 		if ($this->options['make_dir'] && ! file_exists($destination_folder)) {
 			// option is set to make the dir and it doesn't exist
 			if ( ! mkdir($destination_folder, 0755, TRUE)) {
-				throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana_Exception::text($e)), cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
+				throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana_Exception::text($e)), Cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
 			}
 
 		// make sure the destination folder exists
 		} else if ( ! is_dir($destination_folder)) {
-			throw new cl4_Exception_File('The destination folder for the uploaded file doesn\'t exist: :dest_folder:', array(':dest_folder:' => $destination_folder), cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
+			throw new Cl4_Exception_File('The destination folder for the uploaded file doesn\'t exist: :dest_folder:', array(':dest_folder:' => $destination_folder), Cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
 		} // if
 
 		// no files received
 		if ( ! isset($_FILES)) {
-			throw new cl4_Exception_File('The $_FILES array is not set, therefore no files were saved', NULL, cl4_Exception_File::NO_FILES_RECEIVED);
+			throw new Cl4_Exception_File('The $_FILES array is not set, therefore no files were saved', NULL, Cl4_Exception_File::NO_FILES_RECEIVED);
 		}
 
 		// get the upload file info
@@ -123,13 +123,13 @@ class cl4_File {
 					'size' => cl4File::get_files_array_value($files_array_loc, 'size'),
 				);
 			} else {
-				throw new cl4_Exception_File('The field :name: in the $_FILES array was not set, so no file was processed', array(':name:' => implode('.', $files_array_loc)), cl4_Exception_File::FILE_NOT_SET);
+				throw new Cl4_Exception_File('The field :name: in the $_FILES array was not set, so no file was processed', array(':name:' => implode('.', $files_array_loc)), Cl4_Exception_File::FILE_NOT_SET);
 			}
 
 		} else if ( ! empty($_FILES[$files_array_loc]['name'])) {
 			$file_data = $_FILES[$files_array_loc];
 		} else {
-			throw new cl4_Exception_File('The field :name: in the $_FILES array was not set, so no file was processed', array(':name:' => $files_array_loc), cl4_Exception_File::FILE_NOT_SET);
+			throw new Cl4_Exception_File('The field :name: in the $_FILES array was not set, so no file was processed', array(':name:' => $files_array_loc), Cl4_Exception_File::FILE_NOT_SET);
 		}
 
 		// check to see if there was error
@@ -160,12 +160,12 @@ class cl4_File {
 					break;
 			} // switch
 
-			throw new cl4_Exception_File('PHP File Upload Error (:error:) ' . $msg, array(':error:' => $file_data['error']), cl4_Exception_File::PHP_FILE_UPLOAD_ERROR);
+			throw new Cl4_Exception_File('PHP File Upload Error (:error:) ' . $msg, array(':error:' => $file_data['error']), Cl4_Exception_File::PHP_FILE_UPLOAD_ERROR);
 		} // if
 
 		// ensure it's an uploaded file
 		if ( ! is_uploaded_file($file_data['tmp_name'])) {
-			throw new cl4_Exception_File('File received is not an uploaded file: :file:', array(':file:' => $file_data['tmp_name']), cl4_Exception_File::NOT_UPLOADED_FILE);
+			throw new Cl4_Exception_File('File received is not an uploaded file: :file:', array(':file:' => $file_data['tmp_name']), Cl4_Exception_File::NOT_UPLOADED_FILE);
 		}
 
 		return $this->upload_file($file_data, $destination_folder);
@@ -223,12 +223,12 @@ class cl4_File {
 			// only checking by extension
 			if ($this->options['ext_check_only']) {
 				if ( ! in_array(strtolower($file_info['ext']), $this->options['allowed_extensions'])) {
-					throw new cl4_Exception_File('The file extension ":ext:" is not an allowed extension', array(':ext:' => $file_info['ext']), cl4_Exception_File::EXTENSION_NOT_ALLOWED);
+					throw new Cl4_Exception_File('The file extension ":ext:" is not an allowed extension', array(':ext:' => $file_info['ext']), Cl4_Exception_File::EXTENSION_NOT_ALLOWED);
 				}
 
 			} else {
 				if ( ! in_array($file_info['mime_type'], $this->options['allowed_types'])) {
-					throw new cl4_Exception_File('The mime type ":mime:" is not an allowed mime type', array(':mime:' => $file_info['mime_type']), cl4_Exception_File::MIME_NOT_ALLOWED);
+					throw new Cl4_Exception_File('The mime type ":mime:" is not an allowed mime type', array(':mime:' => $file_info['mime_type']), Cl4_Exception_File::MIME_NOT_ALLOWED);
 				}
 			}
 		} // if
@@ -245,7 +245,7 @@ class cl4_File {
 			if ($new_destination_folder != $destination_folder && ! file_exists($new_destination_folder)) {
 				// option is set to make the dir and it doesn't exist
 				if ( ! mkdir($new_destination_folder, 0755, TRUE)) {
-					throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana_Exception::text($e)), cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
+					throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana_Exception::text($e)), Cl4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
 				}
 			}
 		}
@@ -253,11 +253,11 @@ class cl4_File {
 		// if overrite is false, make sure the destination file does not already exist
 		if (file_exists($file_info['dest_file_path'])) {
 			if ( ! $this->options['overwrite']) {
-				throw new cl4_Exception_File('The destination file already exists :dest_file: for user file :user_file:', array(':dest_file:' => $file_info['dest_file'], ':user_file:' => $file_info['user_file']), cl4_Exception_File::DESTINATION_FILE_EXISTS);
+				throw new Cl4_Exception_File('The destination file already exists :dest_file: for user file :user_file:', array(':dest_file:' => $file_info['dest_file'], ':user_file:' => $file_info['user_file']), Cl4_Exception_File::DESTINATION_FILE_EXISTS);
 
 			// we can overwrite, so remove the file first
 			} else if ( ! $this->delete($file_info['dest_file_path'])) {
-				throw new cl4_Exception_File('The destination file already exists :dest_file: but could not be deleted/overwritten', array(':dest_file:' => $file_info['dest_file']), cl4_Exception_File::DELETE_FILE_FAILED);
+				throw new Cl4_Exception_File('The destination file already exists :dest_file: but could not be deleted/overwritten', array(':dest_file:' => $file_info['dest_file']), Cl4_Exception_File::DELETE_FILE_FAILED);
 			}
 		}
 
@@ -270,11 +270,11 @@ class cl4_File {
 				$return['dest_file_path'] = $file_info['dest_file_path'];
 			}
 		} catch (Exception $e) {
-			throw new cl4_Exception_File('The uploaded file (user filename: :user_file:, tmp name: :tmp_file:) could not be copied to :dest_file: with copy(), the error was: :msg:', array(
+			throw new Cl4_Exception_File('The uploaded file (user filename: :user_file:, tmp name: :tmp_file:) could not be copied to :dest_file: with copy(), the error was: :msg:', array(
 				':user_file:' => $file_info['user_file'],
 				':tmp_file:' => $file_info['tmp_file'],
 				':dest_file:' => $file_info['dest_file'],
-				':msg:' => $e->getMessage()), cl4_Exception_File::MOVE_UPLOADED_FILE_FAILED);
+				':msg:' => $e->getMessage()), Cl4_Exception_File::MOVE_UPLOADED_FILE_FAILED);
 		}
 
 		return $return;
@@ -404,7 +404,7 @@ class cl4_File {
 		// ensure we have the name change text if we are going to be changing the file name using: prepend, append, overwrite or overwrite_all
 		$dest_required = array('prepend', 'append', 'overwrite', 'overwrite_all');
 		if (in_array($name_change_method, $dest_required) && empty($options['name_change_text'])) {
-			throw new cl4_Exception_File('Input Error: No destination filename received, defaulting to keep the original: "' . $file_info['orig_file'] . '"');
+			throw new Cl4_Exception_File('Input Error: No destination filename received, defaulting to keep the original: "' . $file_info['orig_file'] . '"');
 			$options['name_change_text'] = $file_info['orig_file'];
 		}
 
@@ -543,7 +543,7 @@ class cl4_File {
 			if (defined('ABS_ROOT')) {
 				$path_to_check_with = ABS_ROOT;
 			} else {
-				throw new cl4_Exception_File('No path to check with and the constant ABS_ROOT is not defined so no file security check can be performed');
+				throw new Cl4_Exception_File('No path to check with and the constant ABS_ROOT is not defined so no file security check can be performed');
 			}
 		}
 
@@ -568,18 +568,18 @@ class cl4_File {
 	*/
 	public function copy_file_to_id($id, $original_filename, $move = FALSE) {
 		if ( ! file_exists($original_filename)) {
-			throw new cl4_Exception_File('The file to be copied to the new ID based filename does not exist: :file', array('file' => $original_filename), cl4_Exception_File::FILE_DOES_NOT_EXIST);
+			throw new Cl4_Exception_File('The file to be copied to the new ID based filename does not exist: :file', array('file' => $original_filename), Cl4_Exception_File::FILE_DOES_NOT_EXIST);
 
 		} else if ( ! is_file($original_filename)) {
-			throw new cl4_Exception_File('The file to be copied to the new ID based filename is not a file (possibly a directory): :file', array('file' => $filename), cl4_Exception_File::IS_NOT_REGULAR_FILE);
+			throw new Cl4_Exception_File('The file to be copied to the new ID based filename is not a file (possibly a directory): :file', array('file' => $filename), Cl4_Exception_File::IS_NOT_REGULAR_FILE);
 		}
 
 		$options['name_change_method'] = 'overwrite';
 
 		try {
 			return File::copy_with_name_change($original_filename, $id, $move, $options);
-		} catch (cl4_Exception_File $e) {
-			throw new cl4_Exception_File('Failed to copy file to id based filename: :msg', array('msg' => $e->getMessage()), cl4_Exception_File::ID_COPY_FAILED);
+		} catch (Cl4_Exception_File $e) {
+			throw new Cl4_Exception_File('Failed to copy file to id based filename: :msg', array('msg' => $e->getMessage()), Cl4_Exception_File::ID_COPY_FAILED);
 		}
 	} // function copy_file_to_id
 
@@ -594,13 +594,13 @@ class cl4_File {
 	public static function move($original_file, $destination_file, $overwrite = FALSE) {
 		// ensure the file we are working with exists
 		if ( ! file_exists($original_file)) {
-			throw new cl4_Exception_File('The file being moved does not exist: :file', array('file' => $original_file), cl4_Exception_File::FILE_DOES_NOT_EXIST);
+			throw new Cl4_Exception_File('The file being moved does not exist: :file', array('file' => $original_file), Cl4_Exception_File::FILE_DOES_NOT_EXIST);
 
 		} else if (file_exists($destination_file)) {
-			throw new cl4_Exception_File('The destination file exists: :file', array('file' => $destination_file), cl4_Exception_File::DESTINATION_FILE_EXISTS);
+			throw new Cl4_Exception_File('The destination file exists: :file', array('file' => $destination_file), Cl4_Exception_File::DESTINATION_FILE_EXISTS);
 
 		} else if ( ! rename($original_file, $destination_file)) {
-			throw new cl4_Exception_File('The file could not be moved. Original file: :orig_file Destination file: :dest_file', array('orig_file' => $original_file, 'dest_file' => $destination_file), cl4_Exception_File::MOVE_FILE_FAILED);
+			throw new Cl4_Exception_File('The file could not be moved. Original file: :orig_file Destination file: :dest_file', array('orig_file' => $original_file, 'dest_file' => $destination_file), Cl4_Exception_File::MOVE_FILE_FAILED);
 		} // if
 
 		return TRUE;
@@ -617,10 +617,10 @@ class cl4_File {
 	public function copy($original_file, $destination_file) {
 		// ensure the file we are working with exists
 		if ( ! file_exists($original_file)) {
-			throw new cl4_Exception_File('The file being copied does not exist: :file', array('file' => $original_file), cl4_Exception_File::FILE_DOES_NOT_EXIST);
+			throw new Cl4_Exception_File('The file being copied does not exist: :file', array('file' => $original_file), Cl4_Exception_File::FILE_DOES_NOT_EXIST);
 
 		} else if ( ! copy($original_file, $destination_file)) {
-			throw new cl4_Exception_File('The file could not be copied. Original file: :orig_file Destination file: :dest_file', array('orig_file' => $original_file, 'dest_file' => $destination_file), cl4_Exception_File::COPY_FILE_FAILED);
+			throw new Cl4_Exception_File('The file could not be copied. Original file: :orig_file Destination file: :dest_file', array('orig_file' => $original_file, 'dest_file' => $destination_file), Cl4_Exception_File::COPY_FILE_FAILED);
 		} // if
 
 		return TRUE;
@@ -644,7 +644,7 @@ class cl4_File {
 		$options += File::$options;
 
 		if ( ! file_exists($original_file)) {
-			throw new cl4_Exception_File('The file being copied does not exist: :file', array('file' => $original_file), cl4_Exception_File::FILE_DOES_NOT_EXIST);
+			throw new Cl4_Exception_File('The file being copied does not exist: :file', array('file' => $original_file), Cl4_Exception_File::FILE_DOES_NOT_EXIST);
 
 		} else {
 			$path_info = pathinfo($original_file);
@@ -669,7 +669,7 @@ class cl4_File {
 				} else {
 					File::copy($original_file, $file_info['dest_file']);
 				}
-			} catch (cl4_Exception_File $e) {
+			} catch (Cl4_Exception_File $e) {
 				throw $e;
 			}
 		}
@@ -686,10 +686,10 @@ class cl4_File {
 	*/
 	public static function delete($filename) {
 		if ( ! file_exists($filename)) {
-			throw new cl4_Exception_File('The file you are trying to delete does not exist: :file', array('file' => $filename), cl4_Exception_File::FILE_DOES_NOT_EXIST);
+			throw new Cl4_Exception_File('The file you are trying to delete does not exist: :file', array('file' => $filename), Cl4_Exception_File::FILE_DOES_NOT_EXIST);
 
 		} else if ( ! unlink($filename)) {
-			throw new cl4_Exception_File('Unable to delete/unlink the file: :file', array('file' => $filename), cl4_Exception_File::DELETE_FILE_FAILED);
+			throw new Cl4_Exception_File('Unable to delete/unlink the file: :file', array('file' => $filename), Cl4_Exception_File::DELETE_FILE_FAILED);
 		}
 
 		return TRUE;
@@ -711,4 +711,4 @@ class cl4_File {
 
 		return $mimes;
 	} // function
-} // class cl4_File
+} // class Cl4_File

@@ -6,7 +6,7 @@
  * @author
  * @copyright  (c) 2010 Claero Systems
  */
-class cl4_Pagination extends Kohana_Pagination {
+class Cl4_Pagination extends Kohana_Pagination {
 	// the number of items on the page
 	protected $items_on_page = NULL;
 

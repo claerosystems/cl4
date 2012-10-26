@@ -3,7 +3,7 @@
 /**
 *   Reads and writes CSV files
 */
-class cl4_CSV {
+class Cl4_CSV {
 	/**
 	* the current mode (read or write)
 	* @var  string
@@ -319,4 +319,4 @@ class cl4_CSV {
 			return $return;
 		}
 	} // function get_row
-} // class cl4_CSV
+} // class Cl4_CSV

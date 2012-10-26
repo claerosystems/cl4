@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die ('No direct script access.');
 
-class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
+class Cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 	/**
 	* Very similar to Kohana::exception_handler() but instead it determines if errors should be displayed based on Kohana::$environment.
 	* All errors will still be logged as long as there is a log object.
@@ -167,7 +167,7 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 
 						// Create an email about this error to send out
 						$error_email = new Mail();
-						$error_email->AddAddress(cl4::get_error_email());
+						$error_email->AddAddress(Cl4::get_error_email());
 						$error_email->Subject = 'Error on ' . LONG_NAME . ' ' . APP_VERSION;
 						$error_email->MsgHTML($error);
 
@@ -210,7 +210,7 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 	} // function handler
 
 	/**
-	* Calls cl4_Exception::handler() with everything the same, but $production_error_display defaults to FALSE
+	* Calls Cl4_Exception::handler() with everything the same, but $production_error_display defaults to FALSE
 	* so that you can display your own error message.
 	* Likely used within the catch of a try/catch.
 	*
@@ -222,4 +222,4 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 	public static function caught_handler(Exception $e, $production_error_display = FALSE, $display_error = TRUE) {
 		return Kohana_Exception::handler($e, $production_error_display, $display_error);
 	}
-} // class cl4_cl4_Exception
+} // class Cl4_Cl4_Exception

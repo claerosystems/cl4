@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_File extends ORM_FieldType {
+class Cl4_ORM_File extends ORM_FieldType {
 	public static function edit($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
 		$options += array(
 			'file_options' => array(
@@ -36,7 +36,7 @@ class cl4_ORM_File extends ORM_FieldType {
 		$file_options = $options['file_options'];
 		$file_options['orm_model'] = $orm_model;
 
-		$destination_folder = cl4File::get_file_path($file_options['destination_folder'], $orm_model->table_name(), $column_name, $file_options);
+		$destination_folder Cl4File::get_file_path($file_options['destination_folder'], $orm_model->table_name(), $column_name, $file_options);
 
 		if ( ! $orm_model->is_field_name_array()) {
 			$remove_checkbox_name = $orm_model->field_name_prefix() . $column_name . '_remove_file';
@@ -65,7 +65,7 @@ class cl4_ORM_File extends ORM_FieldType {
 			// try to upload the file
 			try {
 				// create a new file object to handle the upload
-				$file = new cl4File($file_options);
+				$file = new Cl4File($file_options);
 				$file_data = $file->upload($column_name, $destination_folder);
 
 				// set the new file name
@@ -83,7 +83,7 @@ class cl4_ORM_File extends ORM_FieldType {
 			// try to find the file in the post and upload the file
 			try {
 				$path_to_file = array($options['field_name_prefix'], $orm_model->table_name(), $orm_model->record_number(), $column_name);
-				$post_file_name = cl4File::get_files_array_value($path_to_file, 'name');
+				$post_file_name = Cl4File::get_files_array_value($path_to_file, 'name');
 
 				if ( ! empty($post_file_name)) {
 					// special functionality to name change method id
@@ -100,7 +100,7 @@ class cl4_ORM_File extends ORM_FieldType {
 					} // if
 
 					// create a new file object to handle the upload
-					$file = new cl4File($file_options);
+					$file = new Cl4File($file_options);
 					$file_data = $file->upload($path_to_file, $destination_folder);
 
 					// set the new file name

@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die ('No direct script access.');
 
-class cl4_Database_Query_Builder_Select extends Kohana_Database_Query_Builder_Select {
+class Cl4_Database_Query_Builder_Select extends Kohana_Database_Query_Builder_Select {
 	/**
 	* Adds a new expiry column condition to the last created JOIN statement, similar to:
 	*
@@ -82,4 +82,4 @@ class cl4_Database_Query_Builder_Select extends Kohana_Database_Query_Builder_Se
 
 		return $this;
 	} // function reset_group_by
-} // class cl4_Database_Query_Builder_Select
+} // class Cl4_Database_Query_Builder_Select

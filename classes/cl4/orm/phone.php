@@ -12,7 +12,7 @@
 * todo: handle improperly formatted values
 * todo: create this class!!!
 */
-class cl4_ORM_Phone extends ORM_FieldType {
+class Cl4_ORM_Phone extends ORM_FieldType {
 	public static function edit($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
 		// create the form fields for entering the phone number
 		return Form::phone($html_name, $value, $attributes, $options);
@@ -67,7 +67,7 @@ class cl4_ORM_Phone extends ORM_FieldType {
 	} // function
 
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-		return cl4::format_phone($value);
+		return Cl4::format_phone($value);
 	}
 
 	public static function view_html($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {

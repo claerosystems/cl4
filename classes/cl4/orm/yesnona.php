@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_YesNoNA extends ORM_FieldType {
+class Cl4_ORM_YesNoNA extends ORM_FieldType {
 	public static $source = array(
 		1 => 'Yes',
 		2 => 'No',
@@ -38,7 +38,7 @@ class cl4_ORM_YesNoNA extends ORM_FieldType {
 			$source = ORM_YesNoNA::$source;
 		}
 
-		$source = cl4::translate_array($source);
+		$source = Cl4::translate_array($source);
 
 		if ( ! array_key_exists('multiple', $attributes)) {
 			$attributes['multiple'] = TRUE;

@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class cl4_Message {
+class Cl4_Message {
 	// the error levels
 	// when they are output, the meessages are order in descending numerical order
 	public static $error = 300;
@@ -23,7 +23,7 @@ class cl4_Message {
 	/**
 	* Add a message to the messages array in the session
 	*
-	* 	cl4_Message::add('The message', cl4_Message::$warning);
+	* 	Cl4_Message::add('The message', Cl4_Message::$warning);
 	*
 	* @param  mixed  $message  if string, the message is added to the array of messages under the level; if an array, the key of the array is used as the level and the value is the message
 	* @param  int  $level  if set, this will be used as the level; if null then the default level error will be used
@@ -36,7 +36,7 @@ class cl4_Message {
 		}
 
 		// we are in dev/debug so we don't want to add the message because it's a debug only message
-		if ( ! cl4::is_dev() && $level == Message::$debug) {
+		if ( ! Cl4::is_dev() && $level == Message::$debug) {
 			// get session messages, but don't delete them
 			return Message::get(NULL, FALSE);
 		}
@@ -100,7 +100,7 @@ class cl4_Message {
 	/**
 	* Returns a HTML unordered list with the errors from the validation exception
 	* This can then be used with add() to add the messages to the session
-	* By default it uses views/cl4/cl4_message_validation to format the messages
+	* By default it uses views/cl4/Cl4_message_validation to format the messages
 	* To add additional messages to the output (so they are included in this message), pass them in as an array in $additional_messages
 	*
 	* 	Message::add(__(Kohana::message('file', 'pre_message')) . Message::add_validation_errors($validation, 'file'), Message::$error);
@@ -173,7 +173,7 @@ class cl4_Message {
 	} // function
 
 	/**
-	* Returns the message view object: cl4/cl4_message
+	* Returns the message view object: cl4/Cl4_message
 	*
 	* 	echo Message::display();
 	*
@@ -202,17 +202,17 @@ class cl4_Message {
 	} // function
 
 	/**
-	 * Converts validation errors to cl4_Message-compatable messages.
+	 * Converts validation errors to Cl4_Message-compatable messages.
 	 *
 	 * @param array $errors The errors to convert.
 	 *
-	 * @return array The cl4_Message messages.
+	 * @return array The Cl4_Message messages.
 	 */
 	public static function errors_to_messages($errors) {
 		$messages = array();
 
 		foreach($errors as $field => $message) {
-			$messages[] = array('level' => cl4_Message::$error, 'message' => $message);
+			$messages[] = array('level' => Cl4_Message::$error, 'message' => $message);
 		}
 
 		return $messages;

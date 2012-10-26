@@ -6,7 +6,7 @@
  * @author     Dan Hulton
  * @copyright  (c) 2010 Claero Systems
  */
-class cl4_Arr extends Kohana_Arr {
+class Cl4_Arr extends Kohana_Arr {
 	/**
 	* Explodes a string on 2 or more strings
 	* Useful when you have a strings such as:

@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_Height extends ORM_Select {
+class Cl4_ORM_Height extends ORM_Select {
 	/**
 	 * Displays this column in an edit context.
 	 *
@@ -164,6 +164,6 @@ class cl4_ORM_Height extends ORM_Select {
 			'nbsp' => FALSE,
 		);
 
-		return cl4_ORM_Height::prepare_html(cl4_ORM_Height::view($value, $column_name, $orm_model, $options), $options['nbsp']);
+		return Cl4_ORM_Height::prepare_html(Cl4_ORM_Height::view($value, $column_name, $orm_model, $options), $options['nbsp']);
 	} // function view_html
 }

@@ -4,10 +4,10 @@
 *
 * @author	 Claero Systems <craig.nakamoto@claero.com> / XM Media Inc <dhein@xmmedia.net>
 * @copyright  Claero Systems / XM Media Inc  2004-2009
-* @version	$Id: class-cl4_table.php 715 2010-01-15 17:19:50Z cnakamoto $
+* @version	$Id: class-Cl4_table.php 715 2010-01-15 17:19:50Z cnakamoto $
 */
 
-class cl4_HTMLTable {
+class Cl4_HTMLTable {
 	protected $eol = EOL;
 	protected $heol = HEOL;
 	protected $tab = "\t";

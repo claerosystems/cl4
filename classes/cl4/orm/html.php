@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_HTML extends ORM_Textarea {
+class Cl4_ORM_HTML extends ORM_Textarea {
 	public static function edit($column_name, $html_name, $body, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
 		return Form::html($html_name, $body, $attributes);
 	}

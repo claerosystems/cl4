@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_Checkbox extends ORM_FieldType {
+class Cl4_ORM_Checkbox extends ORM_FieldType {
 	/**
 	* Prepares the checkbox for editing
 	*

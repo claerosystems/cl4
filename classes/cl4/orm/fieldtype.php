@@ -12,7 +12,7 @@
 * This class contains the functions to generate the form fields, values for display and dealing with the values from the post
 * This should not do things like hashing a password because if it's done here, it won't be done when it's set manually. This type of functionality should instead be put in the model (in this example, by overriding save() or __set()).
 */
-class cl4_ORM_FieldType {
+class Cl4_ORM_FieldType {
 	/**
 	* For generation of the HTML fields for use in a form
 	* Should return HTML and the HTML should not be escaped after

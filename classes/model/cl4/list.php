@@ -1,12 +1,12 @@
 <?php defined('SYSPATH') or die ('No direct script access.');
 
 /**
- * This model was created using cl4_ORM and should provide
+ * This model was created using Cl4_ORM and should provide
  * standard Kohana ORM features in additon to cl4-specific features.
  *
  * When extending this, the _table_name and _table_name_display are needed in the sub class.
  */
-class Model_cl4_List extends ORM {
+class Model_Cl4_List extends ORM {
 	protected $_table_names_plural = FALSE;
 
 	// default sorting

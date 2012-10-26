@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die ('No direct script access.');
 
-class cl4_Text extends Kohana_Text {
+class Cl4_Text extends Kohana_Text {
 	/**
 	 * Automatically applies "p" and "br" markup to text.
 	 * Basically [nl2br](http://php.net/nl2br) on steroids.
@@ -132,4 +132,4 @@ class cl4_Text extends Kohana_Text {
 	public static function them($count) {
 	    return ($count == 1 ? 'it' : 'them');
 	} // function them
-} // class cl4_Text
+} // class Cl4_Text

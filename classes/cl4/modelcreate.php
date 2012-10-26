@@ -6,7 +6,7 @@
  * @author     Dan Hulton
  * @copyright  (c) 2010 Claero Systems
  */
-class cl4_ModelCreate {
+class Cl4_ModelCreate {
     /**
 	* Creates the complete PHP code that could be used as a starting point for a Kohana ORM model of the given tablename
 	* One could use this to generate the model code and save the model files.
@@ -38,7 +38,7 @@ class cl4_ModelCreate {
 		$model_code = "<?php defined('SYSPATH') or die ('No direct script access.');" . EOL;
 		$model_code .= EOL;
 		$model_code .= "/**" . EOL;
-		$model_code .= " * This model was created using cl4_ORM and should provide" . EOL;
+		$model_code .= " * This model was created using Cl4_ORM and should provide" . EOL;
 		$model_code .= " * standard Kohana ORM features in additon to cl4-specific features." . EOL;
 		$model_code .= " */" . EOL;
 		$model_code .= 'class Model_' . ModelCreate::make_class_name($table_name) . ' extends ORM {' . EOL;
@@ -57,7 +57,7 @@ class cl4_ModelCreate {
 		if ( ! isset($columns['name'])) {
 			$model_code .= TAB . '//protected $_primary_val = \'' . 'name' . '\'; // default: name (column used as primary value)' . EOL;
 		}
-		$model_code .= TAB . 'public $_table_name_display = \'' . cl4::underscores_to_words($table_name) . '\'; // cl4 specific' . EOL;
+		$model_code .= TAB . 'public $_table_name_display = \'' . Cl4::underscores_to_words($table_name) . '\'; // cl4 specific' . EOL;
 
 		// add sorting
 		$model_code .= EOL;
@@ -394,7 +394,7 @@ class cl4_ModelCreate {
 		else if ($column_name == 'id') $label = 'ID';
 		else $label = $column_name;
 
-		return cl4::underscores_to_words($label);
+		return Cl4::underscores_to_words($label);
 	}
 
 	/**

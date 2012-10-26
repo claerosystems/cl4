@@ -33,7 +33,7 @@ try {
 *   @author  Claero Systems <craig.nakamoto@claero.com> / XM Media Inc <dhein@xmmedia.net>
 *   @copyright  Claero Systems / XM Media Inc  2004-2010
 */
-class cl4_PDF extends FPDI {
+class Cl4_PDF extends FPDI {
 	/**
 	*   If the PDF creation has been rolled back
 	*   Used in KeepTogether()
@@ -684,4 +684,4 @@ class cl4_PDF extends FPDI {
 		$this->_destroy(true);
 		throw new Exception('TCPDF ERROR: ' . $msg);
 	}
-} // class cl4_PDF
+} // class Cl4_PDF

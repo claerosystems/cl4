@@ -3,7 +3,7 @@
 /**
 * Adds field types to Kohana_Form
 */
-class cl4_Form extends Kohana_Form {
+class Cl4_Form extends Kohana_Form {
 	const DATE_FORMAT = 'Y-m-d'; // todo: change to global constant?
 
 	public static $default_source_value = 'id';
@@ -987,7 +987,7 @@ class cl4_Form extends Kohana_Form {
 		$set_title_attribute = ( ! array_key_exists('title', $attributes));
 
 		// get the default values for the form fields
-		$default_data = cl4::parse_phone_value($value);
+		$default_data = Cl4::parse_phone_value($value);
 
 		// add the country code
 		$_attributes = $attributes;

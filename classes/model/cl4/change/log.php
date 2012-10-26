@@ -1,10 +1,10 @@
 <?php defined('SYSPATH') or die ('No direct script access.');
 
 /**
- * This model was created using cl4_ORM and should provide
+ * This model was created using Cl4_ORM and should provide
  * standard Kohana ORM features in additon to cl4-specific features.
  */
-class Model_cl4_Change_Log extends ORM {
+class Model_Cl4_Change_Log extends ORM {
 	protected $_table_names_plural = FALSE;
 	protected $_table_name = 'change_log';
 	protected $_primary_val = 'event_timestamp'; // default: name (column used as primary value)
