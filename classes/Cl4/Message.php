@@ -36,7 +36,7 @@ class cl4_Message {
 		}
 
 		// we are in dev/debug so we don't want to add the message because it's a debug only message
-		if ( ! cl4::is_dev() && $level == Message::$debug) {
+		if ( ! Cl4::is_dev() && $level == Message::$debug) {
 			// get session messages, but don't delete them
 			return Message::get(NULL, FALSE);
 		}

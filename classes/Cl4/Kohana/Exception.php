@@ -167,7 +167,7 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 
 						// Create an email about this error to send out
 						$error_email = new Mail();
-						$error_email->AddAddress(cl4::get_error_email());
+						$error_email->AddAddress(Cl4::get_error_email());
 						$error_email->Subject = 'Error on ' . LONG_NAME . ' ' . APP_VERSION;
 						$error_email->MsgHTML($error);
 

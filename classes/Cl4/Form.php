@@ -987,7 +987,7 @@ class cl4_Form extends Kohana_Form {
 		$set_title_attribute = ( ! array_key_exists('title', $attributes));
 
 		// get the default values for the form fields
-		$default_data = cl4::parse_phone_value($value);
+		$default_data = Cl4::parse_phone_value($value);
 
 		// add the country code
 		$_attributes = $attributes;

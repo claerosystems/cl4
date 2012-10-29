@@ -38,7 +38,7 @@ class cl4_ORM_YesNoNA extends ORM_FieldType {
 			$source = ORM_YesNoNA::$source;
 		}
 
-		$source = cl4::translate_array($source);
+		$source = Cl4::translate_array($source);
 
 		if ( ! array_key_exists('multiple', $attributes)) {
 			$attributes['multiple'] = TRUE;

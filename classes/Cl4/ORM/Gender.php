@@ -36,7 +36,7 @@ class cl4_ORM_Gender extends ORM_FieldType {
 			$source = ORM_Gender::$source;
 		}
 
-		$source = cl4::translate_array($source);
+		$source = Cl4::translate_array($source);
 
 		if ( ! array_key_exists('multiple', $attributes)) {
 			$attributes['multiple'] = TRUE;
