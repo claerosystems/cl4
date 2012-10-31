@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_Height extends ORM_Select {
+class CL4_ORM_Height extends ORM_Select {
 	/**
 	 * Displays this column in an edit context.
 	 *

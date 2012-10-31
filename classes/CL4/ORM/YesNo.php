@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_YesNo extends ORM_FieldType {
+class CL4_ORM_YesNo extends ORM_FieldType {
 	public static $source = array(
 		1 => 'Yes',
 		2 => 'No',

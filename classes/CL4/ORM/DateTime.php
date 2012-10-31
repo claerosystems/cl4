@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_Datetime extends ORM_FieldType {
+class CL4_ORM_Datetime extends ORM_FieldType {
 	/**
 	 * @const string The format to output datetimes as.
 	 */

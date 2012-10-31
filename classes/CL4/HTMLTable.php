@@ -7,7 +7,7 @@
 * @version	$Id: class-cl4_table.php 715 2010-01-15 17:19:50Z cnakamoto $
 */
 
-class cl4_HTMLTable {
+class CL4_HTMLTable {
 	protected $eol = EOL;
 	protected $heol = HEOL;
 	protected $tab = "\t";

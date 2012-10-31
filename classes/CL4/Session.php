@@ -8,7 +8,7 @@
  * @author     Claero Systems
  * @copyright  (c) 2010 Claero Systems
  */
-abstract class cl4_Session extends Kohana_Session {
+abstract class CL4_Session extends Kohana_Session {
 	/**
 	 * Set a variable within a sub-array.
 	 *
@@ -48,4 +48,4 @@ abstract class cl4_Session extends Kohana_Session {
 	public function path($path, $default = NULL, $delimiter = NULL) {
 		return Arr::path($this->_data, $path, $default);
 	} // function path
-} // class cl4_Session
+} // class CL4_Session

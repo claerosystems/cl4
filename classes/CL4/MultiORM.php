@@ -3,7 +3,7 @@
 /**
 * To deal with multiple ORM models
 */
-class cl4_MultiORM {
+class CL4_MultiORM {
 	/**
 	* this will hold the current database instance to be used for database actions
 	* @var database instance

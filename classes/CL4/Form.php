@@ -3,7 +3,7 @@
 /**
 * Adds field types to Kohana_Form
 */
-class cl4_Form extends Kohana_Form {
+class CL4_Form extends Kohana_Form {
 	const DATE_FORMAT = 'Y-m-d'; // todo: change to global constant?
 
 	public static $default_source_value = 'id';

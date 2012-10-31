@@ -3,7 +3,7 @@
 /**
 * provides file upload/copy/move features
 */
-class cl4_File {
+class CL4_File {
 	/**
 	* Options for use within the object
 	* @var array
@@ -711,4 +711,4 @@ class cl4_File {
 
 		return $mimes;
 	} // function
-} // class cl4_File
+} // class CL4_File

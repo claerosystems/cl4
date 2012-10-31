@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class cl4_HTML extends Kohana_HTML {
+class CL4_HTML extends Kohana_HTML {
 	/**
 	* Attributes that should be appended to instead of overwritten
 	* Used in HTML::merge_attributes()

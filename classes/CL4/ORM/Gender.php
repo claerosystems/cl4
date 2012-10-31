@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_Gender extends ORM_FieldType {
+class CL4_ORM_Gender extends ORM_FieldType {
 	public static $source = array(
 		1 => 'Male',
 		2 => 'Female',

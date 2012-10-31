@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_File extends ORM_FieldType {
+class CL4_ORM_File extends ORM_FieldType {
 	public static function edit($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
 		$options += array(
 			'file_options' => array(

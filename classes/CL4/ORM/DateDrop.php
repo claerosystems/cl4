@@ -5,7 +5,7 @@
  *
  * Displays a date composed of selects.
  */
-class cl4_ORM_DateDrop extends cl4_ORM_Date {
+class CL4_ORM_DateDrop extends CL4_ORM_Date {
 	/**
 	 * Displays this column in an edit context.
 	 *

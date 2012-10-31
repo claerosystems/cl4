@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die ('No direct script access.');
 
-abstract class cl4_Database_Query_Builder_Where extends Kohana_Database_Query_Builder_Where {
+abstract class CL4_Database_Query_Builder_Where extends Kohana_Database_Query_Builder_Where {
 	/**
 	* Adds an expiry where clause similar to:
 	*

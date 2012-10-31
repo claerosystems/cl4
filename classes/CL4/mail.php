@@ -4,7 +4,7 @@ if ( ! Kohana::load(Kohana::find_file('vendor', 'phpmailer/class.phpmailer'))) {
 	throw new Kohana_Exception('Unable to find PHPMailer. Ensure it\'s in a vendor folder');
 }
 
-class cl4_Mail extends PHPMailer {
+class CL4_Mail extends PHPMailer {
 	/**
 	* The default mail config to use, unless otherwise specified
 	* @var  string
@@ -247,4 +247,4 @@ class cl4_Mail extends PHPMailer {
 	public function add_log_bcc() {
 		return $this->AddBCC($this->log_email);
 	}
-} // class cl4_Mail
+} // class CL4_Mail

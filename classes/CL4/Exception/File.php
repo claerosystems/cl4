@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class cl4_Exception_File extends Kohana_Exception {
+class CL4_Exception_File extends Kohana_Exception {
 	const NO_FILES_RECEIVED = 1;
 	const FILE_NOT_SET = 2;
 	const PHP_FILE_UPLOAD_ERROR = 3;

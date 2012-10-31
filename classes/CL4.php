@@ -1,3 +1,3 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-class cl4 extends cl4_Core {}
+class CL4 extends CL4_Core {}

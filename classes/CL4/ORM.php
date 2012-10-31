@@ -8,7 +8,7 @@
  *
  * todo: should we separate the cl4 form methods to another class to avoid loading all this code for every model?
  */
-class cl4_ORM extends Kohana_ORM {
+class CL4_ORM extends Kohana_ORM {
 	/**
 	* this is the array of options
 	* @var    string

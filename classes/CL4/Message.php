@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class cl4_Message {
+class CL4_Message {
 	// the error levels
 	// when they are output, the meessages are order in descending numerical order
 	public static $error = 300;

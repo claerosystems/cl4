@@ -15,7 +15,7 @@
 *    ... any other data for that request
 * )
 */
-class cl4_AJAX_Status {
+class CL4_AJAX_Status {
 	/**
 	* @var  int  0: An unkown error occured during the AJAX request
 	*/
@@ -114,4 +114,4 @@ class cl4_AJAX_Status {
 	public static function is_json() {
 		Kohana::$content_type = 'application/json';
 	}
-} // class cl4_AJAX_Status
+} // class CL4_AJAX_Status

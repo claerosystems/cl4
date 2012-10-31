@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cl4_ORM_RangeSelect extends ORM_FieldType {
+class CL4_ORM_RangeSelect extends ORM_FieldType {
 	public static function edit($column_name, $html_name, $selected, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
 		// the default range will be 1-10
 		$default_options = array(

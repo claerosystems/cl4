@@ -6,7 +6,7 @@
  * @author     Dan Hulton
  * @copyright  (c) 2010 Claero Systems
  */
-class cl4_ModelCreate {
+class CL4_ModelCreate {
     /**
 	* Creates the complete PHP code that could be used as a starting point for a Kohana ORM model of the given tablename
 	* One could use this to generate the model code and save the model files.

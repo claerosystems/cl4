@@ -6,7 +6,7 @@
  * @author     Dan Hulton
  * @copyright  (c) 2010 Claero Systems
  */
-class cl4_URL extends Kohana_URL {
+class CL4_URL extends Kohana_URL {
 	/**
 	* Runs http_build_query() with some defaults
 	* If the resulting string is not empty, the string will include the ? in front
