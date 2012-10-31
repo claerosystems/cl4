@@ -67,7 +67,7 @@ class cl4_ORM_Phone extends ORM_FieldType {
 	} // function
 
 	public static function view($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-		return Cl4::format_phone($value);
+		return CL4::format_phone($value);
 	}
 
 	public static function view_html($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {

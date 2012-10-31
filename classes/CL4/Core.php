@@ -28,7 +28,7 @@ class Cl4_Core extends Kohana_Core {
 		}
 
 		// Don't do this in production
-		if (Cl4::is_dev()) {
+		if (CL4::is_dev()) {
 			// Get all passed variables
 			$variables = func_get_args();
 
@@ -39,12 +39,12 @@ class Cl4_Core extends Kohana_Core {
 			}
 
 			// If we haven't checked for FirePHP yet
-			if ( ! isset(Cl4::$is_firephp)) {
+			if ( ! isset(CL4::$is_firephp)) {
 				// See if it's available
-				Cl4::$is_firephp = in_array('firephp', array_keys(Kohana::modules()));
+				CL4::$is_firephp = in_array('firephp', array_keys(Kohana::modules()));
 			}
 
-			if (Cl4::$is_firephp) {
+			if (CL4::$is_firephp) {
 				Fire::log($content);
 			} else {
 				echo Kohana::debug($content) . HEOL;
@@ -115,7 +115,7 @@ class Cl4_Core extends Kohana_Core {
 		// check for GET; only look for it if the value was not set in POST or the Route (Request)
 		if (empty($value)) $value = Arr::get($_GET, $key, $default);
 
-		return Cl4::clean_param($value, $type);
+		return CL4::clean_param($value, $type);
 	} // function get_param
 
 	/**
@@ -135,7 +135,7 @@ class Cl4_Core extends Kohana_Core {
 		$value = Arr::path($_POST, $path);
 		if (empty($value)) Arr::path($_GET, $path, $default);
 
-		return Cl4::clean_param($value, $type);
+		return CL4::clean_param($value, $type);
 	} // function get_param_array
 
 	/**
@@ -252,13 +252,13 @@ class Cl4_Core extends Kohana_Core {
 		foreach ($array as $key => $value) {
 			if ($key) {
 				if (is_array($value)) {
-					$array[__($key)] = Cl4::translate_array($value, $key);
+					$array[__($key)] = CL4::translate_array($value, $key);
 				} else {
 					$array[__($key)] = __($value);
 				}
 			} else {
 				if (is_array($value)) {
-					$array[$key] = Cl4::translate_array($value, $key);
+					$array[$key] = CL4::translate_array($value, $key);
 				} else {
 					$array[$key] = __($value);
 				}
@@ -269,7 +269,7 @@ class Cl4_Core extends Kohana_Core {
 	} // function
 
 	/**
-	* Used in Form::phone(), ORM_Phone and Cl4::format_phone() to break apart the phone number stored in the database as a string
+	* Used in Form::phone(), ORM_Phone and CL4::format_phone() to break apart the phone number stored in the database as a string
 	* Returns an array of the different phone number parts
 	*
 	* @param string $value
@@ -294,7 +294,7 @@ class Cl4_Core extends Kohana_Core {
 	/**
 	* Returns a formatted phone number
 	* For use with Form::phone()
-	* If a string is passed it will be parsed with Cl4::parse_phone_value() first
+	* If a string is passed it will be parsed with CL4::parse_phone_value() first
 	*
 	* @param mixed $phone
 	* @return string
@@ -302,7 +302,7 @@ class Cl4_Core extends Kohana_Core {
 	public static function format_phone($phone) {
 		if ( ! is_array($phone)) {
 			// assume that we've been passed the string that's in the database and try to get it's parts
-			$phone = Cl4::parse_phone_value($phone);
+			$phone = CL4::parse_phone_value($phone);
 		}
 
 		$formatted_phone = '';

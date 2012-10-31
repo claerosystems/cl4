@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die ('No direct script access.');
 
-class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
+class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	/**
 	* Very similar to Kohana::exception_handler() but instead it determines if errors should be displayed based on Kohana::$environment.
 	* All errors will still be logged as long as there is a log object.
@@ -167,7 +167,7 @@ class cl4_Kohana_Exception extends Kohana_Kohana_Exception {
 
 						// Create an email about this error to send out
 						$error_email = new Mail();
-						$error_email->AddAddress(Cl4::get_error_email());
+						$error_email->AddAddress(CL4::get_error_email());
 						$error_email->Subject = 'Error on ' . LONG_NAME . ' ' . APP_VERSION;
 						$error_email->MsgHTML($error);
 
