@@ -2023,7 +2023,7 @@ class CL4_ORM extends Kohana_ORM {
 
 		// add the change log record if _log is true and record_changes is true
 		if ( ! empty($data) && $this->_saved && $this->_log && $this->_log_next_query && $this->_options['record_changes']) {
-			$change_log = ORM::factory('change_log')
+			$change_log = ORM::factory('Change_Log')
 				->set_db($this->_db)
 				->add_change_log(array(
 					'table_name' => $this->_table_name,
@@ -2062,7 +2062,7 @@ class CL4_ORM extends Kohana_ORM {
 
 			// add the change log record if _log is true and record_changes is true
 			if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
-				$change_log = ORM::factory('change_log')
+				$change_log = ORM::factory('Change_Log')
 					->set_db($this->_db)
 					->add_change_log(array(
 						'table_name' => $this->_table_name,
@@ -2152,7 +2152,7 @@ class CL4_ORM extends Kohana_ORM {
 
 		// add the change log record if _log is true and record_changes is true
 		if ( ! empty($data) && $this->_saved && $this->_log && $this->_log_next_query && $this->_options['record_changes']) {
-			$change_log = ORM::factory('change_log')
+			$change_log = ORM::factory('Change_Log')
 				->set_db($this->_db)
 				->add_change_log(array(
 					'table_name' => $this->_table_name,
@@ -2454,7 +2454,7 @@ class CL4_ORM extends Kohana_ORM {
 
 				// add the change log record if _log is true and record_changes is true
 				if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
-					$change_log = ORM::factory('change_log')
+					$change_log = ORM::factory('Change_Log')
 						->set_db($this->_db)
 						->add_change_log(array(
 							'table_name' => $this->_table_name,
@@ -2480,7 +2480,7 @@ class CL4_ORM extends Kohana_ORM {
 
 				// add the change log record if _log is true and record_changes is true
 				if ($this->_log && $this->_log_next_query && $this->_options['record_changes']) {
-					$change_log = ORM::factory('change_log')
+					$change_log = ORM::factory('Change_Log')
 						->set_db($this->_db)
 						->add_change_log(array(
 							'table_name' => $this->_table_name,

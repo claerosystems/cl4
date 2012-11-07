@@ -116,7 +116,7 @@ class CL4_Mail extends PHPMailer {
 	*   @return     bool        true if the user was found and added, false if they couldn't be found
 	*/
 	public function add_user($user_id) {
-		$user = ORM::factory('user', $user_id);
+		$user = ORM::factory('User', $user_id);
 
 		$add_status = false;
 

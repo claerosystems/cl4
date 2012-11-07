@@ -18,6 +18,15 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	* @return  boolean
 	*/
 	public static function handler(Exception $e, $production_error_display = TRUE, $display_error = TRUE) {
+
+		$response = Kohana_Exception::_handler($e);
+
+		// Send the response to the browser
+		echo $response->send_headers()->body();
+
+		exit(1);
+
+/*
         try {
 			// Get the exception information
 			$type    = get_class($e);
@@ -58,13 +67,13 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 				Kohana::$log->add(Log::ERROR, $error);
 
 				$strace = $error . "\n--\n" . $e->getTraceAsString();
-				Kohana::$log->add(Log::STRACE, $strace);
+				Kohana::$log->add(Log::INFO, $strace);
 
 				// Make sure the logs are written
 				Kohana::$log->write();
 			}
 
-			if (Kohana::$is_cli) {
+			if (PHP_SAPI == 'cli') {
 				// Just display the text of the exception and trace
 				echo "\n{$error}\n";
 				// display the trace when in development
@@ -207,6 +216,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 				exit(1);
 			} // if
 		} // catch
+*/
 	} // function handler
 
 	/**
