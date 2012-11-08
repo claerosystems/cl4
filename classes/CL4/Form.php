@@ -576,7 +576,7 @@ class CL4_Form extends Kohana_Form {
 			'month' => TRUE,
 			'day' => TRUE,
 			'year' => TRUE,
-			'field_type' => 'select',
+			'field_type' => 'Select',
 			'month_options' => array(),
 			'day_options' => array(),
 			'year_options' => array(),

@@ -6,7 +6,7 @@
  *
  * When extending this, the _table_name and _table_name_display are needed in the sub class.
  */
-class Model_cl4_List extends ORM {
+class Model_CL4_List extends ORM {
 	protected $_table_names_plural = FALSE;
 
 	// default sorting
@@ -22,12 +22,12 @@ class Model_cl4_List extends ORM {
 		* see the modules/cl4/config/cl4orm.php for a full list of cl4-specific options and documentation on what the options do
 		*/
 		'id' => array(
-			'field_type' => 'hidden',
+			'field_type' => 'Hidden',
 			'edit_flag' => TRUE,
 			'is_nullable' => FALSE,
 		),
 		'name' => array(
-			'field_type' => 'text',
+			'field_type' => 'Text',
 			'list_flag' => TRUE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,
@@ -38,7 +38,7 @@ class Model_cl4_List extends ORM {
 			),
 		),
 		'display_order' => array(
-			'field_type' => 'text',
+			'field_type' => 'Text',
 			'list_flag' => TRUE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,

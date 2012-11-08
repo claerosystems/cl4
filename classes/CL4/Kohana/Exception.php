@@ -17,7 +17,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	* @param  boolean    $display_error             If TRUE and in development, the error will be echo'd out (in addition to logged)
 	* @return  boolean
 	*/
-	public static function handler(Exception $e, $production_error_display = TRUE, $display_error = TRUE) {
+	public static function handler(Exception $e) {
 
 		$response = Kohana_Exception::_handler($e);
 
@@ -230,6 +230,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	* @return  boolean
 	*/
 	public static function caught_handler(Exception $e, $production_error_display = FALSE, $display_error = TRUE) {
-		return Kohana_Exception::handler($e, $production_error_display, $display_error);
+		//return Kohana_Exception::handler($e, $production_error_display, $display_error);
+		return Kohana_Exception::handler($e);
 	}
 } // class cl4_cl4_Exception

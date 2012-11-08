@@ -4,7 +4,7 @@
  * This model was created using cl4_ORM and should provide
  * standard Kohana ORM features in additon to cl4-specific features.
  */
-class Model_cl4_Change_Log extends ORM {
+class Model_CL4_Change_Log extends ORM {
 	protected $_table_names_plural = FALSE;
 	protected $_table_name = 'change_log';
 	protected $_primary_val = 'event_timestamp'; // default: name (column used as primary value)
@@ -31,18 +31,18 @@ class Model_cl4_Change_Log extends ORM {
 		* see the modules/cl4/config/cl4orm.php for a full list of cl4-specific options and documentation on what the options do
 		*/
 		'id' => array(
-			'field_type' => 'hidden',
+			'field_type' => 'Hidden',
 			'edit_flag' => TRUE,
 		),
 		'event_timestamp' => array(
-			'field_type' => 'datetime',
+			'field_type' => 'DateTime',
 			'list_flag' => TRUE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,
 			'view_flag' => TRUE,
 		),
 		'first_change_log_id' => array(
-			'field_type' => 'text',
+			'field_type' => 'Text',
 			'list_flag' => TRUE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,
@@ -50,7 +50,7 @@ class Model_cl4_Change_Log extends ORM {
 			'is_nullable' => FALSE,
 		),
 		'user_id' => array(
-			'field_type' => 'select',
+			'field_type' => 'Select',
 			'list_flag' => TRUE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,
@@ -63,7 +63,7 @@ class Model_cl4_Change_Log extends ORM {
 			),
 		),
 		'table_name' => array(
-			'field_type' => 'text',
+			'field_type' => 'Text',
 			'list_flag' => TRUE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,
@@ -73,7 +73,7 @@ class Model_cl4_Change_Log extends ORM {
 			),
 		),
 		'record_pk' => array(
-			'field_type' => 'text',
+			'field_type' => 'Text',
 			'list_flag' => TRUE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,
@@ -84,7 +84,7 @@ class Model_cl4_Change_Log extends ORM {
 			),
 		),
 		'query_type' => array(
-			'field_type' => 'text',
+			'field_type' => 'Text',
 			'list_flag' => TRUE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,
@@ -95,7 +95,7 @@ class Model_cl4_Change_Log extends ORM {
 			),
 		),
 		'row_count' => array(
-			'field_type' => 'text',
+			'field_type' => 'Text',
 			'list_flag' => TRUE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,
@@ -106,7 +106,7 @@ class Model_cl4_Change_Log extends ORM {
 			),
 		),
 		'sql' => array(
-			'field_type' => 'text',
+			'field_type' => 'Text',
 			'list_flag' => FALSE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,
@@ -116,7 +116,7 @@ class Model_cl4_Change_Log extends ORM {
 			),
 		),
 		'changed' => array(
-			'field_type' => 'text',
+			'field_type' => 'Text',
 			'list_flag' => FALSE,
 			'edit_flag' => TRUE,
 			'search_flag' => TRUE,
