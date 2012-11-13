@@ -36,7 +36,7 @@ class CL4_ORM_File extends ORM_FieldType {
 		$file_options = $options['file_options'];
 		$file_options['orm_model'] = $orm_model;
 
-		$destination_folder = cl4File::get_file_path($file_options['destination_folder'], $orm_model->table_name(), $column_name, $file_options);
+		$destination_folder = CL4File::get_file_path($file_options['destination_folder'], $orm_model->table_name(), $column_name, $file_options);
 
 		if ( ! $orm_model->is_field_name_array()) {
 			$remove_checkbox_name = $orm_model->field_name_prefix() . $column_name . '_remove_file';
