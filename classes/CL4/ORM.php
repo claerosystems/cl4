@@ -299,15 +299,29 @@ class CL4_ORM extends Kohana_ORM {
 			$model = ORM::factory($this->_has_many[$column]['model']);
 
 			if (isset($this->_has_many[$column]['through'])) {
+
 				// Grab has_many "through" relationship table
+				//todo: clean this up, right now this is a hack because the table name is not the same as the model name (because of case changes)
+				// we shouldn't need to specify 'through' and 'through_model'
 				$through = $this->_has_many[$column]['through'];
+				// use 'through_model' if set, or try to guess
+				if ( ! empty($this->_has_many[$column]['through_model'])) {
+					$through_model = $this->_has_many[$column]['through_model'];
+				} else {
+					$parts = explode('_', $through);
+					$through_model = '';
+					foreach($parts as $part) {
+						if ($through_model != '') $through_model .= '_';
+						$through_model .= ucfirst($part);
+					}
+				}
 
 				// Join on through model's target foreign key (far_key) and target model's primary key
 				$join_col1 = $through.'.'.$this->_has_many[$column]['far_key'];
 				$join_col2 = $model->_object_name.'.'.$model->_primary_key;
-
 				$model->join($through)->on($join_col1, '=', $join_col2);
-				if (ORM::factory($through)->has_expiry()) {
+
+				if (ORM::factory($through_model)->has_expiry()) {
 					$model->on_expiry($through);
 				}
 
@@ -394,12 +408,12 @@ class CL4_ORM extends Kohana_ORM {
 		$default_meta_data_field_type = (array) Kohana::$config->load('cl4orm.default_meta_data_field_type');
 
 		// if there is field type specific meta data for file, then get the cl4file options and merge them with the file field type ones
-		if ( ! empty($default_meta_data_field_type['file'])) {
+		if ( ! empty($default_meta_data_field_type['File'])) {
 			$file_options = Kohana::$config->load('cl4file.options');
 			foreach ($file_options as $key => $value) {
 				// only merge the ones that aren't set so we don't merge things like allowed types and allowed extensions
-				if ( ! array_key_exists($key, $default_meta_data_field_type['file']['field_options']['file_options'])) {
-					$default_meta_data_field_type['file']['field_options']['file_options'][$key] = $value;
+				if ( ! array_key_exists($key, $default_meta_data_field_type['File']['field_options']['file_options'])) {
+					$default_meta_data_field_type['File']['field_options']['file_options'][$key] = $value;
 				}
 			} // foreach
 		} // if
@@ -808,7 +822,7 @@ class CL4_ORM extends Kohana_ORM {
 		} // foreach
 
 		// now check for has_many relationships and add the fields
-		// @todo: handle case where we have a belongs to and has many but we only want to display the associated records (eg. atttach a file to a record)
+		// @todo: handle case where we have a belongs to and has many but we only want to display the associated records (eg. attach a file to a record)
 		if ($this->_mode != 'search') {
 			foreach ($this->_has_many as $alias => $relation_data) {
 				// skip any has many relationships not in the process columns array
@@ -841,7 +855,9 @@ class CL4_ORM extends Kohana_ORM {
 					if ($this->_mode == 'view') {
 						$field_html = $source_values;
 					} else {
+
 						$related_model = ORM::factory($relation_data['model']);
+
 						$related_table = $related_model->table_name();
 						$related_pk = $related_model->primary_key();
 						$related_label = $related_model->primary_val();
@@ -1034,6 +1050,7 @@ class CL4_ORM extends Kohana_ORM {
 	 * @return    string   the HTML for the formatted form
 	 */
 	public function get_form(array $options = array()) {
+
 		// set options if passed
 		if ( ! empty($options)) $this->set_options($options);
 
