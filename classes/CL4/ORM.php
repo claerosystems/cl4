@@ -855,7 +855,6 @@ class CL4_ORM extends Kohana_ORM {
 					if ($this->_mode == 'view') {
 						$field_html = $source_values;
 					} else {
-
 						$related_model = ORM::factory($relation_data['model']);
 
 						$related_table = $related_model->table_name();
@@ -877,6 +876,16 @@ class CL4_ORM extends Kohana_ORM {
 
 						$field_html_name = $this->_options['field_name_prefix'] . '[' . $alias . '][]';
 						$field_html = Form::checkboxes($field_html_name, $source_values, $current_values, array(), $checkbox_options);
+
+						// add the column
+						$this->_table_columns['Group'] = array(
+							'field_type' => $alias,
+							'list_flag' => FALSE,
+							'edit_flag' => TRUE,
+							'search_flag' => FALSE,
+							'view_flag' => FALSE,
+							'not_in_database' => TRUE,
+						);
 					} // if
 
 					// add the field label and html
@@ -888,7 +897,7 @@ class CL4_ORM extends Kohana_ORM {
 				} // if
 			} // foreach
 		} // if
-
+		//echo Debug::vars($this->_field_html, $this->_table_columns);
 		return $this;
 	} // function prepare_form
 
