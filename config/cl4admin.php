@@ -2,6 +2,6 @@
 
 return array(
 	'model_list' => array(
-		'change_log' => 'Change Log',
+		'Change_Log' => 'Change Log',
 	),
 );
