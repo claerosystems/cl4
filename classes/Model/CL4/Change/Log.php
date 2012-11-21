@@ -112,6 +112,7 @@ class Model_CL4_Change_Log extends ORM {
 			'search_flag' => TRUE,
 			'view_flag' => TRUE,
 			'field_attributes' => array(
+				'size' => 100,
 				'maxlength' => 15000,
 			),
 		),
@@ -122,6 +123,7 @@ class Model_CL4_Change_Log extends ORM {
 			'search_flag' => TRUE,
 			'view_flag' => TRUE,
 			'field_attributes' => array(
+				'size' => 100,
 				'maxlength' => 5000,
 			),
 		),
