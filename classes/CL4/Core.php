@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class Cl4_Core extends Kohana_Core {
+class CL4_Core extends Kohana_Core {
     /**
 	 * @var boolean If FirePHP has been detected as an available module.
 	 */
