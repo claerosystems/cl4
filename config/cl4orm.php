@@ -365,7 +365,7 @@ return array(
 		'generate_row_id' => FALSE, // if true, the a row ID will be added to each row
 		'row_id_prefix' => '', // when generate_row_id is true, then this will be used as the prefix to the row id
 		// these fields will be added to the hidden fields array when generating the form and will not be included in the _field_html array and therefore will not get a row in an edit form
-		'field_types_treated_as_hidden' => array('hidden'),
+		'field_types_treated_as_hidden' => array('Hidden'),
 		// these fields will be treated as textareas, such that the will limited based on editable_list_options.textarea_word_limit
 		'field_types_treaded_as_textarea' => array('textarea'),
 		'record_changes' => TRUE, // if set to TRUE, Model_Change_Log will be used to record changes; set this to FALSE to disable the change_log logging for all models; use _log and _log_next_query in ORM to affect only the model or save
