@@ -1,0 +1,7 @@
+cl4 is a Kohana library of classes that enhance the built-in Kohana functionality to:
+
+- facilitate the creation of HTML forms and form elements based on ORM models
+- facilitate the creation of tables of data based on ORM models
+- facilitate the creation of PDF files
+- facilitate the creation of CSV files
+- facilitate the sending of emails
