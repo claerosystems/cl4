@@ -6,9 +6,76 @@
  * @author
  * @copyright  (c) 2010 Claero Systems
  */
-class cl4_Pagination extends Kohana_Pagination {
+class CL4_Pagination {
+	// Merged configuration settings
+	protected $config = array(
+		'current_page'      => array('source' => 'query_string', 'key' => 'page'),
+		'total_items'       => 0,
+		'items_per_page'    => 10,
+		'view'              => 'pagination/basic',
+		'auto_hide'         => TRUE,
+		'first_page_in_url' => FALSE,
+	);
+
+	// Current page number
+	protected $current_page;
+
+	// Total item count
+	protected $total_items;
+
+	// How many items to show per page
+	protected $items_per_page;
+
+	// Total page count
+	protected $total_pages;
+
+	// Item offset for the first item displayed on the current page
+	protected $current_first_item;
+
+	// Item offset for the last item displayed on the current page
+	protected $current_last_item;
+
+	// Previous page number; FALSE if the current page is the first one
+	protected $previous_page;
+
+	// Next page number; FALSE if the current page is the last one
+	protected $next_page;
+
+	// First page number; FALSE if the current page is the first one
+	protected $first_page;
+
+	// Last page number; FALSE if the current page is the last one
+	protected $last_page;
+
+	// Query offset
+	protected $offset;
+
 	// the number of items on the page
 	protected $items_on_page = NULL;
+
+	/**
+	 * Creates a new Pagination object.
+	 *
+	 * @param   array  configuration
+	 * @return  Pagination
+	 */
+	public static function factory(array $config = array()) {
+		return new Pagination($config);
+	}
+
+	/**
+	 * Creates a new Pagination object.
+	 *
+	 * @param   array  configuration
+	 * @return  void
+	 */
+	public function __construct(array $config = array()) {
+		// Overwrite system defaults with application defaults
+		$this->config = $this->config_group() + $this->config;
+
+		// Pagination setup
+		$this->setup($config);
+	}
 
 	/**
 	 * Retrieves a pagination config group from the config file. One config group can
@@ -145,4 +212,89 @@ class cl4_Pagination extends Kohana_Pagination {
 
 		return '#';
 	} // function url
+
+	/**
+	 * Checks whether the given page number exists.
+	 *
+	 * @param   integer  page number
+	 * @return  boolean
+	 * @since   3.0.7
+	 */
+	public function valid_page($page)
+	{
+		// Page number has to be a clean integer
+		if ( ! Valid::digit($page))
+			return FALSE;
+
+		return $page > 0 AND $page <= $this->total_pages;
+	}
+
+	/**
+	 * Renders the pagination links.
+	 *
+	 * @param   mixed   string of the view to use, or a Kohana_View object
+	 * @return  string  pagination output (HTML)
+	 */
+	public function render($view = NULL)
+	{
+		// Automatically hide pagination whenever it is superfluous
+		if ($this->config['auto_hide'] === TRUE AND $this->total_pages <= 1)
+			return '';
+
+		if ($view === NULL)
+		{
+			// Use the view from config
+			$view = $this->config['view'];
+		}
+
+		if ( ! $view instanceof View)
+		{
+			// Load the view file
+			$view = View::factory($view);
+		}
+
+		// Pass on the whole Pagination object
+		return $view->set(get_object_vars($this))->set('page', $this)->render();
+	}
+
+	/**
+	 * Renders the pagination links.
+	 *
+	 * @return  string  pagination output (HTML)
+	 */
+	public function __toString()
+	{
+		try
+		{
+			return $this->render();
+		}
+		catch(Exception $e)
+		{
+			Kohana_Exception::handler($e);
+			return '';
+		}
+	}
+
+	/**
+	 * Returns a Pagination property.
+	 *
+	 * @param   string  property name
+	 * @return  mixed   Pagination property; NULL if not found
+	 */
+	public function __get($key)
+	{
+		return isset($this->$key) ? $this->$key : NULL;
+	}
+
+	/**
+	 * Updates a single config setting, and recalculates pagination if needed.
+	 *
+	 * @param   string  config key
+	 * @param   mixed   config value
+	 * @return  void
+	 */
+	public function __set($key, $value)
+	{
+		$this->setup(array($key => $value));
+	}
 } // class
