@@ -586,10 +586,16 @@ class CL4_HTMLTable {
 							}
 
 							$result_html .= $this->tab . $this->tab . '<th' . HTML::attributes($th_attributes) . '>';
-							if ($this->options['add_td_div']) {
-								$result_html .= '<div>' . ( ! empty($headings[$col_num]) ? $headings[$col_num] : '') . '</div>';
+
+							if ($this->options['sort_column'] !== NULL && $col_num == $this->options['sort_column']) {
+								$sort_html = '<span class="cl4_icon cl4_open_' . (strtolower($this->options['sort_order']) == 'asc' ? 'up' : 'down') . ' sort_icon"></span>';
 							} else {
-								$result_html .= ( ! empty($headings[$col_num]) ? $headings[$col_num] : '');
+								$sort_html = '';
+							}
+							if ($this->options['add_td_div']) {
+								$result_html .= '<div>' . ( ! empty($headings[$col_num]) ? $headings[$col_num] : '') . $sort_html . '</div>';
+							} else {
+								$result_html .= ( ! empty($headings[$col_num]) ? $headings[$col_num] : '') . $sort_html;
 							}
 							$result_html .= '</th>' . $this->eol;
 						}
