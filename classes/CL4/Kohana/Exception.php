@@ -4,23 +4,41 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	/**
 	 * Inline exception handler, displays the error message, source of the
 	 * exception, and the stack trace of the error.
+	 * If it's currently an AJAX request, response_ajax() will be used.
+	 *
+	 * @uses    Kohana_Exception::response
+	 * @param   Exception  $e
+	 * @return  boolean
+	 */
+	public static function handler(Exception $e) {
+		$is_ajax = (bool) Arr::get($_REQUEST, 'c_ajax', FALSE);
+
+		$response = Kohana_Exception::_handler($e);
+
+		// only send the response when it's not ajax because if it is, we've already sent the response
+		if ( ! $is_ajax) {
+			// Send the response to the browser
+			echo $response->send_headers()->body();
+		}
+
+		exit(1);
+	}
+
+	/**
+	 * Forced AJAX handler.
 	 *
 	 * @uses    Kohana_Exception::response
 	 * @param   Exception  $e
 	 * @return  boolean
 	 */
 	public static function handler_ajax(Exception $e) {
-		$response = Kohana_Exception::_handler($e);
-// @todo
-		// Send the response to the browser
-		// echo $response->send_headers()->body();
-
-		exit(1);
+		Kohana_Exception::_handler($e, TRUE);
 	}
 
 	/**
 	 * Inline exception handler, displays the error message, source of the
 	 * exception, and the stack trace of the error.
+	 * This won't end the script execution (exit) unless the error can't be displayed.
 	 *
 	 * @uses    Kohana_Exception::response
 	 * @param   Exception  $e
@@ -37,21 +55,33 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	/**
 	 * Exception handler, logs the exception and generates a Response object
 	 * for display.
+	 * If it's an AJAX request, an AJAX JSON response will be sent instead.
 	 *
+	 * @uses    Kohana_Exception::response_ajax
 	 * @uses    Kohana_Exception::response
 	 * @param   Exception  $e
+	 * @param   boolean  $is_ajax  Set to TRUE if it's an AJAX request but c_ajax is not in the $_REQUEST.
 	 * @return  boolean
 	 */
-	public static function _handler(Exception $e) {
+	public static function _handler(Exception $e, $is_ajax = NULL) {
+		if ($is_ajax === NULL) {
+			$is_ajax = (bool) Arr::get($_REQUEST, 'c_ajax', FALSE);
+		}
+
 		if (Kohana::$environment >= Kohana::DEVELOPMENT) {
 			try {
 				// Log the exception
 				Kohana_Exception::log($e);
 
-				// Generate the response
-				$response = Kohana_Exception::response($e);
+				if ($is_ajax) {
+					Kohana_Exception::response_ajax($e);
+					return;
 
-				return $response;
+				} else {
+					// Generate the response
+					$response = Kohana_Exception::response($e);
+					return $response;
+				}
 			} catch (Exception $e) {
 				/**
 				 * Things are going *really* badly for us, We now have no choice
@@ -74,15 +104,26 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 				Kohana_Exception::log($e);
 				Kohana_Exception::notify($e);
 
-				$response = Kohana_Exception::response_production($e);
-
-				return $response;
+				if ($is_ajax) {
+					Kohana_Exception::response_ajax($e);
+					return;
+				} else {
+					$response = Kohana_Exception::response_production($e);
+					return $response;
+				}
 			} catch (Exception $e) {
 				echo 'There was a problem generating the page.';
 			}
 		}
-	}
+	} // function _handler
 
+	/**
+	 * Production error handler.
+	 * Will create a response that displays the default error view with a message regarding the error.
+	 *
+	 * @param   Exception  $e
+	 * @return  Response
+	 */
 	public static function response_production(Exception $e) {
 		$http_header_status = ($e instanceof HTTP_Exception) ? $code : 500;
 
@@ -98,7 +139,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 		$response->status($http_header_status);
 
 		// Set the response headers
-		$response->headers('Content-Type', Kohana_Exception::$error_view_content_type.'; charset='.Kohana::$charset);
+		$response->headers('Content-Type', Kohana_Exception::$error_view_content_type . '; charset=' . Kohana::$charset);
 
 		// Set the response body
 		$response->body($view->render());
@@ -106,6 +147,14 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 		return $response;
 	}
 
+	/**
+	 * Notifies the programmer about the error that occured, including the full stack trace.
+	 * Sends an email with the HTML stack trace attached to the file.
+	 * IF the email fails, it will log that error as well.
+	 *
+	 * @param   Exception  $e
+	 * @return  void
+	 */
 	public static function notify(Exception $e) {
 		try {
 			// Get the exception information
@@ -187,5 +236,26 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 			Kohana::$log->add(Log::ERROR, Kohana_Exception::text($e));
 			Kohana::$log->write();
 		}
+	} // function notify
+
+	/**
+	 * Returns an JSON data for AJAX.
+	 *
+	 * @uses    AJAX_Status::echo_json
+	 * @uses    AJAX_Status::ajax
+	 * @param   Exception  $e
+	 * @return  void
+	 */
+	public static function response_ajax(Exception $e) {
+		$ajax_data = array(
+			'status' => AJAX_Status::UNKNOWN_ERROR,
+			'error_msg' => 'There was a problem getting the data.',
+			'html' => 'There was a problem getting the data.',
+		);
+		if (Kohana::$environment >= Kohana::DEVELOPMENT) {
+			$ajax_data['debug_msg'] = Kohana_Exception::text($e);
+		}
+
+		AJAX_Status::echo_json(AJAX_Status::ajax($ajax_data));
 	}
 }
