@@ -233,7 +233,7 @@ return array(
 			'form_attributes' => array(
 				'method' => 'post',
 				'enctype' => 'multipart/form-data',
-				'class' => 'cl4_multiple_edit_form',
+				'class' => 'js_cl4_multiple_edit_form',
 				'name' => NULL, // will be set in get_editable_list() if not provided
 				'id' => NULL, // will be set in get_editable_list() if not provided
 			),

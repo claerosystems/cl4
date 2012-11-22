@@ -281,7 +281,7 @@ class CL4_MultiORM {
 		$items_on_page = $pagination->get_items_on_page();
 
 		// set up the open form tag
-		$this->_options['form_attributes'] = HTML::set_class_attribute($this->_options['form_attributes'], 'cl4_multiple_edit_form');
+		$this->_options['form_attributes'] = HTML::set_class_attribute($this->_options['form_attributes'], 'js_cl4_multiple_edit_form');
 		$form_action = ($this->_options['form_action'] === NULL ? Request::current() : $this->_options['form_action']);
 		$form_open_tag = Form::open($form_action, $this->_options['form_attributes']);
 
@@ -290,7 +290,7 @@ class CL4_MultiORM {
 			$table_options['heading'][] = Form::checkbox('cl4_check_all', NULL, false,
 				array(
 					'class' => 'cl4_check_all_checkbox',
-					'data-cl4_check_all_checkbox_class' => 'cl4_multiple_edit_form_checkbox',
+					'data-cl4_check_all_checkbox_class' => 'js_cl4_multiple_edit_form_checkbox',
 					'title' => "Check All / Toggle"
 				)
 			);
@@ -406,7 +406,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Edit Selected'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'edit_multiple')),
 					'disabled' => 'disabled',
-					'class' => 'js_cl4_button_link_form cl4_multiple_edit' . $button_class,
+					'class' => 'js_cl4_button_link_form js_cl4_multiple_edit' . $button_class,
 				));
 			} // if
 
@@ -537,7 +537,7 @@ class CL4_MultiORM {
 			if ($list_options['per_row_links']['checkbox']) {
 				$first_col .= Form::checkbox('ids[]', $id, FALSE, array(
 					'id' => NULL,
-					'class' => 'cl4_multiple_edit_form_checkbox cl4_row_checkbox',
+					'class' => 'js_cl4_multiple_edit_form_checkbox cl4_row_checkbox',
 				));
 			} // if
 
