@@ -381,14 +381,14 @@ class CL4_MultiORM {
 			if ($list_options['top_bar_buttons']['search']) {
 				$top_row_buttons .= Form::submit(NULL, __('Search'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'search')),
-					'class' => 'cl4_button_link_form ' . $button_class,
+					'class' => 'js_cl4_button_link_form ' . $button_class,
 				));
 
 				// set up CLEAR SEARCH button
 				if ($this->_options['in_search']) {
 					$top_row_buttons .= Form::submit(NULL, __('Clear Search/Sort'), array(
 						'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'cancel_search')),
-						'class' => 'cl4_button_link_form ' . $button_class,
+						'class' => 'js_cl4_button_link_form ' . $button_class,
 					));
 				} // if
 			} // if
@@ -397,7 +397,7 @@ class CL4_MultiORM {
 			if ($list_options['top_bar_buttons']['add']) {
 				$top_row_buttons .= Form::submit(NULL, __('Add New'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add')),
-					'class' => 'cl4_button_link_form ' . $button_class,
+					'class' => 'js_cl4_button_link_form ' . $button_class,
 				));
 			} // if
 
@@ -406,7 +406,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Edit Selected'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'edit_multiple')),
 					'disabled' => 'disabled',
-					'class' => 'cl4_button_link_form cl4_multiple_edit' . $button_class,
+					'class' => 'js_cl4_button_link_form cl4_multiple_edit' . $button_class,
 				));
 			} // if
 
@@ -414,7 +414,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Export All'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'export')) . '?export_all=1',
 					'data-cl4_form_target' => '_blank',
-					'class' => 'cl4_button_link_form ' . $button_class,
+					'class' => 'js_cl4_button_link_form ' . $button_class,
 				));
 			} // if
 
@@ -424,7 +424,7 @@ class CL4_MultiORM {
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'export')),
 					'data-cl4_form_target' => '_blank',
 					'disabled' => 'disabled',
-					'class' => ' cl4_button_link_form cl4_export_selected ' . $button_class,
+					'class' => 'js_cl4_button_link_form cl4_export_selected ' . $button_class,
 				));
 			} // if
 
@@ -435,7 +435,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Add:'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add_multiple', 'id' => 1)),
 					'data-cl4_add_multiple_form_action_prefix' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add_multiple')), // used to determine data-cl4_form_action when the selection is changed
-					'class' => 'cl4_button_link_form' . $button_class,
+					'class' => 'js_cl4_button_link_form' . $button_class,
 					'id' => $add_multiple_uniqid,
 				));
 
