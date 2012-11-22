@@ -424,7 +424,7 @@ class CL4_MultiORM {
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'export')),
 					'data-cl4_form_target' => '_blank',
 					'disabled' => 'disabled',
-					'class' => 'js_cl4_button_link_form cl4_export_selected ' . $button_class,
+					'class' => 'js_cl4_button_link_form js_cl4_export_selected ' . $button_class,
 				));
 			} // if
 
