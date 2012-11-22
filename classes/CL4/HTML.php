@@ -8,7 +8,7 @@ class CL4_HTML extends Kohana_HTML {
 	*/
 	public static $append_attributes = array('class', 'style');
 
-    /**
+	/**
 	 * Creates a style sheet link element.
 	 * Same as Kohana_HTML::style() but supports using //example.com/path/to/file.css and doesn't add a type="text/css".
 	 * Also adds the file modified time to the file path as: `base.13234534.css`
@@ -81,23 +81,23 @@ class CL4_HTML extends Kohana_HTML {
 		}
 	}
 
-    /**
-    * Creates a meta tag with name and content attributes.
-    *
-    * @param mixed $name The value of the name attribute
-    * @param mixed $content The value of the content attribute
-    * @return string
-    */
-    public static function meta($name, $content = '') {
-        $attributes = array(
-        	'name' => $name,
-        	'content' => $content,
-        );
+	/**
+	* Creates a meta tag with name and content attributes.
+	*
+	* @param mixed $name The value of the name attribute
+	* @param mixed $content The value of the content attribute
+	* @return string
+	*/
+	public static function meta($name, $content = '') {
+		$attributes = array(
+			'name' => $name,
+			'content' => $content,
+		);
 
-        return '<meta'.HTML::attributes($attributes).'>';
-    } // function
+		return '<meta'.HTML::attributes($attributes).'>';
+	} // function
 
-    /**
+	/**
 	 * Convert special characters to HTML entities. All untrusted content
 	 * should be passed through this method to prevent XSS injections.
 	 * Same as Kohana_HTML::chars() but also supports arrays.
@@ -110,8 +110,8 @@ class CL4_HTML extends Kohana_HTML {
 	 * @param   boolean  convert keys as well (default FALSE)
 	 * @return  string
 	 */
-    public static function chars($value, $double_encode = TRUE, $keys = FALSE) {
-    	if (is_array($value)) {
+	public static function chars($value, $double_encode = TRUE, $keys = FALSE) {
+		if (is_array($value)) {
 			foreach ($value as $key => $value1) {
 				if ($keys) {
 					$value[HTML::chars($key, $double_encode)] = HTML::chars($value1, $double_encode);
@@ -122,8 +122,8 @@ class CL4_HTML extends Kohana_HTML {
 
 			return $value;
 
-    	} else {
-    		return parent::chars($value, $double_encode);
+		} else {
+			return parent::chars($value, $double_encode);
 		}
 	} // function chars
 
