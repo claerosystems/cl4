@@ -67,7 +67,8 @@ class CL4_Form extends Kohana_Form {
 		}
 
 		// add the date field
-		$fields['date'] = Form::input_with_suffix_size($name, $date, $attributes, 'cl4_date_field', 'date', 10, 10);
+		$_attributes = HTML::set_class_attribute($attributes, 'js_cl4_date_field-date');
+		$fields['date'] = Form::input_with_suffix_size($name, $date, $_attributes, 'cl4_date_field', 'date', 10, 10);
 
 		$time_fields = Form::time_fields($name, $hour, $min, $sec, $modulation, $attributes, $options);
 		$fields = array_merge($fields, $time_fields);
@@ -174,10 +175,14 @@ class CL4_Form extends Kohana_Form {
 			$attributes = Form::increment_tabindex($attributes);
 			$attributes['size'] = 2;
 			$attributes['maxlength'] = 2;
+			$_attributes = $attributes;
 
 			$field_type = 'input';
 
 			switch ($field_name) {
+				case 'date' :
+					$_attributes = HTML::set_class_attribute($_attributes, 'js_cl4_date_field-date');
+					break;
 				case 'hour' :
 					$value = $hour;
 					break;
@@ -192,7 +197,7 @@ class CL4_Form extends Kohana_Form {
 					break;
 			} // switch
 
-			$fields[$field_name] = Form::input_with_suffix_size($name, $value, $attributes, 'cl4_date_field', $field_name, 2, 2, $field_type);
+			$fields[$field_name] = Form::input_with_suffix_size($name, $value, $_attributes, 'cl4_date_field', $field_name, 2, 2, $field_type);
 		}
 
 		if ( ! $options['24_hour']) {
@@ -523,7 +528,7 @@ class CL4_Form extends Kohana_Form {
 	} // function
 
 	/**
-	* Pass an empty (string), FALSE (bool), 0000-00-00 (string), 0000-00-00 00:00:00 (string) or an invalid date to get a blank field
+	* Pass an empty (string), FALSE (bool), 0000-00-00 (string), 0000-00-00 00:00:00 (string) or an invalid date to get a blank field.
 	*
 	* @param string $name
 	* @param string $value
@@ -545,7 +550,7 @@ class CL4_Form extends Kohana_Form {
 			'maxlength' => 10,
 		);
 
-		$attributes = HTML::set_class_attribute($attributes, 'cl4_date_field-date');
+		$attributes = HTML::set_class_attribute($attributes, 'js_cl4_date_field-date');
 
 		// check if the value of the date is actually empty
 		if (Form::check_date_empty_value($value)) {
