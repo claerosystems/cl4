@@ -510,30 +510,26 @@ class CL4_MultiORM {
 
 			// add 'start of row' buttons as dictated by $list_options['per_row_links'] array:
 			if ($list_options['per_row_links']['view']) {
-				$first_col .= HTML::anchor('/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'view', 'id' => $id)), '&nbsp;', array(
+				$first_col .= HTML::anchor('/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'view', 'id' => $id)), '<span class="cl4_icon cl4_view">&nbsp;</span>', array(
 					'title' => __('View this record'),
-					'class' => 'cl4_view',
 				));
 			} // if
 
 			if ($list_options['per_row_links']['edit']) {
-				$first_col .= HTML::anchor('/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'edit', 'id' => $id)), '&nbsp;', array(
+				$first_col .= HTML::anchor('/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'edit', 'id' => $id)), '<span class="cl4_icon cl4_edit">&nbsp;</span>', array(
 					'title' => __('Edit this record'),
-					'class' => 'cl4_edit',
 				));
 			}
 
 			if ($list_options['per_row_links']['delete']) {
-				$first_col .= HTML::anchor('/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'delete', 'id' => $id)), '&nbsp;', array(
+				$first_col .= HTML::anchor('/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'delete', 'id' => $id)), '<span class="cl4_icon cl4_delete">&nbsp;</span>', array(
 					'title' => __('Delete this record'),
-					'class' => 'cl4_delete',
 				));
 			}
 
 			if ($list_options['per_row_links']['add']) {
-				$first_col .= HTML::anchor($target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add', 'id' => $id)), '&nbsp;', array(
+				$first_col .= HTML::anchor($target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add', 'id' => $id)), '<span class="cl4_icon cl4_add">&nbsp;</span>', array(
 					'title' => __('Duplicate this record'),
-					'class' => 'cl4_add',
 				));
 			}
 
