@@ -92,9 +92,9 @@ class CL4_ORM_Checkbox extends ORM_FieldType {
 
 	public static function view_html($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
 		if ($value) {
-			return ($options['checkmark_icons'] ? '<span class="cl4_checked">&nbsp;</span>' : 'Y');
+			return ($options['checkmark_icons'] ? '<span class="cl4_icon cl4_checked"></span>' : 'Y');
 		} else {
-			return ($options['checkmark_icons'] ? '<span class="cl4_not_checked">&nbsp;</span>' : 'N');
+			return ($options['checkmark_icons'] ? '<span class="cl4_icon cl4_not_checked"></span>' : 'N');
 		}
 	} // function
 } // class
