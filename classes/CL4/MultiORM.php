@@ -723,7 +723,7 @@ class CL4_MultiORM {
 			if ($this->_options['display_cancel']) {
 				$form_buttons[] = Form::input('cl4_cancel', __('Cancel'), array(
 					'type' => 'button',
-					'class' => 'cl4_button_link',
+					'class' => 'js_cl4_button_link',
 					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_model_name, 'action' => 'cancel')),
 				));
 			}

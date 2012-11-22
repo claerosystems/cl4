@@ -1105,7 +1105,7 @@ class CL4_ORM extends Kohana_ORM {
 					$action = 'edit';
 				}
 				$reset_button_options = array(
-					'class' => 'cl4_button_link',
+					'class' => 'js_cl4_button_link',
 					'data-cl4_link' => URL::site(Request::current()->uri()), // this will return the current uri
 				);
 				if ( ! empty($this->_options['reset_button_attributes'])) {
@@ -1115,7 +1115,7 @@ class CL4_ORM extends Kohana_ORM {
 			}
 			if ($this->_options['display_cancel']) {
 				$cancel_button_options = array(
-					'class' => 'cl4_button_link',
+					'class' => 'js_cl4_button_link',
 					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'cancel'))),
 				);
 				if ( ! empty($this->_options['cancel_button_attributes'])) {
@@ -1189,7 +1189,7 @@ class CL4_ORM extends Kohana_ORM {
 			$this->set_target_route();
 
 			$submit_button_options = array(
-				'class' => 'cl4_button_link ' . (isset($this->_options['button_class']) ? $this->_options['button_class'] : NULL),
+				'class' => 'js_cl4_button_link ' . Arr::get($this->_options, 'button_class', ''),
 				'data-cl4_link' => URL::site(Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name))),
 			);
 			if ( ! empty($this->_options['submit_button_options'])) {
