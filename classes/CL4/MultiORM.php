@@ -289,7 +289,7 @@ class CL4_MultiORM {
 		if ($list_options['per_row_links']['checkbox']) {
 			$table_options['heading'][] = Form::checkbox('cl4_check_all', NULL, false,
 				array(
-					'class' => 'cl4_check_all_checkbox',
+					'class' => 'js_cl4_check_all_checkbox',
 					'data-cl4_check_all_checkbox_class' => 'js_cl4_multiple_edit_form_checkbox',
 					'title' => "Check All / Toggle"
 				)
