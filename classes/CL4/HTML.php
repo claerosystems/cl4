@@ -10,7 +10,8 @@ class CL4_HTML extends Kohana_HTML {
 
     /**
 	 * Creates a style sheet link element.
-	 * Same as Kohana_HTML::style() but supports using //example.com/path/to/file.css and doesn't add a type="text/css"
+	 * Same as Kohana_HTML::style() but supports using //example.com/path/to/file.css and doesn't add a type="text/css".
+	 * Also adds the file modified time to the file path as: `base.13234534.css`
 	 *
 	 *     echo HTML::style('media/css/screen.css');
 	 *
@@ -23,23 +24,24 @@ class CL4_HTML extends Kohana_HTML {
 	 * @uses    HTML::attributes
 	 */
 	public static function style($file, array $attributes = NULL, $protocol = NULL, $index = FALSE) {
-        if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
-            // Add the base URL
-            $file = URL::base($index).$file;
-        }
+		if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
+			// Add the base URL
+			$file = URL::site(HTML::add_cache_buster($file), $protocol, $index);
+		}
 
-        // Set the stylesheet link
-        $attributes['href'] = $file;
+		// Set the stylesheet link
+		$attributes['href'] = $file;
 
-        // Set the stylesheet rel
-        $attributes['rel'] = 'stylesheet';
+		// Set the stylesheet rel
+		$attributes['rel'] = empty($attributes['rel']) ? 'stylesheet' : $attributes['rel'];
 
-        return '<link'.HTML::attributes($attributes).'>';
-    } // function
+		return '<link' . HTML::attributes($attributes) . '>';
+	}
 
-    /**
+	/**
 	 * Creates a script link.
-	 * Same as Kohana_HTML::script() but supports using //example.com/path/to/file.js and doesn't add a type="text/javascript"
+	 * Same as Kohana_HTML::script() but supports using //example.com/path/to/file.js and doesn't add a type="text/javascript".
+	 * Also adds the file modified time to the file path as: `base.13234534.js`
 	 *
 	 *     echo HTML::script('media/js/jquery.min.js');
 	 *
@@ -52,16 +54,32 @@ class CL4_HTML extends Kohana_HTML {
 	 * @uses    HTML::attributes
 	 */
 	public static function script($file, array $attributes = NULL, $protocol = NULL, $index = FALSE) {
-        if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
-            // Add the base URL
-            $file = URL::base($index).$file;
-        }
+		if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
+			// Add the base URL
+			$file = URL::site(HTML::add_cache_buster($file), $protocol, $index);
+		}
 
-        // Set the script link
-        $attributes['src'] = $file;
+		// Set the script link
+		$attributes['src'] = $file;
 
-        return '<script'.HTML::attributes($attributes).'></script>';
-    } // function
+		return '<script' . HTML::attributes($attributes) . '></script>';
+	}
+
+	/**
+	 * Rewrites the filename as `filename.<file modified time>.ext` to help with getting browsers to grab a new version.
+	 * If the file can't be found within the DOCROOT, the original filename will be returned.
+	 *
+	 * @param   string  $file  The path to the file inside the DOCROOT.
+	 * @return  string
+	 */
+	public static function add_cache_buster($file) {
+		if (file_exists(DOCROOT . $file)) {
+			$ext = pathinfo(DOCROOT . $file, PATHINFO_EXTENSION);
+			return substr($file, 0, strlen($ext) * -1) . filemtime(DOCROOT . $file) . '.' . $ext;
+		} else {
+			return $file;
+		}
+	}
 
     /**
     * Creates a meta tag with name and content attributes.
