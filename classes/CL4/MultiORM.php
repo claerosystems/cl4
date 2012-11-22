@@ -537,7 +537,7 @@ class CL4_MultiORM {
 			if ($list_options['per_row_links']['checkbox']) {
 				$first_col .= Form::checkbox('ids[]', $id, FALSE, array(
 					'id' => NULL,
-					'class' => 'js_cl4_multiple_edit_form_checkbox cl4_row_checkbox',
+					'class' => 'js_cl4_multiple_edit_form_checkbox js_cl4_row_checkbox',
 				));
 			} // if
 
