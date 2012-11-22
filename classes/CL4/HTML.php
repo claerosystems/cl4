@@ -8,9 +8,10 @@ class CL4_HTML extends Kohana_HTML {
 	*/
 	public static $append_attributes = array('class', 'style');
 
-    /**
+	/**
 	 * Creates a style sheet link element.
-	 * Same as Kohana_HTML::style() but supports using //example.com/path/to/file.css and doesn't add a type="text/css"
+	 * Same as Kohana_HTML::style() but supports using //example.com/path/to/file.css and doesn't add a type="text/css".
+	 * Also adds the file modified time to the file path as: `base.13234534.css`
 	 *
 	 *     echo HTML::style('media/css/screen.css');
 	 *
@@ -23,23 +24,24 @@ class CL4_HTML extends Kohana_HTML {
 	 * @uses    HTML::attributes
 	 */
 	public static function style($file, array $attributes = NULL, $protocol = NULL, $index = FALSE) {
-        if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
-            // Add the base URL
-            $file = URL::base($index).$file;
-        }
+		if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
+			// Add the base URL
+			$file = URL::site(HTML::add_cache_buster($file), $protocol, $index);
+		}
 
-        // Set the stylesheet link
-        $attributes['href'] = $file;
+		// Set the stylesheet link
+		$attributes['href'] = $file;
 
-        // Set the stylesheet rel
-        $attributes['rel'] = 'stylesheet';
+		// Set the stylesheet rel
+		$attributes['rel'] = empty($attributes['rel']) ? 'stylesheet' : $attributes['rel'];
 
-        return '<link'.HTML::attributes($attributes).'>';
-    } // function
+		return '<link' . HTML::attributes($attributes) . '>';
+	}
 
-    /**
+	/**
 	 * Creates a script link.
-	 * Same as Kohana_HTML::script() but supports using //example.com/path/to/file.js and doesn't add a type="text/javascript"
+	 * Same as Kohana_HTML::script() but supports using //example.com/path/to/file.js and doesn't add a type="text/javascript".
+	 * Also adds the file modified time to the file path as: `base.13234534.js`
 	 *
 	 *     echo HTML::script('media/js/jquery.min.js');
 	 *
@@ -52,34 +54,50 @@ class CL4_HTML extends Kohana_HTML {
 	 * @uses    HTML::attributes
 	 */
 	public static function script($file, array $attributes = NULL, $protocol = NULL, $index = FALSE) {
-        if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
-            // Add the base URL
-            $file = URL::base($index).$file;
-        }
+		if (strpos($file, '://') === FALSE && strpos($file, '//') !== 0) {
+			// Add the base URL
+			$file = URL::site(HTML::add_cache_buster($file), $protocol, $index);
+		}
 
-        // Set the script link
-        $attributes['src'] = $file;
+		// Set the script link
+		$attributes['src'] = $file;
 
-        return '<script'.HTML::attributes($attributes).'></script>';
-    } // function
+		return '<script' . HTML::attributes($attributes) . '></script>';
+	}
 
-    /**
-    * Creates a meta tag with name and content attributes.
-    *
-    * @param mixed $name The value of the name attribute
-    * @param mixed $content The value of the content attribute
-    * @return string
-    */
-    public static function meta($name, $content = '') {
-        $attributes = array(
-        	'name' => $name,
-        	'content' => $content,
-        );
+	/**
+	 * Rewrites the filename as `filename.<file modified time>.ext` to help with getting browsers to grab a new version.
+	 * If the file can't be found within the DOCROOT, the original filename will be returned.
+	 *
+	 * @param   string  $file  The path to the file inside the DOCROOT.
+	 * @return  string
+	 */
+	public static function add_cache_buster($file) {
+		if (file_exists(DOCROOT . $file)) {
+			$ext = pathinfo(DOCROOT . $file, PATHINFO_EXTENSION);
+			return substr($file, 0, strlen($ext) * -1) . filemtime(DOCROOT . $file) . '.' . $ext;
+		} else {
+			return $file;
+		}
+	}
 
-        return '<meta'.HTML::attributes($attributes).'>';
-    } // function
+	/**
+	* Creates a meta tag with name and content attributes.
+	*
+	* @param mixed $name The value of the name attribute
+	* @param mixed $content The value of the content attribute
+	* @return string
+	*/
+	public static function meta($name, $content = '') {
+		$attributes = array(
+			'name' => $name,
+			'content' => $content,
+		);
 
-    /**
+		return '<meta'.HTML::attributes($attributes).'>';
+	} // function
+
+	/**
 	 * Convert special characters to HTML entities. All untrusted content
 	 * should be passed through this method to prevent XSS injections.
 	 * Same as Kohana_HTML::chars() but also supports arrays.
@@ -92,8 +110,8 @@ class CL4_HTML extends Kohana_HTML {
 	 * @param   boolean  convert keys as well (default FALSE)
 	 * @return  string
 	 */
-    public static function chars($value, $double_encode = TRUE, $keys = FALSE) {
-    	if (is_array($value)) {
+	public static function chars($value, $double_encode = TRUE, $keys = FALSE) {
+		if (is_array($value)) {
 			foreach ($value as $key => $value1) {
 				if ($keys) {
 					$value[HTML::chars($key, $double_encode)] = HTML::chars($value1, $double_encode);
@@ -104,8 +122,8 @@ class CL4_HTML extends Kohana_HTML {
 
 			return $value;
 
-    	} else {
-    		return parent::chars($value, $double_encode);
+		} else {
+			return parent::chars($value, $double_encode);
 		}
 	} // function chars
 
