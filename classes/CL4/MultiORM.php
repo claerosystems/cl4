@@ -281,7 +281,7 @@ class CL4_MultiORM {
 		$items_on_page = $pagination->get_items_on_page();
 
 		// set up the open form tag
-		$this->_options['form_attributes'] = HTML::set_class_attribute($this->_options['form_attributes'], 'cl4_multiple_edit_form');
+		$this->_options['form_attributes'] = HTML::set_class_attribute($this->_options['form_attributes'], 'js_cl4_multiple_edit_form');
 		$form_action = ($this->_options['form_action'] === NULL ? Request::current() : $this->_options['form_action']);
 		$form_open_tag = Form::open($form_action, $this->_options['form_attributes']);
 
@@ -289,8 +289,8 @@ class CL4_MultiORM {
 		if ($list_options['per_row_links']['checkbox']) {
 			$table_options['heading'][] = Form::checkbox('cl4_check_all', NULL, false,
 				array(
-					'class' => 'cl4_check_all_checkbox',
-					'data-cl4_check_all_checkbox_class' => 'cl4_multiple_edit_form_checkbox',
+					'class' => 'js_cl4_check_all_checkbox',
+					'data-cl4_check_all_checkbox_class' => 'js_cl4_multiple_edit_form_checkbox',
 					'title' => "Check All / Toggle"
 				)
 			);
@@ -381,14 +381,14 @@ class CL4_MultiORM {
 			if ($list_options['top_bar_buttons']['search']) {
 				$top_row_buttons .= Form::submit(NULL, __('Search'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'search')),
-					'class' => 'cl4_button_link_form ' . $button_class,
+					'class' => 'js_cl4_button_link_form ' . $button_class,
 				));
 
 				// set up CLEAR SEARCH button
 				if ($this->_options['in_search']) {
 					$top_row_buttons .= Form::submit(NULL, __('Clear Search/Sort'), array(
 						'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'cancel_search')),
-						'class' => 'cl4_button_link_form ' . $button_class,
+						'class' => 'js_cl4_button_link_form ' . $button_class,
 					));
 				} // if
 			} // if
@@ -397,7 +397,7 @@ class CL4_MultiORM {
 			if ($list_options['top_bar_buttons']['add']) {
 				$top_row_buttons .= Form::submit(NULL, __('Add New'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add')),
-					'class' => 'cl4_button_link_form ' . $button_class,
+					'class' => 'js_cl4_button_link_form ' . $button_class,
 				));
 			} // if
 
@@ -406,7 +406,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Edit Selected'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'edit_multiple')),
 					'disabled' => 'disabled',
-					'class' => 'cl4_button_link_form cl4_multiple_edit' . $button_class,
+					'class' => 'js_cl4_button_link_form js_cl4_multiple_edit' . $button_class,
 				));
 			} // if
 
@@ -414,7 +414,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Export All'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'export')) . '?export_all=1',
 					'data-cl4_form_target' => '_blank',
-					'class' => 'cl4_button_link_form ' . $button_class,
+					'class' => 'js_cl4_button_link_form ' . $button_class,
 				));
 			} // if
 
@@ -424,7 +424,7 @@ class CL4_MultiORM {
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'export')),
 					'data-cl4_form_target' => '_blank',
 					'disabled' => 'disabled',
-					'class' => ' cl4_button_link_form cl4_export_selected ' . $button_class,
+					'class' => 'js_cl4_button_link_form js_cl4_export_selected ' . $button_class,
 				));
 			} // if
 
@@ -435,7 +435,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Add:'), array(
 					'data-cl4_form_action' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add_multiple', 'id' => 1)),
 					'data-cl4_add_multiple_form_action_prefix' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add_multiple')), // used to determine data-cl4_form_action when the selection is changed
-					'class' => 'cl4_button_link_form' . $button_class,
+					'class' => 'js_cl4_button_link_form' . $button_class,
 					'id' => $add_multiple_uniqid,
 				));
 
@@ -537,7 +537,7 @@ class CL4_MultiORM {
 			if ($list_options['per_row_links']['checkbox']) {
 				$first_col .= Form::checkbox('ids[]', $id, FALSE, array(
 					'id' => NULL,
-					'class' => 'cl4_multiple_edit_form_checkbox cl4_row_checkbox',
+					'class' => 'js_cl4_multiple_edit_form_checkbox js_cl4_row_checkbox',
 				));
 			} // if
 
@@ -723,7 +723,7 @@ class CL4_MultiORM {
 			if ($this->_options['display_cancel']) {
 				$form_buttons[] = Form::input('cl4_cancel', __('Cancel'), array(
 					'type' => 'button',
-					'class' => 'cl4_button_link',
+					'class' => 'js_cl4_button_link',
 					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_model_name, 'action' => 'cancel')),
 				));
 			}
