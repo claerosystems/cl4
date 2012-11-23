@@ -164,6 +164,6 @@ class CL4_ORM_Height extends ORM_Select {
 			'nbsp' => FALSE,
 		);
 
-		return cl4_ORM_Height::prepare_html(cl4_ORM_Height::view($value, $column_name, $orm_model, $options), $options['nbsp']);
+		return CL4_ORM_Height::prepare_html(CL4_ORM_Height::view($value, $column_name, $orm_model, $options), $options['nbsp']);
 	} // function view_html
 }
