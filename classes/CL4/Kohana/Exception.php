@@ -16,7 +16,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 		$response = Kohana_Exception::_handler($e);
 
 		// only send the response when it's not ajax because if it is, we've already sent the response
-		if ( ! $is_ajax) {
+		if ( ! $is_ajax && PHP_SAPI != 'cli') {
 			// Send the response to the browser
 			echo $response->send_headers()->body();
 		}
@@ -73,7 +73,12 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 				// Log the exception
 				Kohana_Exception::log($e);
 
-				if ($is_ajax) {
+				if (PHP_SAPI == 'cli') {
+					echo Kohana_Exception::text($e), PHP_EOL;
+					echo "--", PHP_EOL, $e->getTraceAsString(), PHP_EOL;
+					return;
+
+				} else if ($is_ajax) {
 					Kohana_Exception::response_ajax($e);
 					return;
 
@@ -104,7 +109,10 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 				Kohana_Exception::log($e);
 				Kohana_Exception::notify($e);
 
-				if ($is_ajax) {
+				if (PHP_SAPI == 'cli') {
+					echo Kohana_Exception::text($e), PHP_EOL;
+					return;
+				} else if ($is_ajax) {
 					Kohana_Exception::response_ajax($e);
 					return;
 				} else {
