@@ -105,7 +105,7 @@ class CL4_Mail extends PHPMailer {
 				if ( ! empty($options['smtp']['password'])) $this->Password = $options['smtp']['password'];
 			} // if
 		} // if
-	} // function
+	} // function __construct
 
 	/**
 	*   Adds a user based on their user_id
@@ -115,7 +115,7 @@ class CL4_Mail extends PHPMailer {
 	*
 	*   @return     bool        true if the user was found and added, false if they couldn't be found
 	*/
-	public function add_user($user_id) {
+	public function AddUser($user_id) {
 		$user = ORM::factory('User', $user_id);
 
 		$add_status = false;
@@ -131,7 +131,7 @@ class CL4_Mail extends PHPMailer {
 		}
 
 		return $add_status;
-	} // function
+	}
 
 	/**
 	*   Adds a BCC address, Calls the PHPMailer AddBCC() checking for debug first
@@ -145,7 +145,7 @@ class CL4_Mail extends PHPMailer {
 		} else {
 			return parent::AddBCC($address, $name);
 		}
-	} // function AddBCC
+	}
 
 	/**
 	*   Adds an address, Calls the PHPMailer AddAddress() checking for debug first
@@ -159,7 +159,7 @@ class CL4_Mail extends PHPMailer {
 		} else {
 			return parent::AddAddress($address, $name);
 		}
-	} // function AddAddress
+	}
 
 	/**
 	*   Adds a CC address, Calls the PHPMailer AddCCs() checking for debug first
@@ -173,7 +173,7 @@ class CL4_Mail extends PHPMailer {
 		} else {
 			return parent::AddCC($address, $name);
 		}
-	} // function AddCC
+	}
 
 	/**
 	*   Adds multiple email addresses from a string or array to the email
@@ -182,7 +182,7 @@ class CL4_Mail extends PHPMailer {
 	*   @param  string/array    $addresses      Addresses to add to email, can be a string separated by commas or semi colons or an array
 	*   @param  string/array    $names          Names for email addresses formatted the same way as the email address; if only a string with no separators the same name will be used on all the emails
 	*/
-	public function add_multiple_addresses($addresses, $names = '') {
+	public function AddMultipleAddress($addresses, $names = '') {
 		if (is_string($addresses) && (strpos($addresses, ',') !== false || strpos($addresses, ';') !== false)) {
 			$addressArray = Arr::explode_on_multiple($addresses, array(',', ';'));
 		} else if (is_array($addresses)) {
@@ -216,7 +216,7 @@ class CL4_Mail extends PHPMailer {
 		}
 
 		return $add_status;
-	} // function add_multiple_addresses
+	} // function AddMultipleAddress
 
 	/**
 	* Add an array of addresses
@@ -224,7 +224,7 @@ class CL4_Mail extends PHPMailer {
 	* @param array $array
 	* @return bool status of AddAddress()
 	*/
-	public function add_address_array(array $array) {
+	public function AddAddressArray(array $array) {
 		$add_status = TRUE;
 
 		try {
@@ -237,14 +237,34 @@ class CL4_Mail extends PHPMailer {
 		}
 
 		return $add_status;
-	} // function add_address_array
+	}
 
 	/**
 	* Adds the log address as a BCC
 	*
 	* @return bool status of AddAddress()
 	*/
-	public function add_log_bcc() {
+	public function AddLogBCC() {
 		return $this->AddBCC($this->log_email);
+	}
+
+	// ***************************************
+	// Deprecated method names that may eventually be removed.
+	// ***************************************
+
+	public function add_user($user_id) {
+		return $this->AddUser($user_id);
+	}
+
+	public function add_multiple_addresses($addresses, $names = '') {
+		return $this->AddMultipleAddress($addresses, $names);
+	}
+
+	public function add_address_array(array $array) {
+		return $this->AddAddressArray($array);
+	}
+
+	public function add_log_bcc() {
+		return $this->AddLogBCC();
 	}
 } // class CL4_Mail
