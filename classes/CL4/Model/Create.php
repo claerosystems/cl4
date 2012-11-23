@@ -528,7 +528,8 @@ class CL4_Model_Create {
 		$model_code .= TAB . 'public function labels() {' . EOL;
 		$model_code .= TAB . TAB . 'return array(' . EOL;
 		foreach ($this->columns as $column_name => $column_data) {
-			$model_code .= TAB . TAB . TAB . '\'' . $column_name . '\' => \'' . $this->make_column_label($column_name) . '\',' . EOL;
+			$label = (isset($this->options['special_labels'][$column_name]) ? $this->options['special_labels'][$column_name] : $this->make_column_label($column_name));
+			$model_code .= TAB . TAB . TAB . '\'' . $column_name . '\' => \'' . $label . '\',' . EOL;
 		} // foreach
 		$model_code .= TAB . TAB . ');' . EOL;
 		$model_code .= TAB . '}' . EOL;

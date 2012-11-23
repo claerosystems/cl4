@@ -17,4 +17,12 @@ return array(
 	// add any fields that you want customize the default meta data for
 	// setup the same way as the same key in the cl4orm config
 	'default_meta_data_field_type' => array(),
+
+	// labels for columns where the labels can't easily be generated with ucwords()
+	'special_labels' => array(
+		'sql' => 'SQL',
+		'html' => 'HTML',
+		'id' => 'ID',
+		'ip_address' => 'IP Address',
+	),
 );
