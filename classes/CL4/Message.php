@@ -23,7 +23,7 @@ class CL4_Message {
 	/**
 	* Add a message to the messages array in the session
 	*
-	* 	cl4_Message::add('The message', cl4_Message::$warning);
+	* 	Message::add('The message', Message::$warning);
 	*
 	* @param  mixed  $message  if string, the message is added to the array of messages under the level; if an array, the key of the array is used as the level and the value is the message
 	* @param  int  $level  if set, this will be used as the level; if null then the default level error will be used
@@ -202,17 +202,17 @@ class CL4_Message {
 	} // function
 
 	/**
-	 * Converts validation errors to cl4_Message-compatable messages.
+	 * Converts validation errors to Message-compatable messages.
 	 *
 	 * @param array $errors The errors to convert.
 	 *
-	 * @return array The cl4_Message messages.
+	 * @return array The Message messages.
 	 */
 	public static function errors_to_messages($errors) {
 		$messages = array();
 
 		foreach($errors as $field => $message) {
-			$messages[] = array('level' => cl4_Message::$error, 'message' => $message);
+			$messages[] = array('level' => CL4_Message::$error, 'message' => $message);
 		}
 
 		return $messages;
