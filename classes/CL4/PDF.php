@@ -7,8 +7,8 @@ try {
 	Kohana::load(Kohana::find_file('vendor', 'tcpdf/fpdi2tcpdf_bridge'));
 	Kohana::load(Kohana::find_file('vendor', 'tcpdf/fpdi'));
 } catch (Exception $e) {
-	if ((empty($_SERVER['REDIRECT_SCRIPT_URL']) || UTF8::strpos($_SERVER['REDIRECT_SCRIPT_URL'], '/guide/api') !== 0)
-	&& (empty($_SERVER['REQUEST_URI']) || UTF8::strpos($_SERVER['REQUEST_URI'], '/guide/api') !== 0)) {
+	if ((empty($_SERVER['REDIRECT_SCRIPT_URL']) || UTF8::strpos($_SERVER['REDIRECT_SCRIPT_URL'], '/guide-api') !== 0)
+	&& (empty($_SERVER['REQUEST_URI']) || UTF8::strpos($_SERVER['REQUEST_URI'], '/guide-api') !== 0)) {
 		// produce error for user
 		if (Kohana::$errors) {
 			echo 'Unable to find TCPDF and related files. Ensure it\'s in a vendor folder and doesn\'t have any errors';

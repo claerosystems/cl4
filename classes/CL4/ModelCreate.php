@@ -89,7 +89,7 @@ class CL4_ModelCreate {
 
 		// add one full set of commented out cl4 column meta for reference purposes
 		$model_code .= TAB . TAB . '/**' . EOL;
-		$model_code .= TAB . TAB . '* see http://v3.kohanaphp.com/guide/api/Database_MySQL#list_columns for all possible column attributes' . EOL;
+		$model_code .= TAB . TAB . '* see http://v3.kohanaphp.com/guide-api/Database_MySQL#list_columns for all possible column attributes' . EOL;
 		$model_code .= TAB . TAB . '* see the modules/cl4/config/cl4orm.php for a full list of cl4-specific options and documentation on what the options do' . EOL;
 		$model_code .= TAB . TAB . '*/' . EOL;
 
