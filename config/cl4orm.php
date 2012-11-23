@@ -38,13 +38,13 @@ return array(
 	),
 	// this should contain arrays of field type specific meta data; if the field type or key is not set in here, the default_meta_data will be used
 	'default_meta_data_field_type' => array(
-		'text' => array(
+		'Text' => array(
 			'field_attributes' => array( //
 				'maxlength' => 255,
 				'size' => 30,
 			),
 		),
-		'select' => array(
+		'Select' => array(
 			'field_options' => array(
 				// data to get the data to display in this field
 				'source' => array(
@@ -65,7 +65,7 @@ return array(
 				),
 			),
 		),
-		'radios' => array(
+		'Radios' => array(
 			'field_options' => array(
 				'default_value' => 0,
 				// see how to use these in the select defaults
@@ -78,35 +78,35 @@ return array(
 				),
 			),
 		),
-		'yes_no' => array(
+		'Yes_No' => array(
 			'field_options' => array(
 				'default_value' => 0,
 			),
 		),
-		'gender' => array(
+		'Gender' => array(
 			'field_options' => array(
 				'default_value' => 0,
 			),
 		),
-		'textarea' => array(
+		'TextArea' => array(
 			'field_attributes' => array(
 				'cols' => 100,   // the number of columns in a text area
 				'rows' => 5,     // the number of rows in a text area
 			),
 		),
-		'date' => array(
+		'Date' => array(
 			'field_attributes' => array( //
 				'maxlength' => 10,       // a date in the format YYYY-MM-DD
 				'size' => 10,
 			),
 		),
-		'datetime' => array(
+		'DateTime' => array(
 			'field_attributes' => array( // only applies to the date field
 				'maxlength' => 10,       // a date in the format YYYY-MM-DD
 				'size' => 10,
 			),
 		),
-		'file' => array(
+		'File' => array(
 			'field_attributes' => array(
 				'size' => 30,
 			),
@@ -116,7 +116,7 @@ return array(
 				),
 			),
 		),
-		'url' => array(
+		'URL' => array(
 			'field_attributes' => array( //
 				'maxlength' => 255,
 				'size' => 30,
