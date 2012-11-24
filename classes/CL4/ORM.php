@@ -1121,7 +1121,7 @@ class CL4_ORM extends Kohana_ORM {
 			if ($this->_options['display_cancel']) {
 				$cancel_button_options = array(
 					'class' => 'js_cl4_button_link',
-					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'cancel'))),
+					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->url_model_name(), 'action' => 'cancel'))),
 				);
 				if ( ! empty($this->_options['cancel_button_attributes'])) {
 					$cancel_button_options = HTML::merge_attributes($cancel_button_options, $this->_options['cancel_button_attributes']);
