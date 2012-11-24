@@ -266,40 +266,51 @@ class CL4_ORM extends Kohana_ORM {
 	} // function __construct
 
 	/**
-	 * Handles retrieval of all model values, relationships, and metadata.
-	 * This is the same as Kohana_ORM::__get() but for the has_many part it checks for an expiry column.
+	 * Handles getting of column.
+	 * Override this method to add custom get behavior.
+	 * This is the same as Kohana_ORM::__get() but for the has_many part it checks for an expiry column in the through model for has many relationships.
 	 *
 	 * @param   string $column Column name
-	 * @return  mixed
+	 * @throws Kohana_Exception
+	 * @return mixed
 	 */
-	public function __get($column) {
+	public function get($column) {
 		if (array_key_exists($column, $this->_object)) {
 			return (in_array($column, $this->_serialize_columns))
 				? $this->_unserialize_value($this->_object[$column])
 				: $this->_object[$column];
+
 		} elseif (isset($this->_related[$column])) {
 			// Return related model that has already been fetched
 			return $this->_related[$column];
+
 		} elseif (isset($this->_belongs_to[$column])) {
 			$model = $this->_related($column);
 
 			// Use this model's column and foreign model's primary key
-			$col = $model->_object_name.'.'.$model->_primary_key;
+			$col = $model->_object_name . '.' . $model->_primary_key;
 			$val = $this->_object[$this->_belongs_to[$column]['foreign_key']];
 
-			$model->where($col, '=', $val)->find();
+			// Make sure we don't run WHERE "AUTO_INCREMENT column" = NULL queries. This would
+			// return the last inserted record instead of an empty result.
+			// See: http://mysql.localhost.net.ar/doc/refman/5.1/en/server-session-variables.html#sysvar_sql_auto_is_null
+			if ($val !== NULL) {
+				$model->where($col, '=', $val)->find();
+			}
 
 			return $this->_related[$column] = $model;
+
 		} elseif (isset($this->_has_one[$column])) {
 			$model = $this->_related($column);
 
 			// Use this model's primary key value and foreign model's column
-			$col = $model->_object_name.'.'.$this->_has_one[$column]['foreign_key'];
+			$col = $model->_object_name . '.' . $this->_has_one[$column]['foreign_key'];
 			$val = $this->pk();
 
 			$model->where($col, '=', $val)->find();
 
 			return $this->_related[$column] = $model;
+
 		} elseif (isset($this->_has_many[$column])) {
 			$model = ORM::factory($this->_has_many[$column]['model']);
 
@@ -313,17 +324,13 @@ class CL4_ORM extends Kohana_ORM {
 				if ( ! empty($this->_has_many[$column]['through_model'])) {
 					$through_model = $this->_has_many[$column]['through_model'];
 				} else {
-					$parts = explode('_', $through);
-					$through_model = '';
-					foreach($parts as $part) {
-						if ($through_model != '') $through_model .= '_';
-						$through_model .= ucfirst($part);
-					}
+					$through_model = CL4::psr0($through);
 				}
 
 				// Join on through model's target foreign key (far_key) and target model's primary key
-				$join_col1 = $through.'.'.$this->_has_many[$column]['far_key'];
-				$join_col2 = $model->_object_name.'.'.$model->_primary_key;
+				$join_col1 = $through . '.' . $this->_has_many[$column]['far_key'];
+				$join_col2 = $model->_object_name . '.' . $model->_primary_key;
+
 				$model->join($through)->on($join_col1, '=', $join_col2);
 
 				if (ORM::factory($through_model)->has_expiry()) {
@@ -331,20 +338,21 @@ class CL4_ORM extends Kohana_ORM {
 				}
 
 				// Through table's source foreign key (foreign_key) should be this model's primary key
-				$col = $through.'.'.$this->_has_many[$column]['foreign_key'];
+				$col = $through . '.' . $this->_has_many[$column]['foreign_key'];
 				$val = $this->pk();
 			} else {
 				// Simple has_many relationship, search where target model's foreign key is this model's primary key
-				$col = $model->_object_name.'.'.$this->_has_many[$column]['foreign_key'];
+				$col = $model->_object_name . '.' . $this->_has_many[$column]['foreign_key'];
 				$val = $this->pk();
 			}
 
 			return $model->where($col, '=', $val);
+
 		} else {
 			throw new Kohana_Exception('The :property property does not exist in the :class class',
 				array(':property' => $column, ':class' => get_class($this)));
 		}
-	} // function __get
+	} // function get
 
 	/**
 	 * Update the options with the given set.  This will override any options already set, and if none are set
