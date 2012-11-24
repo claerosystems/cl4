@@ -127,7 +127,7 @@ class CL4_Model_Create {
 	* @return mixed
 	*/
 	protected function make_class_name($name) {
-		return str_replace(' ', '_', ucwords(str_replace('_', ' ', $name)));
+		return CL4::psr0($name);
 	}
 
 	protected function make_column_label($column_name) {
