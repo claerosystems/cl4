@@ -172,11 +172,14 @@ class CL4_CSV {
 	} // function get_csv
 
 	/**
-	* Creates the headers and reads the file
-	*
-	* @param   string  $user_filename  The name of the file to display to the user (leave as default to use the filename in the object)
-	*/
-	public function get_csv($user_filename = NULL) {
+	 * Creates the headers and reads the file.
+	 * Nothing can be executed after this.
+	 *
+	 * @param   Response  $response  The response object, used to send the file.
+	 * @param   string    $user_filename  The name of the file to display to the user (leave as default to use the filename in the object)
+	 * @return  void
+	 */
+	public function get_csv($response, $user_filename = NULL) {
 		if ($this->mode != 'write') {
 			throw new Kohana_Exception('A CSV write function has been called when not in write mode');
 		}
@@ -185,13 +188,9 @@ class CL4_CSV {
 			$user_filename = pathinfo($this->filename, PATHINFO_BASENAME);
 		}
 
-		try {
-			Request::current()->response()->send_file($this->filename, $user_filename, array(
-				'mime_type' => 'application/csv',
-			));
-		} catch (Exception $e) {
-			throw $e;
-		}
+		$response->send_file($this->filename, $user_filename, array(
+			'mime_type' => 'application/csv',
+		));
 	} // function get_csv
 
 	/**
