@@ -128,6 +128,11 @@ class CL4_ORM extends Kohana_ORM {
 	protected $_change_log_ids = array();
 
 	/**
+	 * @var  string  The model name to use in URLs. Should, most likely because capitalized properly.
+	 */
+	protected $_url_model_name;
+
+	/**
 	* Calls Kohana_ORM::_intialize() and then check to see if the default value for the expiry column is set
 	*
 	* @return  void
@@ -2923,5 +2928,17 @@ class CL4_ORM extends Kohana_ORM {
 	} // function where_active
 
 	/**
+	 * Returns the model name for use in URLs.
+	 * If the property _url_model_name is set, it will be returned.
+	 * Otherwise the class name without "Model_" will be returned.
+	 *
+	 * @return  string
+	 */
+	public function url_model_name() {
+		if ( ! empty($this->_url_model_name)) {
+			return $this->_url_model_name;
+		} else {
+			return substr(get_class($this), 6);
+		}
 	}
 } // class
