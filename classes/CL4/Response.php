@@ -39,16 +39,6 @@ class CL4_Response extends Kohana_Response {
 			session_write_close();
 		}
 
-		if ($filename !== TRUE && empty($options['mime_type'])) {
-			if (empty($download)) {
-				// Use the file name as the download file name
-				$download = pathinfo($filename, PATHINFO_BASENAME);
-			}
-
-			// Get the mime type from the extension of the download file
-			$options['mime_type'] = File::mime_by_ext(strtolower(pathinfo($download, PATHINFO_EXTENSION)));
-		}
-
 		// Send the file
 		parent::send_file($filename, $download, $options);
 	} // function send_file
