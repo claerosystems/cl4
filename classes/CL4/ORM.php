@@ -130,7 +130,7 @@ class CL4_ORM extends Kohana_ORM {
 	/**
 	 * @var  string  The model name to use in URLs. Should, most likely because capitalized properly.
 	 */
-	protected $_url_model_name;
+	protected $_model_name;
 
 	/**
 	* Calls Kohana_ORM::_intialize() and then check to see if the default value for the expiry column is set
@@ -1129,7 +1129,7 @@ class CL4_ORM extends Kohana_ORM {
 			if ($this->_options['display_cancel']) {
 				$cancel_button_options = array(
 					'class' => 'js_cl4_button_link',
-					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->url_model_name(), 'action' => 'cancel'))),
+					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->model_name(), 'action' => 'cancel'))),
 				);
 				if ( ! empty($this->_options['cancel_button_attributes'])) {
 					$cancel_button_options = HTML::merge_attributes($cancel_button_options, $this->_options['cancel_button_attributes']);
@@ -2937,14 +2937,14 @@ class CL4_ORM extends Kohana_ORM {
 
 	/**
 	 * Returns the model name for use in URLs.
-	 * If the property _url_model_name is set, it will be returned.
+	 * If the property _model_name is set, it will be returned.
 	 * Otherwise the class name without "Model_" will be returned.
 	 *
 	 * @return  string
 	 */
-	public function url_model_name() {
-		if ( ! empty($this->_url_model_name)) {
-			return $this->_url_model_name;
+	public function model_name() {
+		if ( ! empty($this->_model_name)) {
+			return $this->_model_name;
 		} else {
 			return substr(get_class($this), 6);
 		}
