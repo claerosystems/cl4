@@ -618,7 +618,7 @@ class CL4_Form extends Kohana_Form {
 			$month_attributes = $attributes;
 			$month_attributes['id'] .= '_month';
 
-			if ($options['field_type'] == 'text') {
+			if ($options['field_type'] == 'Text') {
 				// make month text field
 				$html .= Form::input_with_suffix_size($name, $month, $month_attributes, 'cl4_date_field', 'month', 2, 2);
 
@@ -642,7 +642,7 @@ class CL4_Form extends Kohana_Form {
 			$day_attributes = Form::increment_tabindex($attributes);
 			$day_attributes['id'] .= '_day';
 
-			if ($options['field_type'] == 'text') {
+			if ($options['field_type'] == 'Text') {
 				// make day text field
 				$html .= Form::input_with_suffix_size($name, $day, $day_attributes, 'cl4_date_field', 'day', 2, 2);
 
@@ -660,7 +660,7 @@ class CL4_Form extends Kohana_Form {
 			$year_attributes = Form::increment_tabindex($attributes);
 			$year_attributes['id'] .= '_year';
 
-			if ($options['field_type'] == 'text') {
+			if ($options['field_type'] == 'Text') {
 				// make day text field
 				$html .= Form::input_with_suffix_size($name, $year, $year_attributes, 'cl4_date_field', 'year', 4, 4);
 

@@ -2079,7 +2079,7 @@ class CL4_ORM extends Kohana_ORM {
 		$files_moved = array();
 		// now check for file columns that have changed and have name change method of id
 		foreach ($this->_table_columns as $column_name => $column_info) {
-			if (array_key_exists($column_name, $data) && $column_info['field_type'] == 'file') {
+			if (array_key_exists($column_name, $data) && $column_info['field_type'] == 'File') {
 				$file_options = $column_info['field_options']['file_options'];
 				if ($file_options['disable_file_upload'] !== TRUE &&
 						($file_options['name_change_method'] == 'id' || $file_options['name_change_method'] == 'pk')) {
@@ -2547,7 +2547,7 @@ class CL4_ORM extends Kohana_ORM {
 	*/
 	public function delete_files() {
 		foreach ($this->_table_columns as $column_name => $options) {
-			if ($options['field_type'] == 'file' && $options['field_options']['file_options']['delete_files'] === TRUE) {
+			if ($options['field_type'] == 'File' && $options['field_options']['file_options']['delete_files'] === TRUE) {
 				$this->delete_file($column_name);
 			}
 		} // foreach
