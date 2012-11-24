@@ -152,7 +152,7 @@ class CL4_MultiORM {
 
 		// this needs to be called here because it requires that the model be loaded
 		$this->_object_name = $this->_model->object_name();
-		$this->_url_model_name = Arr::get($this->_options, 'url_model_name', $this->_object_name);
+		$this->_url_model_name = $this->_model->model_name();
 		$this->_table_name_display = $this->_model->_table_name_display;
 
 		if (empty($this->_options['form_id'])) {

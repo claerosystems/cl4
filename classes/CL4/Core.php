@@ -319,4 +319,8 @@ class CL4_Core extends Kohana_Core {
 
 		return UTF8::trim($formatted_phone);
 	} // function format_phone
+
+	public static function psr0($lower_case) {
+		return str_replace(' ', '_', ucwords(str_replace('_', ' ', $lower_case)));
+	}
 } // class

@@ -128,6 +128,11 @@ class CL4_ORM extends Kohana_ORM {
 	protected $_change_log_ids = array();
 
 	/**
+	 * @var  string  The model name to use in URLs. Should, most likely because capitalized properly.
+	 */
+	protected $_model_name;
+
+	/**
 	* Calls Kohana_ORM::_intialize() and then check to see if the default value for the expiry column is set
 	*
 	* @return  void
@@ -261,40 +266,51 @@ class CL4_ORM extends Kohana_ORM {
 	} // function __construct
 
 	/**
-	 * Handles retrieval of all model values, relationships, and metadata.
-	 * This is the same as Kohana_ORM::__get() but for the has_many part it checks for an expiry column.
+	 * Handles getting of column.
+	 * Override this method to add custom get behavior.
+	 * This is the same as Kohana_ORM::__get() but for the has_many part it checks for an expiry column in the through model for has many relationships.
 	 *
 	 * @param   string $column Column name
-	 * @return  mixed
+	 * @throws Kohana_Exception
+	 * @return mixed
 	 */
-	public function __get($column) {
+	public function get($column) {
 		if (array_key_exists($column, $this->_object)) {
 			return (in_array($column, $this->_serialize_columns))
 				? $this->_unserialize_value($this->_object[$column])
 				: $this->_object[$column];
+
 		} elseif (isset($this->_related[$column])) {
 			// Return related model that has already been fetched
 			return $this->_related[$column];
+
 		} elseif (isset($this->_belongs_to[$column])) {
 			$model = $this->_related($column);
 
 			// Use this model's column and foreign model's primary key
-			$col = $model->_object_name.'.'.$model->_primary_key;
+			$col = $model->_object_name . '.' . $model->_primary_key;
 			$val = $this->_object[$this->_belongs_to[$column]['foreign_key']];
 
-			$model->where($col, '=', $val)->find();
+			// Make sure we don't run WHERE "AUTO_INCREMENT column" = NULL queries. This would
+			// return the last inserted record instead of an empty result.
+			// See: http://mysql.localhost.net.ar/doc/refman/5.1/en/server-session-variables.html#sysvar_sql_auto_is_null
+			if ($val !== NULL) {
+				$model->where($col, '=', $val)->find();
+			}
 
 			return $this->_related[$column] = $model;
+
 		} elseif (isset($this->_has_one[$column])) {
 			$model = $this->_related($column);
 
 			// Use this model's primary key value and foreign model's column
-			$col = $model->_object_name.'.'.$this->_has_one[$column]['foreign_key'];
+			$col = $model->_object_name . '.' . $this->_has_one[$column]['foreign_key'];
 			$val = $this->pk();
 
 			$model->where($col, '=', $val)->find();
 
 			return $this->_related[$column] = $model;
+
 		} elseif (isset($this->_has_many[$column])) {
 			$model = ORM::factory($this->_has_many[$column]['model']);
 
@@ -308,17 +324,13 @@ class CL4_ORM extends Kohana_ORM {
 				if ( ! empty($this->_has_many[$column]['through_model'])) {
 					$through_model = $this->_has_many[$column]['through_model'];
 				} else {
-					$parts = explode('_', $through);
-					$through_model = '';
-					foreach($parts as $part) {
-						if ($through_model != '') $through_model .= '_';
-						$through_model .= ucfirst($part);
-					}
+					$through_model = CL4::psr0($through);
 				}
 
 				// Join on through model's target foreign key (far_key) and target model's primary key
-				$join_col1 = $through.'.'.$this->_has_many[$column]['far_key'];
-				$join_col2 = $model->_object_name.'.'.$model->_primary_key;
+				$join_col1 = $through . '.' . $this->_has_many[$column]['far_key'];
+				$join_col2 = $model->_object_name . '.' . $model->_primary_key;
+
 				$model->join($through)->on($join_col1, '=', $join_col2);
 
 				if (ORM::factory($through_model)->has_expiry()) {
@@ -326,20 +338,21 @@ class CL4_ORM extends Kohana_ORM {
 				}
 
 				// Through table's source foreign key (foreign_key) should be this model's primary key
-				$col = $through.'.'.$this->_has_many[$column]['foreign_key'];
+				$col = $through . '.' . $this->_has_many[$column]['foreign_key'];
 				$val = $this->pk();
 			} else {
 				// Simple has_many relationship, search where target model's foreign key is this model's primary key
-				$col = $model->_object_name.'.'.$this->_has_many[$column]['foreign_key'];
+				$col = $model->_object_name . '.' . $this->_has_many[$column]['foreign_key'];
 				$val = $this->pk();
 			}
 
 			return $model->where($col, '=', $val);
+
 		} else {
 			throw new Kohana_Exception('The :property property does not exist in the :class class',
 				array(':property' => $column, ':class' => get_class($this)));
 		}
-	} // function __get
+	} // function get
 
 	/**
 	 * Update the options with the given set.  This will override any options already set, and if none are set
@@ -1116,7 +1129,7 @@ class CL4_ORM extends Kohana_ORM {
 			if ($this->_options['display_cancel']) {
 				$cancel_button_options = array(
 					'class' => 'js_cl4_button_link',
-					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->_object_name, 'action' => 'cancel'))),
+					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->model_name(), 'action' => 'cancel'))),
 				);
 				if ( ! empty($this->_options['cancel_button_attributes'])) {
 					$cancel_button_options = HTML::merge_attributes($cancel_button_options, $this->_options['cancel_button_attributes']);
@@ -2066,7 +2079,7 @@ class CL4_ORM extends Kohana_ORM {
 		$files_moved = array();
 		// now check for file columns that have changed and have name change method of id
 		foreach ($this->_table_columns as $column_name => $column_info) {
-			if (array_key_exists($column_name, $data) && $column_info['field_type'] == 'file') {
+			if (array_key_exists($column_name, $data) && $column_info['field_type'] == 'File') {
 				$file_options = $column_info['field_options']['file_options'];
 				if ($file_options['disable_file_upload'] !== TRUE &&
 						($file_options['name_change_method'] == 'id' || $file_options['name_change_method'] == 'pk')) {
@@ -2414,10 +2427,11 @@ class CL4_ORM extends Kohana_ORM {
 	* Run Request::send_file() for the file in a specific column for the current record
 	* Checks to see if the file exists before running send_file()
 	*
+	* @param   Response  $response  The response object, used to send the file.
 	* @param  string  $column_name
 	* @return  mixed  NULL if there is file in the column otherwise the script will exit during Request::send_file()
 	*/
-	public function send_file($column_name) {
+	public function send_file($response, $column_name) {
 		if ( ! empty($this->$column_name)) {
 			$file_path = $this->get_filename_with_path($column_name);
 
@@ -2427,7 +2441,7 @@ class CL4_ORM extends Kohana_ORM {
 
 			$file_name = ORM_File::view($this->$column_name, $column_name, $this, $this->_table_columns[$column_name]['field_options']);
 
-			Request::current()->response()->send_file($file_path, $file_name);
+			$response->send_file($file_path, $file_name);
 		} // if
 
 		// nothing to stream
@@ -2534,7 +2548,7 @@ class CL4_ORM extends Kohana_ORM {
 	*/
 	public function delete_files() {
 		foreach ($this->_table_columns as $column_name => $options) {
-			if ($options['field_type'] == 'file' && $options['field_options']['file_options']['delete_files'] === TRUE) {
+			if ($options['field_type'] == 'File' && $options['field_options']['file_options']['delete_files'] === TRUE) {
 				$this->delete_file($column_name);
 			}
 		} // foreach
@@ -2923,15 +2937,17 @@ class CL4_ORM extends Kohana_ORM {
 	} // function where_active
 
 	/**
-	* Unserializes the value of the column.
-	* Exactly the same as Kohana_ORM, but includes the second column
-	* to ensure associative arrays are not returned as stdClass.
-	*
-	* @param  string  $value  The value to JSON decode
-	*
-	* @return  mixed
-	*/
-	protected function _unserialize_value($value) {
-		return json_decode($value, TRUE);
+	 * Returns the model name for use in URLs.
+	 * If the property _model_name is set, it will be returned.
+	 * Otherwise the class name without "Model_" will be returned.
+	 *
+	 * @return  string
+	 */
+	public function model_name() {
+		if ( ! empty($this->_model_name)) {
+			return $this->_model_name;
+		} else {
+			return substr(get_class($this), 6);
+		}
 	}
 } // class
