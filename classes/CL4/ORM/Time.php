@@ -23,12 +23,12 @@ class CL4_ORM_Time extends ORM_FieldType {
 			$value['min']  = array_key_exists('min', $value)  ? $value['min']  : 0;
 			$value['sec']  = array_key_exists('sec', $value)  ? $value['sec']  : 0;
 
-			// add 12 hours to the hour because it's PM, but only when we are not receiving a 24 hour time
-			if ( ! $options['24_hour'] && array_key_exists('modulation', $value) && strtolower($value['modulation']) == 'pm') {
-				$value['hour'] += 12;
-			}
-
 			if ( ! empty($value['hour']) || ! empty($value['min']) || ! empty($value['sec'])) {
+				// add 12 hours to the hour because it's PM, but only when we are not receiving a 24 hour time
+				if ( ! $options['24_hour'] && array_key_exists('modulation', $value) && strtolower($value['modulation']) == 'pm') {
+					$value['hour'] += 12;
+				}
+
 				$orm_model->$column_name = sprintf('%' . ($options['24_hour'] ? '02' : '') . 'd:%02d:%02d', $value['hour'], $value['min'], $value['sec']);
 			} else {
 				$orm_model->$column_name = '';
