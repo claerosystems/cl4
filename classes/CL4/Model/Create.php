@@ -521,10 +521,10 @@ class CL4_Model_Create {
 	protected function build_labels() {
 		$model_code = EOL;
 		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . '* Labels for columns.' . EOL;
-		$model_code .= TAB . '*' . EOL;
-		$model_code .= TAB . '* @return  array' . EOL;
-		$model_code .= TAB . '*/' . EOL;
+		$model_code .= TAB . ' * Labels for columns.' . EOL;
+		$model_code .= TAB . ' *' . EOL;
+		$model_code .= TAB . ' * @return  array' . EOL;
+		$model_code .= TAB . ' */' . EOL;
 		$model_code .= TAB . 'public function labels() {' . EOL;
 		$model_code .= TAB . TAB . 'return array(' . EOL;
 		foreach ($this->columns as $column_name => $column_data) {
@@ -540,13 +540,15 @@ class CL4_Model_Create {
 	protected function build_rules() {
 		$model_code = EOL;
 		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . '* Rule definitions for validation.' . EOL;
-		$model_code .= TAB . '*' . EOL;
-		$model_code .= TAB . '* @return  array' . EOL;
-		$model_code .= TAB . '*/' . EOL;
+		$model_code .= TAB . ' * Rule definitions for validation.' . EOL;
+		$model_code .= TAB . ' *' . EOL;
+		$model_code .= TAB . ' * @return  array' . EOL;
+		$model_code .= TAB . ' */' . EOL;
 		$model_code .= TAB . '/*public function rules() {' . EOL;
 		$model_code .= TAB . TAB . 'return array(' . EOL;
-		$model_code .= TAB . TAB . TAB . '\'' . $this->first_text_column_name . '\' => array(array(\'not_empty\')),' . EOL;
+		$model_code .= TAB . TAB . TAB . '\'' . $this->first_text_column_name . '\' => array(' . EOL;
+		$model_code .= TAB . TAB . TAB . TAB . 'array(\'not_empty\'),' . EOL;
+		$model_code .= TAB . TAB . TAB . '),' . EOL;
 		$model_code .= TAB . TAB . ');' . EOL;
 		$model_code .= TAB . '}*/' . EOL;
 
@@ -556,13 +558,15 @@ class CL4_Model_Create {
 	protected function build_filters() {
 		$model_code = EOL;
 		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . '* Filter definitions, run everytime a field is set.' . EOL;
-		$model_code .= TAB . '*' . EOL;
-		$model_code .= TAB . '* @return  array' . EOL;
-		$model_code .= TAB . '*/' . EOL;
+		$model_code .= TAB . ' * Filter definitions, run everytime a field is set.' . EOL;
+		$model_code .= TAB . ' *' . EOL;
+		$model_code .= TAB . ' * @return  array' . EOL;
+		$model_code .= TAB . ' */' . EOL;
 		$model_code .= TAB . '/*public function filters() {' . EOL;
 		$model_code .= TAB . TAB . 'return array(' . EOL;
-		$model_code .= TAB . TAB . TAB . '\'' . ( ! empty($this->first_text_column_name) ? $this->first_text_column_name : 'TRUE') . '\' => array(array(\'trim\')),' . EOL;
+		$model_code .= TAB . TAB . TAB . ( ! empty($this->first_text_column_name) ? '\'' . $this->first_text_column_name . '\'' : 'TRUE') . ' => array(' . EOL;
+		$model_code .= TAB . TAB . TAB . TAB . 'array(\'trim\'),' . EOL;
+		$model_code .= TAB . TAB . TAB . '),' . EOL;
 		$model_code .= TAB . TAB . ');' . EOL;
 		$model_code .= TAB . '}*/' . EOL;
 
