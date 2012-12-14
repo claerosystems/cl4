@@ -24,5 +24,6 @@ return array(
 		'html' => 'HTML',
 		'id' => 'ID',
 		'ip_address' => 'IP Address',
+		'datetime' => 'Date Time',
 	),
 );
