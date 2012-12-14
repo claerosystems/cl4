@@ -411,7 +411,7 @@ class CL4_Model_Create {
 				$belongs_to_code .= EOL;
 				$belongs_to_code .= TAB . TAB . '\'' . $column_name_wo_id . '\' => array(' . EOL;
 				$belongs_to_code .= TAB . TAB . TAB . '\'model\' => \'' . $this->make_class_name($column_name_wo_id) . '\',' . EOL;
-				$belongs_to_code .= TAB . TAB . TAB . '\'foreign_key\' => \'id\',' . EOL;
+				$belongs_to_code .= TAB . TAB . TAB . '\'foreign_key\' => \'' . $column_name . '\',' . EOL;
 				$belongs_to_code .= TAB . TAB . '),';
 			}
 		} // if
