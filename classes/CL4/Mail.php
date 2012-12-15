@@ -22,7 +22,7 @@ class CL4_Mail extends PHPMailer {
 	* @var array
 	*/
 	protected $user_table = array(
-		'model' => 'user',
+		'model' => 'User',
 		'email_field' => 'username',
 		'first_name_field' => 'first_name',
 		'last_name_field' => 'last_name',

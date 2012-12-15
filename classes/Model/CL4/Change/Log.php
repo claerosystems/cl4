@@ -19,7 +19,7 @@ class Model_CL4_Change_Log extends ORM {
 	// relationships
 	protected $_belongs_to = array(
 		'user' => array(
-			'model' => 'user',
+			'model' => 'User',
 			'foreign_key' => 'user_id',
 		),
 	);
