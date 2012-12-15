@@ -6,7 +6,7 @@ class CL4_ORM_TextArea extends ORM_FieldType {
 	}
 
 	public static function search($column_name, $html_name, $body, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
-		return ORM_Textarea::edit($column_name, $html_name, $body, $attributes, $options, $orm_model);
+		return ORM_TextArea::edit($column_name, $html_name, $body, $attributes, $options, $orm_model);
 	}
 
 	public static function search_prepare($column_name, $value, array $options = array(), ORM $orm_model = NULL) {
@@ -24,7 +24,7 @@ class CL4_ORM_TextArea extends ORM_FieldType {
 	} // function
 
 	public static function view_html($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
-		$value = ORM_Textarea::prepare_html(ORM_Textarea::view($value, $column_name, $orm_model, $options), $options['nbsp']);
+		$value = ORM_TextArea::prepare_html(ORM_TextArea::view($value, $column_name, $orm_model, $options), $options['nbsp']);
 		if ($options['nl2br']) {
 			return nl2br($value);
 		} else {
