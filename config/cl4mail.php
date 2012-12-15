@@ -27,7 +27,7 @@ return array(
 
 		// Config for adding a user to To field using a query
 		'user_table' => array(
-			'model' => 'user', // The model to select from
+			'model' => 'User', // The model to select from
 			'email_field' => 'username', // The field to get the email address from
 			'first_name_field' => 'first_name', // The field to get the first name from
 			'last_name_field' => 'last_name', // The field to get the last name from
