@@ -2402,7 +2402,7 @@ class CL4_ORM extends Kohana_ORM {
 			$file_options = $this->_table_columns[$column_name]['field_options']['file_options'];
 
 			// use the function inside cl4File to get the path to the file (possibly based on table and column name depending on the options)
-			return cl4file::get_file_path($file_options['destination_folder'], $this->_table_name, $column_name, $file_options);
+			return CL4File::get_file_path($file_options['destination_folder'], $this->_table_name, $column_name, $file_options);
 
 		} else {
 			throw new Kohana_Exception('The column name :column: does not exist in _table_columns', array(':column:' => $column_name));
