@@ -128,6 +128,16 @@ class CL4_HTML extends Kohana_HTML {
 	} // function chars
 
 	/**
+	 * Returns the HTML for a cl4 icon.
+	 *
+	 * @param  string  $icon  The name of the icon. "cl4_" is added.
+	 * @return  string
+	 */
+	public static function icon($icon) {
+		return '<span class="cl4_icon cl4_' . $icon . '"></span>';
+	}
+
+	/**
 	* If the class attribute is not set, it will add it otherwise, it will add the new class prefixed with a space
 	*
 	* @param mixed $attributes
