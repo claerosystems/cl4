@@ -3,6 +3,7 @@
 return array(
 	'model_comment' => array(
 		'package' => 'Application',
+		'category' => 'Models',
 		'author' => 'Claero Systems',
 		'copyright' => '(c) ' . date('Y') . ' Claero Systems',
 	),
