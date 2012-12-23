@@ -436,7 +436,9 @@ class CL4_PDF extends FPDI {
 			$w = $this->CalculatePercentageWidth($w);
 		}
 
-		$border = strtoupper($border);
+		if ( ! is_array($border)) {
+			$border = strtoupper($border);
+		}
 
 		parent::Cell($w, $h, $txt, $border, $ln, $align, $fill, $link, $stretch, $ignore_min_height);
 	} // function Cell
@@ -476,7 +478,9 @@ class CL4_PDF extends FPDI {
 			$w = $this->CalculatePercentageWidth($w);
 		}
 
-		$border = strtoupper($border);
+		if ( ! is_array($border)) {
+			$border = strtoupper($border);
+		}
 
 		return parent::MultiCell($w, $h, $txt, $border, $align, $fill, $ln, $x, $y, $reseth, $stretch, $ishtml, $autopadding, $maxh);
 	} // function MultiCell
