@@ -39,7 +39,7 @@ return array(
 	// this should contain arrays of field type specific meta data; if the field type or key is not set in here, the default_meta_data will be used
 	'default_meta_data_field_type' => array(
 		'text' => array(
-			'field_attributes' => array( //
+			'field_attributes' => array(
 				'maxlength' => 255,
 				'size' => 30,
 			),
@@ -117,7 +117,13 @@ return array(
 			),
 		),
 		'url' => array(
-			'field_attributes' => array( //
+			'field_attributes' => array(
+				'maxlength' => 255,
+				'size' => 30,
+			),
+		),
+		'email' => array(
+			'field_attributes' => array(
 				'maxlength' => 255,
 				'size' => 30,
 			),
