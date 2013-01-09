@@ -4,7 +4,8 @@
 * Adds field types to Kohana_Form
 */
 class CL4_Form extends Kohana_Form {
-	const DATE_FORMAT = 'Y-m-d'; // todo: change to global constant?
+	const DATE_FORMAT = 'Y-m-d';
+	const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
 
 	public static $default_source_value = 'id';
 	public static $default_source_label = 'name';
@@ -23,6 +24,7 @@ class CL4_Form extends Kohana_Form {
 	 * `string`  | view         | The view to use to generate the combination of fields for a date time. | `"cl4/form/datetime"`
 	 * `boolean` | show_seconds | Setting this FALSE will change the seconds field to a hidden field. | `TRUE`
 	 * `boolean` | 24_hour      | Setting this to TRUE will hide the modulation field. | `FALSE`
+	 * `boolean` | default_current_date | Setting this to TRUE will default to the current date when the field is empty. | `FALSE`
 	 *
 	 * @param   string  $name        Input name; the values returned will be an the $_REQUEST array of the date, hour, minute, possibly second and modulation
 	 * @param   string  $value       Input value; NULL, 0000-00-00, 00:00:00 or 0000-00-00 00:00:00 will all make the fields blank; otherwise it will use strtotime() to get the time out of the string
@@ -36,14 +38,19 @@ class CL4_Form extends Kohana_Form {
 			'view' => 'cl4/form/datetime',
 			'show_seconds' => TRUE,
 			'24_hour' => FALSE,
+			'default_current_date' => FALSE,
 		);
 
 		$fields = array();
 
 		// check if the date is empty
 		if (Form::check_date_empty_value($value)) {
-			// the value is empty or something that triggers empty
-			$value = '';
+			// determine if we should display the current date as the default
+			if ($options['default_current_date']) {
+				$value = date(Form::DATE_TIME_FORMAT);
+			} else {
+				$value = '';
+			}
 		}
 
 		// generate the date and time default values based on the date
