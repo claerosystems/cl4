@@ -1120,6 +1120,21 @@ class CL4_Form extends Kohana_Form {
 	} // function input_button
 
 	/**
+	 * Creates an input with type "number".
+	 *
+	 * @param  string  $name        The name of the number input (name attribute)
+	 * @param  string  $value       The text of the number input (value attribute)
+	 * @param  array   $attributes  Any additional attributes to add to the input (type will be set to number)
+	 *
+	 * @return  string  The html of type number input
+	 */
+	public static function number($name, $value, array $attributes = NULL) {
+		$attributes['type'] = 'number';
+
+		return Form::input($name, $value, $attributes);
+	} // function number
+
+	/**
 	* Runs the SQL query and returns the source array for fields such as checkboxes, radios or selects
 	*
 	* @param  string  $source   The SELECT SQL query
