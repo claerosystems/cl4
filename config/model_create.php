@@ -21,10 +21,11 @@ return array(
 
 	// labels for columns where the labels can't easily be generated with ucwords()
 	'special_labels' => array(
-		'sql' => 'SQL',
+		'datetime' => 'Date Time',
 		'html' => 'HTML',
 		'id' => 'ID',
 		'ip_address' => 'IP Address',
-		'datetime' => 'Date Time',
+		'sql' => 'SQL',
+		'url' => 'URL',
 	),
 );
