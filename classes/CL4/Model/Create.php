@@ -322,7 +322,7 @@ class CL4_Model_Create {
 
 		// now set some other stuff based on the field type (mostly attributes)
 		$loop_through_field_attributes = FALSE; // if this is set to true, then
-		if ($column_data['data_type'] == 'decimal') {
+		if ($column_data['data_type'] == 'decimal' || $column_data['data_type'] == 'decimal unsigned') {
 			$meta_data['field_attributes']['size'] = $meta_data['field_attributes']['maxlength'] = $column_data['numeric_precision'] + 1;
 		} else if ($meta_data['field_type'] == 'Text') {
 			$loop_through_field_attributes = TRUE;
