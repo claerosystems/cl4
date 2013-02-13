@@ -61,6 +61,7 @@ return array(
 					'data' => NULL,
 					'value' => 'id',
 					'label' => 'name',
+					'parent_label' => 'parent',
 					'order_by' => 'name',
 				),
 			),
