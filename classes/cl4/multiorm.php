@@ -1257,6 +1257,18 @@ class cl4_MultiORM {
 					}
 					break;
 
+				case 'sql_parent' :
+					if ( ! empty($options['data'])) {
+						// source data appears to be a sql statement so get all the values
+						$this->_lookup_data[$object_name][$column_name] = array();
+						foreach (DB::query(Database::SELECT, $options['data'])->execute($this->_db) as $result) {
+							$this->_lookup_data[$object_name][$column_name][$result[$options['parent_label']]][$result[$options['value']]] = $result[$options['label']];
+						}
+					} else {
+						throw new Kohana_Exception('The source is set to sql_parent, but the data is empty');
+					}
+					break;
+
 				case 'table_name' :
 					if ( ! empty($options['data'])) {
 						try {
