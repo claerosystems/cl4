@@ -545,7 +545,7 @@ class CL4_MultiORM {
 			$i = 0;
 
 			// generate the data to be displayed
-			$no_replace_spaces_types = array('checkbox', 'textarea', 'file');
+			$no_replace_spaces_types = array('Checkbox', 'TextArea', 'File');
 
 			// todo: implement multiple tables
 			foreach ($display_order as $column_name) {
