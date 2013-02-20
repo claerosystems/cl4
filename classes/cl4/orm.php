@@ -1301,7 +1301,7 @@ class cl4_ORM extends Kohana_ORM {
 							$this->_lookup_data[$column_name][$result[$options['parent_label']]][$result[$options['value']]] = $result[$options['label']];
 						}
 					} else {
-						throw new Kohana_Exception('The source is set to sql, but the data is empty');
+						throw new Kohana_Exception('The source is set to sql_parent, but the data is empty');
 					}
 					break;
 

@@ -1265,7 +1265,7 @@ class cl4_MultiORM {
 							$this->_lookup_data[$object_name][$column_name][$result[$options['parent_label']]][$result[$options['value']]] = $result[$options['label']];
 						}
 					} else {
-						throw new Kohana_Exception('The source is set to sql, but the data is empty');
+						throw new Kohana_Exception('The source is set to sql_parent, but the data is empty');
 					}
 					break;
 
