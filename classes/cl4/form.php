@@ -428,7 +428,7 @@ class cl4_Form extends Kohana_Form {
 	 *
 	 * @return  string
 	 */
-	protected static function _checkbox_layout($name, $col, $label, $checkbox_value, $checked, $attributes, $options) {
+	protected static function _checkbox_layout($name, & $col, $label, $checkbox_value, $checked, $attributes, $options) {
 		switch ($options['orientation']) {
 			case 'table' :
 				// $col is increment inside checkbox_layout_table() and passed by reference
