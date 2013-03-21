@@ -51,7 +51,7 @@ class cl4_ORM_Radios extends ORM_FieldType {
 	public static function view_html($value, $column_name, ORM $orm_model = NULL, array $options = array(), $source = NULL) {
 		$found_value = ORM_Radios::view($value, $column_name, $orm_model, $options, $source);
 		if ($found_value !== NULL && $found_value !== 0) {
-			return ORM_Radios::prepare_html($found_value, $options['nbsp']);
+			return ORM_Radios::prepare_html($found_value, $options['nbsp'], $options['escape_label']);
 		} else if ($value > 0) {
 			// the value is still > 0 but we don't know what the value is because it's not in the data
 			return __(Kohana::message('cl4', 'cl4_unknown_html'));

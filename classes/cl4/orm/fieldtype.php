@@ -161,14 +161,17 @@ class cl4_ORM_FieldType {
 	} // function view_html
 
 	/**
-	* Does HTML::chars() and optionally will replace spaces with a no breaking space
+	* Does HTML::chars() (depending on parametert) and optionally will replace spaces with a non-breaking space.
 	*
-	* @param   string  $value  The value to escaped
-	* @param   bool    $nbsp   If the spaces should be replaced with no breaking spaces
+	* @param   string  $value  The value to be prepared for HTML viewing.
+	* @param   bool    $nbsp   If the spaces should be replaced with no breaking spaces.
+	* @param   bool    $escape_label   If TRUE (default), the label will be escaped.
 	* @return  string
 	*/
-	protected static function prepare_html($value, $nbsp = FALSE) {
-		$value = HTML::chars($value);
+	protected static function prepare_html($value, $nbsp = FALSE, $escape_label = TRUE) {
+		if ($escape_label) {
+			$value = HTML::chars($value);
+		}
 		return ($nbsp ? str_replace(' ', '&nbsp;', $value) : $value);
 	}
 

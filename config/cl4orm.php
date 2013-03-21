@@ -229,6 +229,7 @@ return array(
 
 		// formatting for views
 		'nbsp' => FALSE, // replace spaces with &nbsp; in the data to avoid wrapping in view_html()
+		'escape_label' => TRUE, // escape the labels in view_html(); useful when you have a label (ie, on radios) that has HTML in it; the option is also on some fields, such as radios and checkboxes
 		'checkmark_icons' => TRUE, // will display check mark icons (using a span with class cl4_check or cl4_no_check) when TRUE or Y/N when FALSE in view_html()
 		'nl2br' => TRUE, // if set to true, new lines in textareas (and possibly others) will be converted to br's in view_html()
 
