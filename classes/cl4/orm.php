@@ -571,6 +571,7 @@ class cl4_ORM extends Kohana_ORM {
 	protected function get_view_html_options($column_name = NULL) {
 		$options = array(
 			'nbsp' => $this->_options['nbsp'],
+			'escape_label' => Arr::path($this->_table_columns, $column_name . '.field_options.escape_label', $this->_options['escape_label']),
 			'checkmark_icons' => $this->_options['checkmark_icons'],
 			'nl2br' => $this->_options['nl2br'],
 			'source' => Arr::get($this->_table_columns[$column_name], 'source', array()),
