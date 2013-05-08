@@ -88,4 +88,25 @@ class cl4_Arr extends Kohana_Arr {
 
 		return $class;
 	} // function stdclass_to_array
+
+	/**
+	 * Shuffles an array keeping the associated keys.
+	 *
+	 * @param  array  $array  The array to shuffle.
+	 * @return  boolean
+	 */
+	public static function shuffle_assoc( & $array) {
+        $keys = array_keys($array);
+
+        shuffle($keys);
+
+        $new = array();
+        foreach($keys as $key) {
+            $new[$key] = $array[$key];
+        }
+
+        $array = $new;
+
+        return TRUE;
+	}
 } // class
