@@ -2,7 +2,6 @@
 
 // include all the necessary files
 try {
-	Kohana::load(Kohana::find_file('vendor', 'tcpdf/config/lang/eng'));
 	Kohana::load(Kohana::find_file('vendor', 'tcpdf/tcpdf'));
 	Kohana::load(Kohana::find_file('vendor', 'tcpdf/fpdi2tcpdf_bridge'));
 	Kohana::load(Kohana::find_file('vendor', 'tcpdf/fpdi'));
