@@ -129,6 +129,12 @@ return array(
 				'size' => 30,
 			),
 		),
+		'Password' => array(
+			'field_attributes' => array(
+				'maxlength' => 255,
+				'size' => 30,
+			),
+		),
 	),
 
 	// default options for relationships, merged in during set_options()
