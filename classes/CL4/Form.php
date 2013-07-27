@@ -404,7 +404,6 @@ class CL4_Form extends Kohana_Form {
 				foreach ($label as $sub_checkbox_value => $sub_label) {
 					$_attributes = Arr::overwrite($attributes, array(
 						'id' => $attributes['id'] . '-' . $sub_checkbox_value,
-						'first_checkbox' => $first_checkbox,
 					));
 					$_options = $options;
 					$_options['first_checkbox'] = $first_checkbox;
