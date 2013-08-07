@@ -65,7 +65,7 @@ class CL4_ORM_File extends ORM_FieldType {
 			// try to upload the file
 			try {
 				// create a new file object to handle the upload
-				$file = new cl4File($file_options);
+				$file = new CL4File($file_options);
 				$file_data = $file->upload($column_name, $destination_folder);
 
 				// set the new file name
@@ -83,7 +83,7 @@ class CL4_ORM_File extends ORM_FieldType {
 			// try to find the file in the post and upload the file
 			try {
 				$path_to_file = array($options['field_name_prefix'], $orm_model->table_name(), $orm_model->record_number(), $column_name);
-				$post_file_name = cl4File::get_files_array_value($path_to_file, 'name');
+				$post_file_name = CL4File::get_files_array_value($path_to_file, 'name');
 
 				if ( ! empty($post_file_name)) {
 					// special functionality to name change method id
@@ -100,7 +100,7 @@ class CL4_ORM_File extends ORM_FieldType {
 					} // if
 
 					// create a new file object to handle the upload
-					$file = new cl4File($file_options);
+					$file = new CL4File($file_options);
 					$file_data = $file->upload($path_to_file, $destination_folder);
 
 					// set the new file name
