@@ -109,7 +109,7 @@ class CL4_File {
 			// we are dealing with an array post so the FILES array will also be in an array (with a very poor layout)
 
 			// first see if the field is in the $_FILES by checking if the name has a value
-			$name = cl4File::get_files_array_value($files_array_loc, 'name');
+			$name = CL4File::get_files_array_value($files_array_loc, 'name');
 
 			// the above will return NULL if nothing is set, so check for empty
 			if ( ! empty($name)){
@@ -117,10 +117,10 @@ class CL4_File {
 				// now we need to get the pieces of information
 				$file_data = array(
 					'name' => $name,
-					'type' => cl4File::get_files_array_value($files_array_loc, 'type'),
-					'tmp_name' => cl4File::get_files_array_value($files_array_loc, 'tmp_name'),
-					'error' => cl4File::get_files_array_value($files_array_loc, 'error'),
-					'size' => cl4File::get_files_array_value($files_array_loc, 'size'),
+					'type' => CL4File::get_files_array_value($files_array_loc, 'type'),
+					'tmp_name' => CL4File::get_files_array_value($files_array_loc, 'tmp_name'),
+					'error' => CL4File::get_files_array_value($files_array_loc, 'error'),
+					'size' => CL4File::get_files_array_value($files_array_loc, 'size'),
 				);
 			} else {
 				throw new CL4_Exception_File('The field :name: in the $_FILES array was not set, so no file was processed', array(':name:' => implode('.', $files_array_loc)), CL4_Exception_File::FILE_NOT_SET);
@@ -234,12 +234,12 @@ class CL4_File {
 		} // if
 
 		// generate the new file name and extension
-		$file_info['dest_file'] = cl4File::get_destination_filename($file_info, $this->options['name_change_method'], $this->options);
+		$file_info['dest_file'] = CL4File::get_destination_filename($file_info, $this->options['name_change_method'], $this->options);
 
 		// add the file path to the destination file
 		$file_info['dest_file_path'] = $destination_folder . '/' . $file_info['dest_file'];
 
-		// the destination folder may have changed within cl4File::get_destination_filename() so determine if we need to make the directory
+		// the destination folder may have changed within CL4File::get_destination_filename() so determine if we need to make the directory
 		if ($this->options['make_dir']) {
 			$new_destination_folder = pathinfo($file_info['dest_file_path'], PATHINFO_DIRNAME);
 			if ($new_destination_folder != $destination_folder && ! file_exists($new_destination_folder)) {
@@ -417,7 +417,7 @@ class CL4_File {
 
 			case 'random' :
 				// generate a random filename that starts with the current timestamp (to avoid 2 people ending up with the same filename)
-				$dest_file = time() . '_' . cl4File::clean_filename(uniqid()) . '.' . $file_info['ext'];
+				$dest_file = time() . '_' . CL4File::clean_filename(uniqid()) . '.' . $file_info['ext'];
 				break;
 
 			case 'prepend' :
@@ -458,7 +458,7 @@ class CL4_File {
 		} // switch
 
 		if ($options['clean_filename']) {
-			$dest_file = cl4File::clean_filename($dest_file);
+			$dest_file = CL4File::clean_filename($dest_file);
 		}
 		if ($options['lowercase_filename']) {
 			$dest_file = strtolower($dest_file);
@@ -475,19 +475,19 @@ class CL4_File {
 	* @param   string   $original_file       The original file including path
 	* @param   integer  $record_pk           The record primary key
 	* @param   string   $destination_folder  The destination folder
-	* @param   array    $options             The file options, passed directly to cl4File::get_destination_filename()
+	* @param   array    $options             The file options, passed directly to CL4File::get_destination_filename()
 	*
 	* @return  array    Array with 2 keys: dest_file and dest_file_path
 	*/
 	public static function move_to_id_path($original_file_path, $record_pk, $destination_folder, $options) {
 		$ext = pathinfo($original_file_path, PATHINFO_EXTENSION);
 
-		$destination_file = cl4File::get_destination_filename(array(
+		$destination_file = CL4File::get_destination_filename(array(
 			'record_pk' => $record_pk,
 			'ext' => $ext
 		), 'id', $options);
 
-		cl4File::move($original_file_path, $destination_folder . '/' . $destination_file);
+		CL4File::move($original_file_path, $destination_folder . '/' . $destination_file);
 
 		return array(
 			'dest_file' => $destination_file,

@@ -3,7 +3,7 @@
 return array(
 	'options' => array(
 		/**
-		* Note that not all these options are used within cl4File, but some are also used in ORM_File or even both
+		* Note that not all these options are used within CL4File, but some are also used in ORM_File or even both
 		*
 		* For public files (inside doc root), the following options must be set:
 		*   - file_download_url
