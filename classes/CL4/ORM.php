@@ -1659,7 +1659,7 @@ class CL4_ORM extends Kohana_ORM {
 		}
 
 		$original_post = $post;
-		$post = $this->get_table_records_from_post($post);
+		$post = (array) $this->get_table_records_from_post($post);
 
 		// get the id from the post and set it in the object (if there is one, won't be one in 'add' case)
 		if ( ! empty($post[$this->_primary_key])) {
@@ -2665,7 +2665,7 @@ class CL4_ORM extends Kohana_ORM {
 			'search_like' => $search_like,
 		);
 
-		$post = $this->get_table_records_from_post($post);
+		$post = (array) $this->get_table_records_from_post($post);
 
 		foreach ($post as $column_name => $value) {
 			if ($this->table_column_exists($column_name) && ($skip_search_flag || $this->_table_columns[$column_name]['search_flag'])) {
