@@ -373,7 +373,7 @@ class CL4_File {
 	} // function get_mime_type_error_msg
 
 	/**
-	* generates the destination filename and other paramters based on the file info, name change method and options and returns the updated file_info array
+	* generates the destination filename and other parameters based on the file info, name change method and options and returns the updated file_info array
 	*
 	* Name change methods:
 	*   keep: doesn't change the name
@@ -496,8 +496,8 @@ class CL4_File {
 	} // function move_file_to_id_path
 
 	/**
-	* Returns the path possibly based on the on the table name and column name, depending on the parameters
-	* This doesn't do any checking for directory existance nor creation of the directory(ies)
+	* Returns the path possibly based on the table name and column name, depending on the parameters
+	* This doesn't do any checking for directory existence nor creation of the directory(ies)
 	*
 	* @param  string  $destination_folder
 	* @param  string  $table_name
