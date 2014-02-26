@@ -2445,7 +2445,7 @@ class CL4_ORM extends Kohana_ORM {
 	* @param  string  $column_name
 	* @return  mixed  NULL if there is file in the column otherwise the script will exit during Request::send_file()
 	*/
-	public function send_file($response, $column_name) {
+	public function send_file($response, $column_name, $options = array()) {
 		if ( ! empty($this->$column_name)) {
 			$file_path = $this->get_filename_with_path($column_name);
 
@@ -2455,7 +2455,7 @@ class CL4_ORM extends Kohana_ORM {
 
 			$file_name = ORM_File::view($this->$column_name, $column_name, $this, $this->_table_columns[$column_name]['field_options']);
 
-			$response->send_file($file_path, $file_name);
+			$response->send_file($file_path, $file_name, $options);
 		} // if
 
 		// nothing to stream
