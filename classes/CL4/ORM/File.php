@@ -24,6 +24,7 @@ class CL4_ORM_File extends ORM_FieldType {
 				$checkbox_attributes['tabindex'] = $attributes['tabindex'];
 				$attributes['tabindex'] = ((int) $attributes['tabindex']) + 1;
 			}
+			$checkbox_attributes['id'] = $column_name . '_replace';
 			$view_options['replace_checkbox'] = Form::checkbox($orm_model->get_field_html_name($column_name . '_remove_file'), 1, FALSE, $checkbox_attributes);
 		}
 
