@@ -213,7 +213,18 @@ class CL4_ORM extends Kohana_ORM {
 	 */
 	public static function factory($model, $id = NULL, $options = array()) {
 		// Set class name
-		$model = 'Model_' . ucfirst($model);
+
+		$model_words = explode('_', $model);
+		if (sizeof($model_words > 1)) {
+			$model = 'Model';
+			foreach ($model_words as $word) {
+				$model .= '_' . ucfirst($word);
+			}
+		} else {
+			$model = 'Model_' . ucfirst($model);
+		}
+
+		//echo Debug::vars($model_words, $model);exit;
 
 		return new $model($id, $options);
 	} // function factory
