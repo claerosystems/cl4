@@ -914,11 +914,14 @@ class CL4_MultiORM {
 		if (isset($post[$this->_options['field_name_prefix']])) {
 			// we are dealing with a post array, so we need to find the record within the post array
 			if (isset($post[$this->_options['field_name_prefix']][$table_name])) {
+				$primary_key = ORM::factory($this->_model_name)->primary_key();
 				$table_records = $post[$this->_options['field_name_prefix']][$table_name];
 
 				foreach ($table_records as $num => $record_data) {
 					try {
-						$this->_records[$num] = ORM::factory($this->_model_name, NULL, $this->_options)
+						$_id = Arr::get($record_data, $primary_key);
+
+						$this->_records[$num] = ORM::factory($this->_model_name, $_id, $this->_options)
 							->set_record_number($num)
 							->save_values($record_data);
 					} catch (Exception $e) {
