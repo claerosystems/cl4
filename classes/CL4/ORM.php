@@ -1690,10 +1690,11 @@ class CL4_ORM extends Kohana_ORM {
 			// don't save, if:
 			// skip the primary key as we've delt with above
 			if (($column_name == $this->_primary_key)
-			// if the edit flag it set to false and the column is not in ignored columns
-			|| ( ! $column_meta['edit_flag'])
-			// if the mode is edit and view in edit mode is true
-			|| ($this->_mode == 'edit' && $column_meta['view_in_edit_mode'])) {
+					// if the edit flag it set to false and the column is not in ignored columns
+					|| ( ! $column_meta['edit_flag'])
+					// if the mode is edit and view in edit mode is true
+					|| ($this->_mode == 'edit' && $column_meta['view_in_edit_mode'])
+					|| ! empty($column_meta['not_in_database'])) {
 				$save_field = FALSE;
 			} else {
 				$save_field = TRUE;
