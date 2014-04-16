@@ -1672,18 +1672,11 @@ class CL4_ORM extends Kohana_ORM {
 		$original_post = $post;
 		$post = (array) $this->get_table_records_from_post($post);
 
-		// get the id from the post and set it in the object (if there is one, won't be one in 'add' case)
-		if ( ! empty($post[$this->_primary_key])) {
-			$this->clear();
-			$this->where($this->_object_name . '.' . $this->_primary_key, '=', $post[$this->_primary_key])->find();
-
+		// make sure the primary key is not in the post
+		if (isset($post[$this->_primary_key])) {
 			// remove the id as we don't want to risk changing it
 			unset($post[$this->_primary_key]);
 		} // if
-
-		// make sure the model is loaded
-		// this is determine if it has already been loaded, if the primary key has been set
-		$this->loaded();
 
 		// loop through the columns in the model and only process/set columns that have a field_type and editable (edit_flag)
 		foreach ($this->_table_columns as $column_name => $column_meta) {
