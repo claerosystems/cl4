@@ -471,8 +471,8 @@ class CL4_Form extends Kohana_Form {
 
 		if ( ! $options['first_checkbox']) {
 			if ($options['orientation'] == 'vertical') {
-				$html .= HEOL;
-			} else if ($options['orientation'] == 'horitzonal') {
+				$html .= HEOL; // adds too much space in jquery mobile
+			} else if ($options['orientation'] == 'horizontal') {
 				$html .= '&nbsp;&nbsp;&nbsp;';
 			} else {
 				$html .= EOL;
