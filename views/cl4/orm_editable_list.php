@@ -23,6 +23,8 @@
 
 		<?php echo $nav_html; ?>
 
+		<div class="clearfix"></div>
+
 		<?php if ($options['display_no_rows'] && $items_on_page == 0) { // check to see if there are no rows ?>
 		<div class="cl4_no_rows">0 items found</div>
 		<?php } else { // if ?>
