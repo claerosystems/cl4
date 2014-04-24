@@ -250,7 +250,7 @@ class CL4_File {
 			}
 		}
 
-		// if overrite is false, make sure the destination file does not already exist
+		// if overwrite is false, make sure the destination file does not already exist
 		if (file_exists($file_info['dest_file_path'])) {
 			if ( ! $this->options['overwrite']) {
 				throw new CL4_Exception_File('The destination file already exists :dest_file: for user file :user_file:', array(':dest_file:' => $file_info['dest_file'], ':user_file:' => $file_info['user_file']), CL4_Exception_File::DESTINATION_FILE_EXISTS);
