@@ -199,15 +199,30 @@ class CL4_Pagination {
 			$page = NULL;
 		}
 
+		//echo Debug::vars();exit;
+
+		$base_url = Base::get_url(Route::name(Request::current()->route()), array(
+			'model' => Request::current()->param('model'),
+			'action' => Request::current()->param('action'),
+			'id' => Request::current()->param('id'),
+			'column_name' => Request::current()->param('column_name'),
+		));
+
 		switch ($this->config['current_page']['source']) {
 			case 'query_string' :
-				return URL::site(Request::current()->uri()) . URL::query(array($this->config['current_page']['key'] => $page));
+				return $base_url . URL::query(array($this->config['current_page']['key'] => $page));
 
 			case 'query_string2' :
-				return URL::site(Request::current()->route()->uri()) . URL::query(array($this->config['current_page']['key'] => $page));
+				return $base_url . URL::query(array($this->config['current_page']['key'] => $page));
 
 			case 'route' :
-				return URL::site(Request::current()->route()->uri(array($this->config['current_page']['key'] => $page))) . URL::query();
+				return Base::get_url(Route::name(Request::current()->route()), array(
+					'model' => Request::current()->param('model'),
+					'action' => Request::current()->param('action'),
+					'id' => Request::current()->param('id'),
+					'column_name' => Request::current()->param('column_name'),
+					$this->config['current_page']['key'] => $page,
+				));
 		}
 
 		return '#';

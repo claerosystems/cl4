@@ -9,9 +9,9 @@ $ellipsis = ' <span class="ellipsis">...</span> ';
 // if there is only 1 page then it will display only the number of records showing
 if ($total_pages > 1) {
 	if ($previous_page !== FALSE) {
-		echo HTML::anchor($page->url($previous_page), '<span class="cl4_icon cl4_left"></span>' . __('Previous') . '</span>', array('class' => 'previous'));
+		echo HTML::anchor($page->url($previous_page), '' . __('Previous') . '</span>', array('class' => 'previous'));
 	} else {
-		echo '<span class="no_previous"><span class="cl4_icon cl4_no_left"></span>', __('Previous'), '</span>';
+		echo '<span class="no_previous">', __('Previous'), '</span>';
 	}
 	echo ' ';
 
@@ -142,9 +142,9 @@ if ($total_pages > 1) {
 	echo ' ';
 
 	if ($next_page !== FALSE) {
-		echo HTML::anchor($page->url($next_page), '' . __('Next') . '<span class="cl4_icon cl4_right"></span>', array('class' => 'next'));
+		echo HTML::anchor($page->url($next_page), '' . __('Next') . '', array('class' => 'next'));
 	} else {
-		echo '<span class="no_next">', __('Next'), '<span class="cl4_icon cl4_no_right"></span></span>';
+		echo '<span class="no_next">', __('Next'), '</span>';
 	}
 } // if
 
