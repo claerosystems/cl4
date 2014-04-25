@@ -1103,7 +1103,7 @@ class CL4_ORM extends Kohana_ORM {
 			}
 
 			// generate the form tags
-			$form_action = ($this->_options['form_action'] === NULL ? Request::current() : $this->_options['form_action']);
+			$form_action = ($this->_options['form_action'] === NULL ? '' : $this->_options['form_action']);
 			$form_open_tag = Form::open($form_action, $this->_options['form_attributes']);
 			$form_close_tag = Form::close();
 		} else {
@@ -1131,7 +1131,7 @@ class CL4_ORM extends Kohana_ORM {
 				}
 				$reset_button_options = array(
 					'class' => 'js_cl4_button_link',
-					'data-cl4_link' => URL::site(Request::current()->uri()), // this will return the current uri
+					'data-cl4_link' => Base::get_url('cl4admin', array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => Request::$current->action())), // this will return the current uri
 				);
 				if ( ! empty($this->_options['reset_button_attributes'])) {
 					$reset_button_options = HTML::merge_attributes($reset_button_options, $this->_options['reset_button_attributes']);
@@ -1141,7 +1141,7 @@ class CL4_ORM extends Kohana_ORM {
 			if ($this->_options['display_cancel']) {
 				$cancel_button_options = array(
 					'class' => 'js_cl4_button_link',
-					'data-cl4_link' => URL::site(Route::get($target_route)->uri(array('model' => $this->model_name(), 'action' => 'cancel'))),
+					'data-cl4_link' => Base::get_url('cl4admin', array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => 'cancel')),
 				);
 				if ( ! empty($this->_options['cancel_button_attributes'])) {
 					$cancel_button_options = HTML::merge_attributes($cancel_button_options, $this->_options['cancel_button_attributes']);
