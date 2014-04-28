@@ -330,7 +330,7 @@ class CL4_MultiORM {
 				}
 			} // if
 		} else {
-			$sort_url = URL::site(Request::current()->uri());
+			$sort_url = Base::get_url('cl4admin', array('model' => $this->_model_name));
 		} // if
 
 		// set up the headings and sort links, etc. based on model
