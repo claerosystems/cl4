@@ -1,3 +1,3 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class Money extends CL4_Money { }
+class ORM_Money extends CL4_ORM_Money { }
