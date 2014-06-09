@@ -309,7 +309,8 @@ class CL4_MultiORM {
 		if ( ! empty($list_options['sort_url'])) {
 			if (is_array($list_options['sort_url'])) {
 				// is a route
-				$sort_url = Route::get($list_options['sort_url']['route_name'])->uri($list_options['sort_url']['params']);
+				//$sort_url = Route::get($list_options['sort_url']['route_name'])->uri($list_options['sort_url']['params']);
+				$sort_url = Base::get_url($list_options['sort_url']['route_name'], $list_options['sort_url']['params']);
 			} else {
 				// is a string, so look for a question mark in the url
 				$question_mark_pos = strpos($list_options['sort_url'], '?');
@@ -380,7 +381,7 @@ class CL4_MultiORM {
 			// set up SEARCH button
 			if ($list_options['top_bar_buttons']['search']) {
 				$top_row_buttons .= Form::submit(NULL, __('Search'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'search')),
+					'data-cl4_form_action' => Base::get_url($this->_options['target_route'], array('model' => $this->_url_model_name, 'action' => 'search')), //URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'search')),
 					'class' => 'js_cl4_button_link_form ' . $button_class,
 				));
 
@@ -501,7 +502,8 @@ class CL4_MultiORM {
 			}
 
 			// add custom route links
-			foreach ($list_options['per_row_links_route'] as $route_name => $custom_data) {
+			foreach ($list_options['per_row_links_route'] as $custom_data) {
+				$route_name = $custom_data['route_name'];
 				$route_params = Arr::merge(array('id' => $id), $custom_data['params']);
 				$html = array_key_exists('html', $custom_data) ? $custom_data['html'] : '&nbsp;';
 				$attributes = array_key_exists('attributes', $custom_data) ? $custom_data['attributes'] : array();
@@ -568,7 +570,7 @@ class CL4_MultiORM {
 					}
 
 					// implement option to replace spaces for better formatting
-					if ($this->_options['replace_spaces'] && ! in_array($column_data['form_type'], $no_replace_spaces_types)) {
+					if ($this->_options['replace_spaces'] && ! in_array($column_data['field_type'], $no_replace_spaces_types)) {
 						// adds extra spaces for padding on right side of every column
 						$row_data[$i] = str_replace(' ', '&nbsp;', $row_data[$i]) . '&nbsp;&nbsp;';
 					} // if
@@ -603,7 +605,7 @@ class CL4_MultiORM {
 
 	/**
 	* Sets the search within this object
-	* The search is used with get_ediable_list()
+	* The search is used with get_editable_list()
 	*
 	* @chainable
 	* @param mixed $post
