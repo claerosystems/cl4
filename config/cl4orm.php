@@ -170,7 +170,18 @@ return array(
 		// defaults to the current route
 		// the default is set in cl4ORM::set_target_route() of this is NULL
 		// don't use Route::instance() to set it within the config because you can't use ORM before doing the main request
-		'target_route' => NULL,
+		// 20140618 CSN deprecating this because it does not handle different routes (that may have additional required parameters) properly:
+		// 'target_route' => NULL,
+		// instead use target_route_name and target_route_parameters below
+
+		// these should be used globally in ORM / Multi-ORM for all routes and they should take precedent / replace
+		// target_route
+		'target_route_name' => 'cl4admin',
+		'target_route_parameters' => array(),
+
+		// with the default value of NULL, the form will default to the current page
+		// this will be use anywhere in OMR or MultiORM where there is a form tag generated
+		'form_action' => NULL,
 
 		'text_field_max_size' => 100,
 		'text_field_max_length' => 7000,
@@ -182,9 +193,7 @@ return array(
 		'get_form_view_file' => 'cl4/orm_form_table', // the default view to use when displaying the edit or search form
 		'get_view_view_file' => 'cl4/orm_view_table', // the default view to use when displaying a view of a record
 		'edit_multiple_view_file' => 'cl4/orm_edit_multiple_table',
-		// with the default value of NULL, the form will default to the current page
-		// this will be use anywhere in OMR or MultiORM where there is a form tag generated
-		'form_action' => NULL,
+
 		// the default options for the attributes of the form tag
 		'form_attributes' => array(
 			'enctype' => 'multipart/form-data', // todo: maybe only include this if a file type column is present?

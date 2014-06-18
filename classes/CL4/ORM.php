@@ -562,11 +562,13 @@ class CL4_ORM extends Kohana_ORM {
 	* @return  ORM
 	*/
 	public function set_target_route($route_name = NULL) {
+		/*20140618 CSN deprecated
 		if ( ! empty($route_name)) {
 			$this->_options['target_route'] = Route::name($route_name);
 		} else if ($this->_options['target_route'] === NULL) {
 			$this->_options['target_route'] = Route::name(Request::current()->route());
 		}
+		*/
 
 		return $this;
 	} // function set_target_route
@@ -1112,8 +1114,8 @@ class CL4_ORM extends Kohana_ORM {
 		} // if
 
 		if ($this->_options['display_buttons']) {
-			$this->set_target_route();
-			$target_route = $this->_options['target_route'];
+			//20140618 CSN deprecated: $this->set_target_route();
+			//20140618 CSN deprecated: $target_route = $this->_options['target_route'];
 
 			// set up the buttons
 			if ($this->_options['display_submit']) {
@@ -1143,7 +1145,8 @@ class CL4_ORM extends Kohana_ORM {
 				$cancel_button_options = array(
 					'class' => 'js_cl4_button_link',
 					//'data-cl4_link' => Base::get_url($target_route, array('model' => $this->model_name(), 'action' => 'cancel')),
-					'data-cl4_link' => Base::get_url('cl4admin', array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => 'cancel')),
+					//'data-cl4_link' => Base::get_url('cl4admin', array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => 'cancel')),
+					'data-cl4_link' => $this->get_target_url(array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => 'cancel')),
 				);
 				if ( ! empty($this->_options['cancel_button_attributes'])) {
 					$cancel_button_options = HTML::merge_attributes($cancel_button_options, $this->_options['cancel_button_attributes']);
@@ -1213,11 +1216,11 @@ class CL4_ORM extends Kohana_ORM {
 
 		// set up the buttons
 		if ($this->_options['display_buttons'] && $this->_options['display_back_to_list']) {
-			$this->set_target_route();
+			//20140618 CSN deprecated: $this->set_target_route();
 
 			$submit_button_options = array(
 				'class' => 'js_cl4_button_link ' . Arr::get($this->_options, 'button_class', ''),
-				'data-cl4_link' => URL::site(Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name))),
+				'data-cl4_link' => $this->get_target_url(array('model' => $this->_object_name)), // URL::site(Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name))),
 			);
 			if ( ! empty($this->_options['submit_button_options'])) {
 				$submit_button_options = HTML::merge_attributes($submit_button_options, $this->_options['submit_button_options']);
@@ -1657,6 +1660,32 @@ class CL4_ORM extends Kohana_ORM {
 
 		return $post;
 	} // function get_table_records_from_post
+
+	/**
+	 * Return the complete URL for the target route and merged default and specified parameters.
+	 *
+	 * @param array $override_parameters
+	 *
+	 * @return string
+	 */
+	public function get_target_url($override_parameters = array()) {
+		// make sure the route name is set
+		// todo: also make sure it is valid
+		if ( ! empty($this->_options['target_route_name'])) {
+			$this->_options['target_route_name'] = Route::name(Request::current()->route());
+		}
+
+		// add the standard cl4 parameters if they are not specified anywhere else
+		if (empty($this->_options['target_route_parameters']['model']) && empty($override_parameters['model'])) $override_parameters['model'] = Request::current()->param('model');
+		if (empty($this->_options['target_route_parameters']['id']) && empty($override_parameters['id'])) $override_parameters['id'] = Request::current()->param('id');
+		if (empty($this->_options['target_route_parameters']['column_name']) && empty($override_parameters['column_name'])) $override_parameters['column_name'] = Request::current()->param('column_name');
+		if (empty($this->_options['target_route_parameters']['action']) && empty($override_parameters['action'])) $override_parameters['action'] = Request::current()->param('action');
+
+		// merge the defaults with the passed options (add defaults where values are missing)
+		$parameters = Arr::merge($this->_options['target_route_parameters'], $override_parameters);
+
+		return Base::get_url($this->_options['target_route_name'], $parameters);
+	}
 
 	/**
 	* Set all values from the $_POST or passed array using the model rules (field_type, edit_flag, ignored_columns, etc.)

@@ -194,11 +194,15 @@ class CL4_MultiORM {
 	* @return  ORM
 	*/
 	public function set_target_route($route_name = NULL) {
+		/* 20140618 CSN deprecating this because $this->_options['target_route_name'] and $this->_options['target_route_parameters'] replaces this code
+
 		if ( ! empty($route_name)) {
 			$this->_options['target_route'] = Route::name($route_name);
 		} else if ($this->_options['target_route'] === NULL) {
 			$this->_options['target_route'] = Route::name(Request::current()->route());
 		}
+
+		*/
 
 		return $this;
 	} // function set_target_route
@@ -213,8 +217,9 @@ class CL4_MultiORM {
 		// update the options if passed
 		$this->set_options($options);
 
-		$this->set_target_route();
-		$target_route = Route::get($this->_options['target_route']);
+		//20140618 CSN deprecated: $this->set_target_route();
+		//20140618 CSN deprecated: $target_route = Route::get($this->_options['target_route']);
+
 		$list_options = $this->_options['editable_list_options'];
 		$table_options = $list_options['table_options_multiorm'];
 		$display_order = $this->_model->display_order();
@@ -270,6 +275,7 @@ class CL4_MultiORM {
 
 		// create the pagination object
 		$pagination = Pagination::factory(array(
+			'base_url' => $this->get_target_url(),
 			'group' => $this->_options['pagination_config_group'],
 			'total_items'    => $this->_num_rows, // get the total number of records
 			'items_per_page' => $this->_options['page_max_rows'],
@@ -375,20 +381,20 @@ class CL4_MultiORM {
 		// add the top row of control buttons
 		$top_row_buttons = '';
 		if ( ! $this->_options['hide_top_row_buttons']) {
-			$this->set_target_route();
+			//20140618 CSN deprecated: $this->set_target_route();
 			$button_class = ( ! empty($this->_options['button_class']) ? ' ' . $this->_options['button_class'] : '');
 
 			// set up SEARCH button
 			if ($list_options['top_bar_buttons']['search']) {
 				$top_row_buttons .= Form::submit(NULL, __('Search'), array(
-					'data-cl4_form_action' => Base::get_url($this->_options['target_route'], array('model' => $this->_url_model_name, 'action' => 'search')), //URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'search')),
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'search')),
 					'class' => 'js_cl4_button_link_form ' . $button_class,
 				));
 
 				// set up CLEAR SEARCH button
 				if ($this->_options['in_search']) {
 					$top_row_buttons .= Form::submit(NULL, __('Clear Search/Sort'), array(
-						'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'cancel_search')),
+						'data-cl4_form_action' => $this->get_target_url(array('action' => 'cancel_search')),
 						'class' => 'js_cl4_button_link_form ' . $button_class,
 					));
 				} // if
@@ -397,7 +403,7 @@ class CL4_MultiORM {
 			// set up ADD button
 			if ($list_options['top_bar_buttons']['add']) {
 				$top_row_buttons .= Form::submit(NULL, __('Add New'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add')),
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'add')),
 					'class' => 'js_cl4_button_link_form ' . $button_class,
 				));
 			} // if
@@ -405,7 +411,7 @@ class CL4_MultiORM {
 			// set up MULTIPLE EDIT button
 			if ($list_options['top_bar_buttons']['edit']) {
 				$top_row_buttons .= Form::submit(NULL, __('Edit Selected'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'edit_multiple')),
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'edit_multiple')),
 					'disabled' => 'disabled',
 					'class' => 'js_cl4_button_link_form js_cl4_multiple_edit' . $button_class,
 				));
@@ -413,7 +419,7 @@ class CL4_MultiORM {
 
 			if ($list_options['top_bar_buttons']['export_all']) {
 				$top_row_buttons .= Form::submit(NULL, __('Export All'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'export')) . '?export_all=1',
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'export')) . '?export_all=1',
 					'data-cl4_form_target' => '_blank',
 					'class' => 'js_cl4_button_link_form ' . $button_class,
 				));
@@ -422,7 +428,7 @@ class CL4_MultiORM {
 			// set up export selected button
 			if ($list_options['top_bar_buttons']['export_selected']) {
 				$top_row_buttons .= Form::submit(NULL, __('Export Selected'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'export')),
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'export')),
 					'data-cl4_form_target' => '_blank',
 					'disabled' => 'disabled',
 					'class' => 'js_cl4_button_link_form js_cl4_export_selected ' . $button_class,
@@ -434,8 +440,8 @@ class CL4_MultiORM {
 				$add_multiple_uniqid = uniqid('cl4_add_multiple_button_');
 
 				$top_row_buttons .= Form::submit(NULL, __('Add:'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add_multiple', 'id' => 1)),
-					'data-cl4_add_multiple_form_action_prefix' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add_multiple')), // used to determine data-cl4_form_action when the selection is changed
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'add_multiple', 'id' => 1)),
+					'data-cl4_add_multiple_form_action_prefix' => $this->get_target_url(array('action' => 'add_multiple')), // used to determine data-cl4_form_action when the selection is changed
 					'class' => 'js_cl4_button_link_form' . $button_class,
 					'id' => $add_multiple_uniqid,
 				));
@@ -512,25 +518,25 @@ class CL4_MultiORM {
 
 			// add 'start of row' buttons as dictated by $list_options['per_row_links'] array:
 			if ($list_options['per_row_links']['view']) {
-				$first_col .= HTML::anchor(URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'view', 'id' => $id)), '<span class="cl4_icon cl4_view">&nbsp;</span>', array(
+				$first_col .= HTML::anchor($this->get_target_url(array('model' => $this->_model_name, 'action' => 'view', 'id' => $id)), '<span class="cl4_icon cl4_view">&nbsp;</span>', array(
 					'title' => __('View this record'),
 				));
 			} // if
 
 			if ($list_options['per_row_links']['edit']) {
-				$first_col .= HTML::anchor(URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'edit', 'id' => $id)), '<span class="cl4_icon cl4_edit">&nbsp;</span>', array(
+				$first_col .= HTML::anchor($this->get_target_url(array('model' => $this->_model_name, 'action' => 'edit', 'id' => $id)), '<span class="cl4_icon cl4_edit">&nbsp;</span>', array(
 					'title' => __('Edit this record'),
 				));
 			}
 
 			if ($list_options['per_row_links']['delete']) {
-				$first_col .= HTML::anchor(URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'delete', 'id' => $id)), '<span class="cl4_icon cl4_delete">&nbsp;</span>', array(
+				$first_col .= HTML::anchor($this->get_target_url(array('model' => $this->_model_name, 'action' => 'delete', 'id' => $id)), '<span class="cl4_icon cl4_delete">&nbsp;</span>', array(
 					'title' => __('Delete this record'),
 				));
 			}
 
 			if ($list_options['per_row_links']['add']) {
-				$first_col .= HTML::anchor(URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add', 'id' => $id)), '<span class="cl4_icon cl4_add">&nbsp;</span>', array(
+				$first_col .= HTML::anchor($this->get_target_url(array('model' => $this->_model_name, 'action' => 'add', 'id' => $id)), '<span class="cl4_icon cl4_add">&nbsp;</span>', array(
 					'title' => __('Duplicate this record'),
 				));
 			}
@@ -691,8 +697,8 @@ class CL4_MultiORM {
 		}
 
 		$form_buttons = array();
-		$this->set_target_route();
-		$target_route = $this->_options['target_route'];
+		//20140618 CSN deprecated: $this->set_target_route();
+		//20140618 CSN deprecated: $target_route = $this->_options['target_route'];
 		$edit_multiple_options = $this->_options['edit_multiple_options'];
 		$display_order = $this->_model->display_order();
 
@@ -726,7 +732,7 @@ class CL4_MultiORM {
 				$form_buttons[] = Form::input('cl4_cancel', __('Cancel'), array(
 					'type' => 'button',
 					'class' => 'js_cl4_button_link',
-					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_model_name, 'action' => 'cancel')),
+					'data-cl4_link' => $this->get_target_url(array('action' => 'cancel')),
 				));
 			}
 		} // if
@@ -842,6 +848,32 @@ class CL4_MultiORM {
 			'items' => $this->_num_rows,
 		));
 	} // function get_record_edit_view
+
+	/**
+	 * Return the complete URL for the target route and merged default and specified parameters.
+	 *
+	 * @param array $override_parameters
+	 *
+	 * @return string
+	 */
+	public function get_target_url($override_parameters = array()) {
+		// make sure the route name is set
+		// todo: also make sure it is valid
+		if ( ! empty($this->_options['target_route_name'])) {
+			$this->_options['target_route_name'] = Route::name(Request::current()->route());
+		}
+
+		// add the standard cl4 parameters if they are not specified anywhere else
+		if (empty($this->_options['target_route_parameters']['model']) && empty($override_parameters['model'])) $override_parameters['model'] = Request::current()->param('model');
+		if (empty($this->_options['target_route_parameters']['id']) && empty($override_parameters['id'])) $override_parameters['id'] = Request::current()->param('id');
+		if (empty($this->_options['target_route_parameters']['column_name']) && empty($override_parameters['column_name'])) $override_parameters['column_name'] = Request::current()->param('column_name');
+		if (empty($this->_options['target_route_parameters']['action']) && empty($override_parameters['action'])) $override_parameters['action'] = Request::current()->param('action');
+
+		// merge the defaults with the passed options (add defaults where values are missing)
+		$parameters = Arr::merge($this->_options['target_route_parameters'], $override_parameters);
+
+		return Base::get_url($this->_options['target_route_name'], $parameters);
+	}
 
 	/**
 	* get a table with data from the specified model
