@@ -516,6 +516,11 @@ class CL4_MultiORM {
 				$first_col .= HTML::anchor(URL_ROOT . '/' . Route::get($route_name)->uri($route_params), $html, $attributes);
 			}
 
+			// add custom links
+			foreach ($list_options['per_row_links_custom'] as $custom) {
+				$first_col .= '<a href="javascript:;" data-id="' . $id . '" onclick="' . $custom['onclick'] . '" title="' . $custom['title'] . '">' . $custom['html'] . '</a>';
+			}
+
 			// add 'start of row' buttons as dictated by $list_options['per_row_links'] array:
 			if ($list_options['per_row_links']['view']) {
 				$first_col .= HTML::anchor($this->get_target_url(array('model' => $this->_model_name, 'action' => 'view', 'id' => $id)), '<span class="cl4_icon cl4_view">&nbsp;</span>', array(
@@ -584,6 +589,7 @@ class CL4_MultiORM {
 			} // foreach
 
 			$content_table->add_row($row_data);
+			$content_table->set_attribute($j, NULL, 'data-id', $id);
 
 			++$j;
 		} // foreach

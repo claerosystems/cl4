@@ -301,6 +301,7 @@ return array(
 			* )
 			*/
 			'per_row_links_route' => array(),
+			'per_row_links_custom' => array(),
 			// top bar buttons
 			'top_bar_buttons' => array(
 				'add' => TRUE,             // add (add new) button
