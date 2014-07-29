@@ -365,6 +365,18 @@ class CL4_ORM extends Kohana_ORM {
 		}
 	} // function get
 
+
+	/**
+	 * Get the option with the specified path, return false if not found.
+	 *
+	 * @param $option_path
+	 * @param null $deliminator
+	 * @return mixed
+	 */
+	public function get_option($option_path, $deliminator = NULL) {
+		return Arr::path($this->_options, $option_path, false, $deliminator);
+	} // function get_option
+
 	/**
 	 * Update the options with the given set.  This will override any options already set, and if none are set
 	 * it will create a new set of options for the object based on the defaults first.
