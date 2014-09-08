@@ -1066,6 +1066,7 @@ class CL4_MultiORM {
 		$options += array(
 			'use_db_values' => FALSE,
 			'use_db_column_names' => FALSE,
+			'convert_to_latin1' => TRUE,
 		);
 
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
@@ -1102,7 +1103,7 @@ class CL4_MultiORM {
 			$this->_model->where($this->_model->primary_key(), 'IN', $this->_ids);
 		}
 
-		$phpexcel_path = Kohana::find_file('vendor', 'phpexcel/PHPExcel');
+		$phpexcel_path = Kohana::find_file('vendor', 'disabledPHPExcel/PHPExcel');
 		if ($phpexcel_path) {
 			$use_phpexcel = TRUE;
 			Kohana::load($phpexcel_path);
@@ -1195,10 +1196,14 @@ class CL4_MultiORM {
 					++$i;
 
 					if ($options['use_db_values']) {
-						$row_data[$i] = $record_model->$column_name;
+						$row_data_string = $record_model->$column_name;
 					} else {
 						$source = (isset($this->_lookup_data[$this->_object_name][$column_name]) ? $this->_lookup_data[$this->_object_name][$column_name] : NULL);
-						$row_data[$i] = $record_model->get_view_string($column_name, $source);
+						$row_data_string = strip_tags($record_model->get_view_string($column_name, $source));
+					}
+
+					if ($options['convert_to_latin1']) {
+						$row_data[$i] = iconv('UTF8', 'ISO-8859-1//TRANSLIT', $row_data_string);
 					}
 				} // if
 			} // foreach
