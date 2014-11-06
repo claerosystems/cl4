@@ -1103,7 +1103,7 @@ class CL4_MultiORM {
 			$this->_model->where($this->_model->primary_key(), 'IN', $this->_ids);
 		}
 
-		$phpexcel_path = Kohana::find_file('vendor', 'disabledPHPExcel/PHPExcel');
+		$phpexcel_path = Kohana::find_file('vendor', 'phpexcel/PHPExcel');
 		if ($phpexcel_path) {
 			$use_phpexcel = TRUE;
 			Kohana::load($phpexcel_path);
@@ -1202,11 +1202,17 @@ class CL4_MultiORM {
 						$row_data_string = strip_tags($record_model->get_view_string($column_name, $source));
 					}
 
+					// todo: remove line breaks, no time to test this right now:
+					//$row_data_string = substr_replace($row_data_string, "/n", ' ');
+					//$row_data_string = substr_replace($row_data_string, "/r", ' ');
+
 					if ($options['convert_to_latin1']) {
 						$row_data[$i] = iconv('UTF8', 'ISO-8859-1//TRANSLIT', $row_data_string);
 					}
 				} // if
 			} // foreach
+
+			//echo Debug::vars($record_model->$column_name, $row_data_string);
 
 			if ($use_phpexcel) {
 				$col = 0;
@@ -1221,6 +1227,8 @@ class CL4_MultiORM {
 				$csv->add_row($row_data);
 			}
 		} // foreach
+
+		//exit;
 
 		if ($use_phpexcel) {
 			return $xlsx;
