@@ -1196,7 +1196,7 @@ class CL4_ORM extends Kohana_ORM {
 		} // if
 
 		// return the generated view
-		return View::factory($this->_options['get_form_view_file'], array(
+		return Base::get_view($this->_options['get_form_view_file'], array(
 			'model'                 => $this,
 			'any_visible'           => $this->any_visible('edit'),
 			'form_options'          => $this->_options,
