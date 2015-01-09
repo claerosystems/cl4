@@ -6,7 +6,14 @@
 */
 class CL4_ORM_Money extends CL4_ORM_Text {
 	public static function edit($column_name, $html_name, $value, array $attributes = NULL, array $options = array(), ORM $orm_model = NULL) {
-		$attributes = array('class' => 'cl4_money', 'type' => 'number', 'step' => '0.01');
+		// set up defaults but try to maintain exiting attributes passed in
+		if (empty($attributes['type'])) $attributes['type'] = 'number';
+		if (empty($attributes['step'])) $attributes['step'] = '0.01';
+		if (empty($attributes['class'])) {
+			$attributes['class'] = 'cl4_money';
+		} else if (strpos($attributes['class'], 'cl4_money') != 0) {
+			$attributes['class'] .= ' cl4_money';
+		}
 		return '$ ' . parent::edit($column_name, $html_name, number_format($value,0), $attributes, $options, $orm_model);
 	}
 
