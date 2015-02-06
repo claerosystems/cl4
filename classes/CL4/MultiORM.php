@@ -389,6 +389,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Search'), array(
 					'data-cl4_form_action' => $this->get_target_url(array('action' => 'search')),
 					'class' => 'js_cl4_button_link_form ' . $button_class,
+					'data-ajax' => 'false'
 				));
 
 				// set up CLEAR SEARCH button
@@ -396,6 +397,7 @@ class CL4_MultiORM {
 					$top_row_buttons .= Form::submit(NULL, __('Clear Search/Sort'), array(
 						'data-cl4_form_action' => $this->get_target_url(array('action' => 'cancel_search')),
 						'class' => 'js_cl4_button_link_form ' . $button_class,
+						'data-ajax' => 'false'
 					));
 				} // if
 			} // if
@@ -405,6 +407,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::submit(NULL, __('Add New'), array(
 					'data-cl4_form_action' => $this->get_target_url(array('action' => 'add')),
 					'class' => 'js_cl4_button_link_form ' . $button_class,
+					'data-ajax' => 'false'
 				));
 			} // if
 
@@ -414,6 +417,7 @@ class CL4_MultiORM {
 					'data-cl4_form_action' => $this->get_target_url(array('action' => 'edit_multiple')),
 					'disabled' => 'disabled',
 					'class' => 'js_cl4_button_link_form js_cl4_multiple_edit' . $button_class,
+					'data-ajax' => 'false'
 				));
 			} // if
 
@@ -422,6 +426,7 @@ class CL4_MultiORM {
 					'data-cl4_form_action' => $this->get_target_url(array('action' => 'export')) . '?export_all=1',
 					'data-cl4_form_target' => '_blank',
 					'class' => 'js_cl4_button_link_form ' . $button_class,
+					'data-ajax' => 'false'
 				));
 			} // if
 
@@ -432,6 +437,7 @@ class CL4_MultiORM {
 					'data-cl4_form_target' => '_blank',
 					'disabled' => 'disabled',
 					'class' => 'js_cl4_button_link_form js_cl4_export_selected ' . $button_class,
+					'data-ajax' => 'false'
 				));
 			} // if
 
@@ -444,6 +450,7 @@ class CL4_MultiORM {
 					'data-cl4_add_multiple_form_action_prefix' => $this->get_target_url(array('action' => 'add_multiple')), // used to determine data-cl4_form_action when the selection is changed
 					'class' => 'js_cl4_button_link_form' . $button_class,
 					'id' => $add_multiple_uniqid,
+					'data-ajax' => 'false'
 				));
 
 				// Set up multiple add dropdown
@@ -451,6 +458,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::select(NULL, $add_count_array, 1, array(
 					'class' => 'cl4_add_multiple_count',
 					'data-cl4_add_multiple_related_button' => $add_multiple_uniqid,
+					'data-ajax' => 'false'
 				));
 			} // if
 
