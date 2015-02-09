@@ -1145,6 +1145,7 @@ class CL4_ORM extends Kohana_ORM {
 				}
 				$reset_button_options = array(
 					'class' => 'js_cl4_button_link',
+					'data-ajax' => 'false',
 					//'data-cl4_link' => URL::site(Request::instance()->uri(), TRUE) //URL::site(Request::current()->uri()), // this will return the current uri
 					'data-cl4_link' => Base::get_url('cl4admin', array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => Request::$current->action())) . URL::query(), // this will return the current uri
 				);
