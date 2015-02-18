@@ -1111,7 +1111,7 @@ class CL4_MultiORM {
 			$this->_model->where($this->_model->primary_key(), 'IN', $this->_ids);
 		}
 
-		$phpexcel_path = Kohana::find_file('vendor', 'phpexcel/PHPExcel');
+		$phpexcel_path = FALSE; //Kohana::find_file('vendor', 'phpexcel/PHPExcel');
 		if ($phpexcel_path) {
 			$use_phpexcel = TRUE;
 			Kohana::load($phpexcel_path);
