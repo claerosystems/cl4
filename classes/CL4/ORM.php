@@ -1694,6 +1694,10 @@ class CL4_ORM extends Kohana_ORM {
 		if (empty($this->_options['target_route_parameters']['column_name']) && empty($override_parameters['column_name'])) $override_parameters['column_name'] = Request::current()->param('column_name');
 		if (empty($this->_options['target_route_parameters']['action']) && empty($override_parameters['action'])) $override_parameters['action'] = Request::current()->param('action');
 
+
+		// todo: 20141223 CSN not sure about this, but it fixed a problem on Tucker:
+		if (empty($this->_options['target_route_parameters']['controller']) && empty($override_parameters['controller'])) $override_parameters['controller'] = 'CL4Admin';
+
 		// merge the defaults with the passed options (add defaults where values are missing)
 		$parameters = Arr::merge($this->_options['target_route_parameters'], $override_parameters);
 
