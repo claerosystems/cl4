@@ -714,11 +714,12 @@ class CL4_ORM extends Kohana_ORM {
 	 * This can be run multiple times and it will overwrite the pervious data every time either for all fields or a specific field
 	 *
 	 * @chainable
-	 * @param   array  $process_column_name  Can be a string or an array of column names
+	 * @param   array   (optional) $process_column_name  Can be a string or an array of column names
+	 * @param   array   (optional) an array of field attributes used to override the model field attributes
 	 *
 	 * @return  ORM
 	 */
-	public function prepare_form($process_column_name = NULL) {
+	public function prepare_form($process_column_name = NULL, $override_attributes = array()) {
 		// add the extra hidden fields from options, if there is any
 		if (count($this->_options['hidden_fields'] > 0)) {
 			foreach ($this->_options['hidden_fields'] as $hidden_field) {
@@ -780,6 +781,12 @@ class CL4_ORM extends Kohana_ORM {
 			if ($this->show_field($column_name)) {
 				// look for the attributes and set them
 				$field_attributes = $column_info['field_attributes'];
+
+				// use override attributes if set
+				if ( ! empty($override_attributes)) {
+					$field_attributes = Arr::merge($field_attributes, $override_attributes);
+				}
+
 				$label_attributes = array();
 				if ($this->_mode == 'edit' && isset($rules[$column_name]['not_empty'])) {
 					$field_attributes = HTML::set_class_attribute($field_attributes, 'cl4_required');
@@ -1257,12 +1264,13 @@ class CL4_ORM extends Kohana_ORM {
 	 * Generate and return the formatted HTML for the given field
 	 *
 	 * @param   string  $column_name  the name of the field in the model
+	 * @param   array   an array of field attributes used to override the model field attributes
 	 * @return  string  the HTML for the given fieldname, based on the model
 	 */
-	public function get_field($column_name) {
-		if ( ! isset($this->_field_html[$column_name]['field']) && ! isset($this->_form_fields_hidden[$column_name])) {
-			$this->prepare_form($column_name);
-		}
+	public function get_field($column_name, $override_attributes = array()) {
+		//if ( ! isset($this->_field_html[$column_name]['field']) && ! isset($this->_form_fields_hidden[$column_name])) {
+			$this->prepare_form($column_name, $override_attributes);
+		//}
 
 		if (isset($this->_field_html[$column_name]['field'])) {
 			return $this->_field_html[$column_name]['field'];
