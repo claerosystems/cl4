@@ -91,7 +91,7 @@ class CL4_File {
 		if ($this->options['make_dir'] && ! file_exists($destination_folder)) {
 			// option is set to make the dir and it doesn't exist
 			if ( ! mkdir($destination_folder, 0755, TRUE)) {
-				throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana_Exception::text($e)), CL4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
+				throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder), CL4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
 			}
 
 		// make sure the destination folder exists
@@ -245,7 +245,7 @@ class CL4_File {
 			if ($new_destination_folder != $destination_folder && ! file_exists($new_destination_folder)) {
 				// option is set to make the dir and it doesn't exist
 				if ( ! mkdir($new_destination_folder, 0755, TRUE)) {
-					throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder, ':exception_text:' => Kohana_Exception::text($e)), CL4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
+					throw new Kohana_Exception('Could not create the destination path: :dest_folder: :exception_text:', array(':dest_folder:' => $destination_folder), CL4_Exception_File::DESTINATION_FOLDER_DOESNT_EXIST);
 				}
 			}
 		}
@@ -288,11 +288,7 @@ class CL4_File {
 	* @return  string  HTML string for output
 	*/
 	private static function get_mime_type_error_msg($html = TRUE, array $options = NULL) {
-		if (isset($this) && $options === NULL) {
-			$options = $this->options;
-		} else {
-			$options += Kohana::$config->load('cl4file.options');
-		}
+		$options += Kohana::$config->load('cl4file.options');
 
 		if ($html) {
 			$msg = '';
@@ -571,7 +567,7 @@ class CL4_File {
 			throw new CL4_Exception_File('The file to be copied to the new ID based filename does not exist: :file', array('file' => $original_filename), CL4_Exception_File::FILE_DOES_NOT_EXIST);
 
 		} else if ( ! is_file($original_filename)) {
-			throw new CL4_Exception_File('The file to be copied to the new ID based filename is not a file (possibly a directory): :file', array('file' => $filename), CL4_Exception_File::IS_NOT_REGULAR_FILE);
+			throw new CL4_Exception_File('The file to be copied to the new ID based filename is not a file (possibly a directory): :file', array('file' => $original_filename), CL4_Exception_File::IS_NOT_REGULAR_FILE);
 		}
 
 		$options['name_change_method'] = 'overwrite';

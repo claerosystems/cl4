@@ -194,11 +194,15 @@ class CL4_MultiORM {
 	* @return  ORM
 	*/
 	public function set_target_route($route_name = NULL) {
+		/* 20140618 CSN deprecating this because $this->_options['target_route_name'] and $this->_options['target_route_parameters'] replaces this code
+
 		if ( ! empty($route_name)) {
 			$this->_options['target_route'] = Route::name($route_name);
 		} else if ($this->_options['target_route'] === NULL) {
 			$this->_options['target_route'] = Route::name(Request::current()->route());
 		}
+
+		*/
 
 		return $this;
 	} // function set_target_route
@@ -213,8 +217,9 @@ class CL4_MultiORM {
 		// update the options if passed
 		$this->set_options($options);
 
-		$this->set_target_route();
-		$target_route = Route::get($this->_options['target_route']);
+		//20140618 CSN deprecated: $this->set_target_route();
+		//20140618 CSN deprecated: $target_route = Route::get($this->_options['target_route']);
+
 		$list_options = $this->_options['editable_list_options'];
 		$table_options = $list_options['table_options_multiorm'];
 		$display_order = $this->_model->display_order();
@@ -270,6 +275,7 @@ class CL4_MultiORM {
 
 		// create the pagination object
 		$pagination = Pagination::factory(array(
+			'base_url' => $this->get_target_url(),
 			'group' => $this->_options['pagination_config_group'],
 			'total_items'    => $this->_num_rows, // get the total number of records
 			'items_per_page' => $this->_options['page_max_rows'],
@@ -309,7 +315,8 @@ class CL4_MultiORM {
 		if ( ! empty($list_options['sort_url'])) {
 			if (is_array($list_options['sort_url'])) {
 				// is a route
-				$sort_url = Route::get($list_options['sort_url']['route_name'])->uri($list_options['sort_url']['params']);
+				//$sort_url = Route::get($list_options['sort_url']['route_name'])->uri($list_options['sort_url']['params']);
+				$sort_url = Base::get_url($list_options['sort_url']['route_name'], $list_options['sort_url']['params']);
 			} else {
 				// is a string, so look for a question mark in the url
 				$question_mark_pos = strpos($list_options['sort_url'], '?');
@@ -374,21 +381,23 @@ class CL4_MultiORM {
 		// add the top row of control buttons
 		$top_row_buttons = '';
 		if ( ! $this->_options['hide_top_row_buttons']) {
-			$this->set_target_route();
+			//20140618 CSN deprecated: $this->set_target_route();
 			$button_class = ( ! empty($this->_options['button_class']) ? ' ' . $this->_options['button_class'] : '');
 
 			// set up SEARCH button
 			if ($list_options['top_bar_buttons']['search']) {
 				$top_row_buttons .= Form::submit(NULL, __('Search'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'search')),
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'search')),
 					'class' => 'js_cl4_button_link_form ' . $button_class,
+					'data-ajax' => 'false'
 				));
 
 				// set up CLEAR SEARCH button
 				if ($this->_options['in_search']) {
 					$top_row_buttons .= Form::submit(NULL, __('Clear Search/Sort'), array(
-						'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'cancel_search')),
+						'data-cl4_form_action' => $this->get_target_url(array('action' => 'cancel_search')),
 						'class' => 'js_cl4_button_link_form ' . $button_class,
+						'data-ajax' => 'false'
 					));
 				} // if
 			} // if
@@ -396,35 +405,39 @@ class CL4_MultiORM {
 			// set up ADD button
 			if ($list_options['top_bar_buttons']['add']) {
 				$top_row_buttons .= Form::submit(NULL, __('Add New'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add')),
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'add')),
 					'class' => 'js_cl4_button_link_form ' . $button_class,
+					'data-ajax' => 'false'
 				));
 			} // if
 
 			// set up MULTIPLE EDIT button
 			if ($list_options['top_bar_buttons']['edit']) {
 				$top_row_buttons .= Form::submit(NULL, __('Edit Selected'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'edit_multiple')),
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'edit_multiple')),
 					'disabled' => 'disabled',
 					'class' => 'js_cl4_button_link_form js_cl4_multiple_edit' . $button_class,
+					'data-ajax' => 'false'
 				));
 			} // if
 
 			if ($list_options['top_bar_buttons']['export_all']) {
 				$top_row_buttons .= Form::submit(NULL, __('Export All'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'export')) . '?export_all=1',
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'export')) . '?export_all=1',
 					'data-cl4_form_target' => '_blank',
 					'class' => 'js_cl4_button_link_form ' . $button_class,
+					'data-ajax' => 'false'
 				));
 			} // if
 
 			// set up export selected button
 			if ($list_options['top_bar_buttons']['export_selected']) {
 				$top_row_buttons .= Form::submit(NULL, __('Export Selected'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'export')),
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'export')),
 					'data-cl4_form_target' => '_blank',
 					'disabled' => 'disabled',
 					'class' => 'js_cl4_button_link_form js_cl4_export_selected ' . $button_class,
+					'data-ajax' => 'false'
 				));
 			} // if
 
@@ -433,10 +446,11 @@ class CL4_MultiORM {
 				$add_multiple_uniqid = uniqid('cl4_add_multiple_button_');
 
 				$top_row_buttons .= Form::submit(NULL, __('Add:'), array(
-					'data-cl4_form_action' => URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add_multiple', 'id' => 1)),
-					'data-cl4_add_multiple_form_action_prefix' => '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add_multiple')), // used to determine data-cl4_form_action when the selection is changed
+					'data-cl4_form_action' => $this->get_target_url(array('action' => 'add_multiple', 'id' => 1)),
+					'data-cl4_add_multiple_form_action_prefix' => $this->get_target_url(array('action' => 'add_multiple')), // used to determine data-cl4_form_action when the selection is changed
 					'class' => 'js_cl4_button_link_form' . $button_class,
 					'id' => $add_multiple_uniqid,
+					'data-ajax' => 'false'
 				));
 
 				// Set up multiple add dropdown
@@ -444,6 +458,7 @@ class CL4_MultiORM {
 				$top_row_buttons .= Form::select(NULL, $add_count_array, 1, array(
 					'class' => 'cl4_add_multiple_count',
 					'data-cl4_add_multiple_related_button' => $add_multiple_uniqid,
+					'data-ajax' => 'false'
 				));
 			} // if
 
@@ -501,34 +516,40 @@ class CL4_MultiORM {
 			}
 
 			// add custom route links
-			foreach ($list_options['per_row_links_route'] as $route_name => $custom_data) {
+			foreach ($list_options['per_row_links_route'] as $custom_data) {
+				$route_name = $custom_data['route_name'];
 				$route_params = Arr::merge(array('id' => $id), $custom_data['params']);
 				$html = array_key_exists('html', $custom_data) ? $custom_data['html'] : '&nbsp;';
 				$attributes = array_key_exists('attributes', $custom_data) ? $custom_data['attributes'] : array();
 				$first_col .= HTML::anchor(URL_ROOT . '/' . Route::get($route_name)->uri($route_params), $html, $attributes);
 			}
 
+			// add custom links
+			foreach ($list_options['per_row_links_custom'] as $custom) {
+				$first_col .= '<a href="javascript:;" data-id="' . $id . '" onclick="' . $custom['onclick'] . '" title="' . $custom['title'] . '">' . $custom['html'] . '</a>';
+			}
+
 			// add 'start of row' buttons as dictated by $list_options['per_row_links'] array:
 			if ($list_options['per_row_links']['view']) {
-				$first_col .= HTML::anchor(URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'view', 'id' => $id)), '<span class="cl4_icon cl4_view">&nbsp;</span>', array(
+				$first_col .= HTML::anchor($this->get_target_url(array('model' => $this->_model_name, 'action' => 'view', 'id' => $id)), '<span class="cl4_icon cl4_view">&nbsp;</span>', array(
 					'title' => __('View this record'),
 				));
 			} // if
 
 			if ($list_options['per_row_links']['edit']) {
-				$first_col .= HTML::anchor(URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'edit', 'id' => $id)), '<span class="cl4_icon cl4_edit">&nbsp;</span>', array(
+				$first_col .= HTML::anchor($this->get_target_url(array('model' => $this->_model_name, 'action' => 'edit', 'id' => $id)), '<span class="cl4_icon cl4_edit">&nbsp;</span>', array(
 					'title' => __('Edit this record'),
 				));
 			}
 
 			if ($list_options['per_row_links']['delete']) {
-				$first_col .= HTML::anchor(URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'delete', 'id' => $id)), '<span class="cl4_icon cl4_delete">&nbsp;</span>', array(
+				$first_col .= HTML::anchor($this->get_target_url(array('model' => $this->_model_name, 'action' => 'delete', 'id' => $id)), '<span class="cl4_icon cl4_delete">&nbsp;</span>', array(
 					'title' => __('Delete this record'),
 				));
 			}
 
 			if ($list_options['per_row_links']['add']) {
-				$first_col .= HTML::anchor(URL_ROOT . '/' . $target_route->uri(array('model' => $this->_url_model_name, 'action' => 'add', 'id' => $id)), '<span class="cl4_icon cl4_add">&nbsp;</span>', array(
+				$first_col .= HTML::anchor($this->get_target_url(array('model' => $this->_model_name, 'action' => 'add', 'id' => $id)), '<span class="cl4_icon cl4_add">&nbsp;</span>', array(
 					'title' => __('Duplicate this record'),
 				));
 			}
@@ -568,7 +589,7 @@ class CL4_MultiORM {
 					}
 
 					// implement option to replace spaces for better formatting
-					if ($this->_options['replace_spaces'] && ! in_array($column_data['form_type'], $no_replace_spaces_types)) {
+					if ($this->_options['replace_spaces'] && ! in_array($column_data['field_type'], $no_replace_spaces_types)) {
 						// adds extra spaces for padding on right side of every column
 						$row_data[$i] = str_replace(' ', '&nbsp;', $row_data[$i]) . '&nbsp;&nbsp;';
 					} // if
@@ -576,6 +597,7 @@ class CL4_MultiORM {
 			} // foreach
 
 			$content_table->add_row($row_data);
+			$content_table->set_attribute($j, NULL, 'data-id', $id);
 
 			++$j;
 		} // foreach
@@ -603,7 +625,7 @@ class CL4_MultiORM {
 
 	/**
 	* Sets the search within this object
-	* The search is used with get_ediable_list()
+	* The search is used with get_editable_list()
 	*
 	* @chainable
 	* @param mixed $post
@@ -689,8 +711,8 @@ class CL4_MultiORM {
 		}
 
 		$form_buttons = array();
-		$this->set_target_route();
-		$target_route = $this->_options['target_route'];
+		//20140618 CSN deprecated: $this->set_target_route();
+		//20140618 CSN deprecated: $target_route = $this->_options['target_route'];
 		$edit_multiple_options = $this->_options['edit_multiple_options'];
 		$display_order = $this->_model->display_order();
 
@@ -724,7 +746,7 @@ class CL4_MultiORM {
 				$form_buttons[] = Form::input('cl4_cancel', __('Cancel'), array(
 					'type' => 'button',
 					'class' => 'js_cl4_button_link',
-					'data-cl4_link' => '/' . Route::get($target_route)->uri(array('model' => $this->_model_name, 'action' => 'cancel')),
+					'data-cl4_link' => $this->get_target_url(array('action' => 'cancel')),
 				));
 			}
 		} // if
@@ -840,6 +862,32 @@ class CL4_MultiORM {
 			'items' => $this->_num_rows,
 		));
 	} // function get_record_edit_view
+
+	/**
+	 * Return the complete URL for the target route and merged default and specified parameters.
+	 *
+	 * @param array $override_parameters
+	 *
+	 * @return string
+	 */
+	public function get_target_url($override_parameters = array()) {
+		// make sure the route name is set
+		// todo: also make sure it is valid
+		if ( ! empty($this->_options['target_route_name'])) {
+			$this->_options['target_route_name'] = Route::name(Request::current()->route());
+		}
+
+		// add the standard cl4 parameters if they are not specified anywhere else
+		if (empty($this->_options['target_route_parameters']['model']) && empty($override_parameters['model'])) $override_parameters['model'] = Request::current()->param('model');
+		if (empty($this->_options['target_route_parameters']['id']) && empty($override_parameters['id'])) $override_parameters['id'] = Request::current()->param('id');
+		if (empty($this->_options['target_route_parameters']['column_name']) && empty($override_parameters['column_name'])) $override_parameters['column_name'] = Request::current()->param('column_name');
+		if (empty($this->_options['target_route_parameters']['action']) && empty($override_parameters['action'])) $override_parameters['action'] = Request::current()->param('action');
+
+		// merge the defaults with the passed options (add defaults where values are missing)
+		$parameters = Arr::merge($this->_options['target_route_parameters'], $override_parameters);
+
+		return Base::get_url($this->_options['target_route_name'], $parameters);
+	}
 
 	/**
 	* get a table with data from the specified model
@@ -1026,6 +1074,7 @@ class CL4_MultiORM {
 		$options += array(
 			'use_db_values' => FALSE,
 			'use_db_column_names' => FALSE,
+			'convert_to_latin1' => TRUE,
 		);
 
 		$this->_table_columns[$this->_object_name] = $this->_model->table_columns();
@@ -1062,7 +1111,7 @@ class CL4_MultiORM {
 			$this->_model->where($this->_model->primary_key(), 'IN', $this->_ids);
 		}
 
-		$phpexcel_path = Kohana::find_file('vendor', 'phpexcel/PHPExcel');
+		$phpexcel_path = FALSE; //Kohana::find_file('vendor', 'phpexcel/PHPExcel');
 		if ($phpexcel_path) {
 			$use_phpexcel = TRUE;
 			Kohana::load($phpexcel_path);
@@ -1155,13 +1204,23 @@ class CL4_MultiORM {
 					++$i;
 
 					if ($options['use_db_values']) {
-						$row_data[$i] = $record_model->$column_name;
+						$row_data_string = $record_model->$column_name;
 					} else {
 						$source = (isset($this->_lookup_data[$this->_object_name][$column_name]) ? $this->_lookup_data[$this->_object_name][$column_name] : NULL);
-						$row_data[$i] = $record_model->get_view_string($column_name, $source);
+						$row_data_string = strip_tags($record_model->get_view_string($column_name, $source));
+					}
+
+					// todo: remove line breaks, no time to test this right now:
+					//$row_data_string = substr_replace($row_data_string, "/n", ' ');
+					//$row_data_string = substr_replace($row_data_string, "/r", ' ');
+
+					if ($options['convert_to_latin1']) {
+						$row_data[$i] = iconv('UTF8', 'ISO-8859-1//TRANSLIT', $row_data_string);
 					}
 				} // if
 			} // foreach
+
+			//echo Debug::vars($record_model->$column_name, $row_data_string);
 
 			if ($use_phpexcel) {
 				$col = 0;
@@ -1176,6 +1235,8 @@ class CL4_MultiORM {
 				$csv->add_row($row_data);
 			}
 		} // foreach
+
+		//exit;
 
 		if ($use_phpexcel) {
 			return $xlsx;

@@ -468,7 +468,13 @@ class CL4_Core extends Kohana_Core {
 	 * return the localized view based on i18n::lang()
 	 */
 	public static function get_view($path, $template_data = array()) {
-		return View::factory('themes' . '/' . APP_THEME . '/' . i18n::lang() . '/' . $path, $template_data);
+		// see if requested view exists, otherwise back out to default language
+		$requested_view = 'themes' . '/' . APP_THEME . '/' . i18n::lang() . '/' . $path;
+		if (Kohana::find_file('views', $requested_view, NULL, FALSE)) {
+			return View::factory($requested_view, $template_data);
+		} else {
+			return View::factory('themes' . '/' . APP_THEME . '/' . DEFAULT_LANG . '/' . $path, $template_data);
+		}
 	}
 
 	/**

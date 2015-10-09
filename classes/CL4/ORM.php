@@ -367,6 +367,18 @@ class CL4_ORM extends Kohana_ORM {
 		}
 	} // function get
 
+
+	/**
+	 * Get the option with the specified path, return false if not found.
+	 *
+	 * @param $option_path
+	 * @param null $deliminator
+	 * @return mixed
+	 */
+	public function get_option($option_path, $deliminator = NULL) {
+		return Arr::path($this->_options, $option_path, false, $deliminator);
+	} // function get_option
+
 	/**
 	 * Update the options with the given set.  This will override any options already set, and if none are set
 	 * it will create a new set of options for the object based on the defaults first.
@@ -564,11 +576,13 @@ class CL4_ORM extends Kohana_ORM {
 	* @return  ORM
 	*/
 	public function set_target_route($route_name = NULL) {
+		/*20140618 CSN deprecated
 		if ( ! empty($route_name)) {
 			$this->_options['target_route'] = Route::name($route_name);
 		} else if ($this->_options['target_route'] === NULL) {
 			$this->_options['target_route'] = Route::name(Request::current()->route());
 		}
+		*/
 
 		return $this;
 	} // function set_target_route
@@ -702,11 +716,12 @@ class CL4_ORM extends Kohana_ORM {
 	 * This can be run multiple times and it will overwrite the pervious data every time either for all fields or a specific field
 	 *
 	 * @chainable
-	 * @param   array  $process_column_name  Can be a string or an array of column names
+	 * @param   array   (optional) $process_column_name  Can be a string or an array of column names
+	 * @param   array   (optional) an array of field attributes used to override the model field attributes
 	 *
 	 * @return  ORM
 	 */
-	public function prepare_form($process_column_name = NULL) {
+	public function prepare_form($process_column_name = NULL, $override_attributes = array()) {
 		// add the extra hidden fields from options, if there is any
 		if (count($this->_options['hidden_fields'] > 0)) {
 			foreach ($this->_options['hidden_fields'] as $hidden_field) {
@@ -768,6 +783,12 @@ class CL4_ORM extends Kohana_ORM {
 			if ($this->show_field($column_name)) {
 				// look for the attributes and set them
 				$field_attributes = $column_info['field_attributes'];
+
+				// use override attributes if set
+				if ( ! empty($override_attributes)) {
+					$field_attributes = Arr::merge($field_attributes, $override_attributes);
+				}
+
 				$label_attributes = array();
 				if ($this->_mode == 'edit' && isset($rules[$column_name]['not_empty'])) {
 					$field_attributes = HTML::set_class_attribute($field_attributes, 'cl4_required');
@@ -1118,8 +1139,8 @@ class CL4_ORM extends Kohana_ORM {
 		} // if
 
 		if ($this->_options['display_buttons']) {
-			$this->set_target_route();
-			$target_route = $this->_options['target_route'];
+			//20140618 CSN deprecated: $this->set_target_route();
+			//20140618 CSN deprecated: $target_route = $this->_options['target_route'];
 
 			// set up the buttons
 			if ($this->_options['display_submit']) {
@@ -1137,8 +1158,9 @@ class CL4_ORM extends Kohana_ORM {
 				}
 				$reset_button_options = array(
 					'class' => 'js_cl4_button_link',
+					'data-ajax' => 'false',
 					//'data-cl4_link' => URL::site(Request::instance()->uri(), TRUE) //URL::site(Request::current()->uri()), // this will return the current uri
-					'data-cl4_link' => Base::get_url('cl4admin', array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => Request::$current->action())), // this will return the current uri
+					'data-cl4_link' => Base::get_url('cl4admin', array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => Request::$current->action())) . URL::query(), // this will return the current uri
 				);
 				if ( ! empty($this->_options['reset_button_attributes'])) {
 					$reset_button_options = HTML::merge_attributes($reset_button_options, $this->_options['reset_button_attributes']);
@@ -1149,7 +1171,8 @@ class CL4_ORM extends Kohana_ORM {
 				$cancel_button_options = array(
 					'class' => 'js_cl4_button_link',
 					//'data-cl4_link' => Base::get_url($target_route, array('model' => $this->model_name(), 'action' => 'cancel')),
-					'data-cl4_link' => Base::get_url('cl4admin', array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => 'cancel')),
+					//'data-cl4_link' => Base::get_url('cl4admin', array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => 'cancel')),
+					'data-cl4_link' => $this->get_target_url(array('id' => $this->pk(), 'model' => $this->model_name(), 'action' => 'cancel')) . URL::query(),
 				);
 				if ( ! empty($this->_options['cancel_button_attributes'])) {
 					$cancel_button_options = HTML::merge_attributes($cancel_button_options, $this->_options['cancel_button_attributes']);
@@ -1187,7 +1210,7 @@ class CL4_ORM extends Kohana_ORM {
 		} // if
 
 		// return the generated view
-		return View::factory($this->_options['get_form_view_file'], array(
+		return Base::get_view($this->_options['get_form_view_file'], array(
 			'model'                 => $this,
 			'any_visible'           => $this->any_visible('edit'),
 			'form_options'          => $this->_options,
@@ -1219,11 +1242,11 @@ class CL4_ORM extends Kohana_ORM {
 
 		// set up the buttons
 		if ($this->_options['display_buttons'] && $this->_options['display_back_to_list']) {
-			$this->set_target_route();
+			//20140618 CSN deprecated: $this->set_target_route();
 
 			$submit_button_options = array(
 				'class' => 'js_cl4_button_link ' . Arr::get($this->_options, 'button_class', ''),
-				'data-cl4_link' => URL::site(Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name))),
+				'data-cl4_link' => $this->get_target_url(array('model' => $this->_object_name)), // URL::site(Route::get($this->_options['target_route'])->uri(array('model' => $this->_object_name))),
 			);
 			if ( ! empty($this->_options['submit_button_options'])) {
 				$submit_button_options = HTML::merge_attributes($submit_button_options, $this->_options['submit_button_options']);
@@ -1247,12 +1270,13 @@ class CL4_ORM extends Kohana_ORM {
 	 * Generate and return the formatted HTML for the given field
 	 *
 	 * @param   string  $column_name  the name of the field in the model
+	 * @param   array   an array of field attributes used to override the model field attributes
 	 * @return  string  the HTML for the given fieldname, based on the model
 	 */
-	public function get_field($column_name) {
-		if ( ! isset($this->_field_html[$column_name]['field']) && ! isset($this->_form_fields_hidden[$column_name])) {
-			$this->prepare_form($column_name);
-		}
+	public function get_field($column_name, $override_attributes = array()) {
+		//if ( ! isset($this->_field_html[$column_name]['field']) && ! isset($this->_form_fields_hidden[$column_name])) {
+			$this->prepare_form($column_name, $override_attributes);
+		//}
 
 		if (isset($this->_field_html[$column_name]['field'])) {
 			return $this->_field_html[$column_name]['field'];
@@ -1663,6 +1687,36 @@ class CL4_ORM extends Kohana_ORM {
 
 		return $post;
 	} // function get_table_records_from_post
+
+	/**
+	 * Return the complete URL for the target route and merged default and specified parameters.
+	 *
+	 * @param array $override_parameters
+	 *
+	 * @return string
+	 */
+	public function get_target_url($override_parameters = array()) {
+		// make sure the route name is set
+		// todo: also make sure it is valid
+		if ( ! empty($this->_options['target_route_name'])) {
+			$this->_options['target_route_name'] = Route::name(Request::current()->route());
+		}
+
+		// add the standard cl4 parameters if they are not specified anywhere else
+		if (empty($this->_options['target_route_parameters']['model']) && empty($override_parameters['model'])) $override_parameters['model'] = Request::current()->param('model');
+		if (empty($this->_options['target_route_parameters']['id']) && empty($override_parameters['id'])) $override_parameters['id'] = Request::current()->param('id');
+		if (empty($this->_options['target_route_parameters']['column_name']) && empty($override_parameters['column_name'])) $override_parameters['column_name'] = Request::current()->param('column_name');
+		if (empty($this->_options['target_route_parameters']['action']) && empty($override_parameters['action'])) $override_parameters['action'] = Request::current()->param('action');
+
+
+		// todo: 20141223 CSN not sure about this, but it fixed a problem on Tucker:
+		if (empty($this->_options['target_route_parameters']['controller']) && empty($override_parameters['controller'])) $override_parameters['controller'] = 'CL4Admin';
+
+		// merge the defaults with the passed options (add defaults where values are missing)
+		$parameters = Arr::merge($this->_options['target_route_parameters'], $override_parameters);
+
+		return Base::get_url($this->_options['target_route_name'], $parameters);
+	}
 
 	/**
 	* Set all values from the $_POST or passed array using the model rules (field_type, edit_flag, ignored_columns, etc.)

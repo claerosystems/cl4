@@ -734,6 +734,7 @@ class CL4_Form extends Kohana_Form {
 			'select_one' => FALSE,
 			'select_all' => FALSE,
 			'select_none' => FALSE,
+			'select_add' => FALSE,
 			'add_values' => NULL,
 			'add_values_after' => NULL,
 			'db_instance' => NULL,
@@ -773,13 +774,16 @@ class CL4_Form extends Kohana_Form {
 		$add_values = array();
 		// add the Select One, All and None values if enabled
 		if ($options['select_one']) {
-			$add_values[''] = '-- Select One --';
+			$add_values[''] = '-- ' . __('Select One') . ' --';
 		} // if
 		if ($options['select_all']) {
-			$add_values['all'] = 'All';
+			$add_values['all'] = __('All');
 		} // if
 		if ($options['select_none']) {
-			$add_values['none'] = 'None';
+			$add_values['none'] = __('None');
+		} // if
+		if ($options['select_add']) {
+			$add_values['add'] = __('Add New');
 		} // if
 		// if there are any additional values, add them as well
 		if (is_array($options['add_values'])) {

@@ -199,14 +199,17 @@ class CL4_Pagination {
 			$page = NULL;
 		}
 
-		//echo Debug::vars();exit;
 
-		$base_url = Base::get_url(Route::name(Request::current()->route()), array(
-			'model' => Request::current()->param('model'),
-			'action' => Request::current()->param('action'),
-			'id' => Request::current()->param('id'),
-			'column_name' => Request::current()->param('column_name'),
-		));
+		//echo Debug::vars(Request::current()->uri());exit;
+		/*
+				$base_url = Base::get_url(Route::name(Request::current()->route()), array(
+					'model' => Request::current()->param('model'),
+					'action' => Request::current()->param('action'),
+					'id' => Request::current()->param('id'),
+					'column_name' => Request::current()->param('column_name'),
+				));
+		*/
+		$base_url = URL_ROOT . '/' . Request::current()->uri();
 
 		switch ($this->config['current_page']['source']) {
 			case 'query_string' :
