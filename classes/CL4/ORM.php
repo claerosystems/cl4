@@ -218,13 +218,15 @@ class CL4_ORM extends Kohana_ORM {
 		if (sizeof($model_words > 1)) {
 			$model = 'Model';
 			foreach ($model_words as $word) {
-				$model .= '_' . ucfirst($word);
+				if ($word != 'ja' && $word != 'Ja') {
+					$model .= '_' . ucfirst($word);
+				} else {
+					$model .= '_JA';
+				}
 			}
 		} else {
 			$model = 'Model_' . ucfirst($model);
 		}
-
-		//echo Debug::vars($model_words, $model);exit;
 
 		return new $model($id, $options);
 	} // function factory
@@ -886,11 +888,15 @@ class CL4_ORM extends Kohana_ORM {
 						$related_pk = $related_model->primary_key();
 						$related_label = $related_model->primary_val();
 
+
+						//echo Debug::vars($alias, $related_table, $related_pk);exit;
+
 						// get the current source values
 						$current_values = $this->$alias
 							->select($related_table . '.' . $related_pk)
 							->find_all()
 							->as_array(NULL, $related_pk);
+
 
 						// note: never disable the hidden checkbox or save_values() will not initiate the saving of the related data
 						$checkbox_options = array(
