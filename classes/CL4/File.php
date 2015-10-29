@@ -408,27 +408,32 @@ class CL4_File {
 		switch ($name_change_method) {
 			case 'timestamp' :
 				// prepend the current timestamp to the filename
-				$dest_file = time() . '_' . $file_info['filename_no_ext'] . '.' . $file_info['ext'];
+				$dest_file = time() . '_' . $file_info['filename_no_ext'];
+				$dest_file .= ( ! empty($file_info['ext'])) ? '.' . $file_info['ext'] : '';
 				break;
 
 			case 'random' :
 				// generate a random filename that starts with the current timestamp (to avoid 2 people ending up with the same filename)
-				$dest_file = time() . '_' . CL4File::clean_filename(uniqid()) . '.' . $file_info['ext'];
+				$dest_file = time() . '_' . CL4File::clean_filename(uniqid());
+				$dest_file .= ( ! empty($file_info['ext'])) ? '.' . $file_info['ext'] : '';
 				break;
 
 			case 'prepend' :
 				// prepend the filename with a string
-				$dest_file = $options['name_change_text'] . $file_info['filename_no_ext'] . '.' . $file_info['ext'];
+				$dest_file = $options['name_change_text'] . $file_info['filename_no_ext'];
+				$dest_file .= ( ! empty($file_info['ext'])) ? '.' . $file_info['ext'] : '';
 				break;
 
 			case 'append' :
 				// append the filename with a string
-				$dest_file = $file_info['filename_no_ext'] . $options['name_change_text'] . '.' . $file_info['ext'];
+				$dest_file = $file_info['filename_no_ext'] . $options['name_change_text'];
+				$dest_file .= ( ! empty($file_info['ext'])) ? '.' . $file_info['ext'] : '';
 				break;
 
 			case 'overwrite' :
 				// replace the filename with a given string
-				$dest_file = $options['name_change_text'] . '.' . $file_info['ext'];
+				$dest_file = $options['name_change_text'];
+				$dest_file .= ( ! empty($file_info['ext'])) ? '.' . $file_info['ext'] : '';
 				break;
 
 			case 'overwrite_all' :
@@ -440,7 +445,8 @@ class CL4_File {
 			case 'pk' :
 				if ( ! empty($file_info['record_pk'])) {
 					// result: [id]_[timestamp].[ext]
-					$dest_file = $file_info['record_pk'] . '_' . time() . '.' . $file_info['ext'];
+					$dest_file = $file_info['record_pk'] . '_' . time();
+					$dest_file .= ( ! empty($file_info['ext'])) ? '.' . $file_info['ext'] : '';
 				} else {
 					throw new Kohana_Exception('No record primary key (pk) was received for id/pk name change so the destination file name could not be retrieved');
 				}
@@ -449,7 +455,8 @@ class CL4_File {
 			case 'keep' :
 			default :
 				// keep original src filename (no changes)
-				$dest_file = $file_info['filename_no_ext'] . '.' . $file_info['ext'];
+				$dest_file = $file_info['filename_no_ext'];
+				$dest_file .= ( ! empty($file_info['ext'])) ? '.' . $file_info['ext'] : '';
 				break;
 		} // switch
 
