@@ -1157,13 +1157,14 @@ class CL4_Form extends Kohana_Form {
 		$source_array = array();
 		try {
 			$source_result = DB::query(Database::SELECT, $source)->execute($options['db_instance']);
-			if ($source_result->num_fields() == 3) {
-				foreach ($source_result as $row) {
-					$source_array[$row[$options['source_parent']]][$row[$options['source_value']]] = $row[$options['source_label']];
-				}
-			} else {
+			// todo: 20151108 CSN not sure what this was, why 3?  I think this is a bug, commenting out for now
+			//if ($source_result->count() == 3) {
+			//	foreach ($source_result as $row) {
+			//		$source_array[$row[$options['source_parent']]][$row[$options['source_value']]] = $row[$options['source_label']];
+			//	}
+			//} else {
 				$source_array = $source_result->as_array($options['source_value'], $options['source_label']);
-			}
+			//}
 		} catch (Exception $e) {
 			throw $e;
 		}
