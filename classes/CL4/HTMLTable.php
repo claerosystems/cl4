@@ -123,7 +123,7 @@ class CL4_HTMLTable {
 			'populate_all_cols' => TRUE,
 			'rows_only' => FALSE,
 
-			'odd_even' => TRUE,
+			'odd_even' => FALSE,
 			'start_row_num' => 0, // this cannot be used when passing in data with the option
 			'num_columns' => NULL,
 
