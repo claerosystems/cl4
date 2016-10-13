@@ -1266,6 +1266,30 @@ class CL4_ORM extends Kohana_ORM {
 		));
 	} // function get_view
 
+    /**
+     * get the change log
+     */
+    public function get_changes() {
+        $return_data = array();
+
+        $changes = DB::select('id', 'event_timestamp', 'changed')
+            ->from('change_log')
+            ->where('table_name', '=', $this->_table_name)
+            ->and_where('record_pk', '=', $this->pk())
+            ->order_by('event_timestamp', 'desc')
+            ->execute()
+            ->as_array();
+
+        if (is_array($changes)) {
+            foreach ($changes as $change) {
+                $event_label = $change['event_timestamp'] . ' (#' . $change['id'] . ')';
+                $return_data[$event_label] = unserialize($change['changed']);
+            }
+        }
+
+        return $return_data;
+    }
+
 	/**
 	 * Generate and return the formatted HTML for the given field
 	 *
