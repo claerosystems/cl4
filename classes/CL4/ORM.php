@@ -215,9 +215,11 @@ class CL4_ORM extends Kohana_ORM {
 		// Set class name
 
 		$model_words = explode('_', $model);
-		if (sizeof($model_words > 1)) {
+
+		if (sizeof($model_words) > 1) {
 			$model = 'Model';
 			foreach ($model_words as $word) {
+			    // todo: 20180904 CSN this is a terrible hack and needs to be fixed
 				if ($word != 'ja' && $word != 'Ja') {
 					$model .= '_' . ucfirst($word);
 				} else {
