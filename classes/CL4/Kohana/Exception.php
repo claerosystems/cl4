@@ -10,7 +10,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	 * @param   Exception  $e
 	 * @return  boolean
 	 */
-	public static function handler(Exception $e) {
+	public static function handler($e) {
 		$is_ajax = (bool) Arr::get($_REQUEST, 'c_ajax', FALSE);
 
 		$response = Kohana_Exception::_handler($e);
@@ -31,7 +31,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	 * @param   Exception  $e
 	 * @return  boolean
 	 */
-	public static function handler_ajax(Exception $e) {
+	public static function handler_ajax($e) {
 		Kohana_Exception::_handler($e, TRUE);
 	}
 
@@ -44,7 +44,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	 * @param   Exception  $e
 	 * @return  boolean
 	 */
-	public static function handler_continue(Exception $e) {
+	public static function handler_continue($e) {
 		if (Kohana::$environment >= Kohana::DEVELOPMENT) {
 			Kohana_Exception::handler($e);
 		} else {
@@ -63,7 +63,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	 * @param   boolean  $is_ajax  Set to TRUE if it's an AJAX request but c_ajax is not in the $_REQUEST.
 	 * @return  boolean
 	 */
-	public static function _handler(Exception $e, $is_ajax = NULL) {
+	public static function _handler($e, $is_ajax = NULL) {
 		if ($is_ajax === NULL) {
 			$is_ajax = (bool) Arr::get($_REQUEST, 'c_ajax', FALSE);
 		}
@@ -132,7 +132,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	 * @param   Exception  $e
 	 * @return  Response
 	 */
-	public static function response_production(Exception $e) {
+	public static function response_production($e) {
 		$http_header_status = ($e instanceof HTTP_Exception) ? $code : 500;
 
 		// Instantiate the error view.
@@ -163,7 +163,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	 * @param   Exception  $e
 	 * @return  void
 	 */
-	public static function notify(Exception $e) {
+	public static function notify($e) {
 		try {
 			// Get the exception information
 			$class   = get_class($e);
@@ -254,7 +254,7 @@ class CL4_Kohana_Exception extends Kohana_Kohana_Exception {
 	 * @param   Exception  $e
 	 * @return  void
 	 */
-	public static function response_ajax(Exception $e) {
+	public static function response_ajax($e) {
 		$ajax_data = array(
 			'status' => AJAX_Status::UNKNOWN_ERROR,
 			'error_msg' => 'There was a problem getting the data.',
