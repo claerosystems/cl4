@@ -93,7 +93,7 @@ class CL4_Pagination {
 		$config['group'] = (string) $group;
 
 		// Recursively load requested config groups
-		while (isset($config['group']) AND isset($config_file->$config['group'])) {
+		while (isset($config['group']) AND isset($config_file->$group)) {
 			// Temporarily store config group name
 			$group = $config['group'];
 			unset($config['group']);
