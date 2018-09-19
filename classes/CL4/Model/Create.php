@@ -43,7 +43,7 @@ class CL4_Model_Create {
 	*/
 	public function create_model() {
 		// start to generate the php code for the model
-		$model_code = Kohana::FILE_SECURITY . EOL;
+		$model_code = '<?php defined(\'SYSPATH\') OR die(\'No direct access allowed.\');' . EOL;
 		$model_code .= EOL;
 		$model_code .= $this->build_model_comment();
 		$model_code .= 'class Model_' . $this->make_class_name($this->table_name) . ' extends ORM {' . EOL;
@@ -55,16 +55,16 @@ class CL4_Model_Create {
 
 		// add relationships placeholder
 		$model_code .= EOL;
-		$model_code .= TAB . '// relationships'. EOL;
-		$model_code .= TAB . '// protected $_has_one = array();' . EOL;
+		$model_code .= '    ' . '// relationships'. EOL;
+		$model_code .= '    ' . '// protected $_has_one = array();' . EOL;
 		// these will be replaced later on after looping through the columns
-		$model_code .= TAB . '{[has_many_code]}' . EOL;
-		$model_code .= TAB . '{[belongs_to_code]}' . EOL;
+		$model_code .= '    ' . '{[has_many_code]}' . EOL;
+		$model_code .= '    ' . '{[belongs_to_code]}' . EOL;
 
 		// add the column definitions
 		$model_code .= EOL;
-		$model_code .= TAB . '// column definitions'. EOL;
-		$model_code .= TAB . 'protected $_table_columns = array(' . EOL;
+		$model_code .= '    ' . '// column definitions'. EOL;
+		$model_code .= '    ' . 'protected $_table_columns = array(' . EOL;
 
 		$has_many_code = '';
 		$belongs_to_code = '';
@@ -78,12 +78,12 @@ class CL4_Model_Create {
 
 			$model_code .= $this->build_col_code($column_name, $meta_data, $default_meta_data, $loop_through_field_attributes);
 		} // foreach
-		$model_code .= TAB . ');' . EOL;
+		$model_code .= '    ' . ');' . EOL;
 
 		// replace the has many code placeholder
 		$has_many_code = $this->build_has_many();
 		if ( ! empty($has_many_code)) {
-			$has_many_code = 'protected $_has_many = array(' . $has_many_code . EOL . TAB . ');';
+			$has_many_code = 'protected $_has_many = array(' . $has_many_code . EOL . '    ' . ');';
 		} else {
 			$has_many_code = '// protected $_has_many = array();';
 		}
@@ -91,7 +91,7 @@ class CL4_Model_Create {
 
 		// replace the belongs to4 code placeholder
 		if ( ! empty($belongs_to_code)) {
-			$belongs_to_code = 'protected $_belongs_to = array(' . $belongs_to_code . EOL . TAB . ');';
+			$belongs_to_code = 'protected $_belongs_to = array(' . $belongs_to_code . EOL . '    ' . ');';
 		} else {
 			$belongs_to_code = '// protected $_belongs_to = array();';
 		}
@@ -184,34 +184,34 @@ class CL4_Model_Create {
 		$model_code = '';
 
 		if ( ! empty($this->db_name) && $this->db_name != Database::$default) {
-			$model_code .= TAB . 'protected $_db_group = \'' . $this->db_name . '\'; // or any group in database configuration' . EOL;
+			$model_code .= '    ' . 'protected $_db_group = \'' . $this->db_name . '\'; // or any group in database configuration' . EOL;
 		}
 
-		$model_code .= TAB . 'protected $_table_names_plural = FALSE;' . EOL;
-		$model_code .= TAB . 'protected $_table_name = \'' . $this->table_name . '\';' . EOL;
+		$model_code .= '    ' . 'protected $_table_names_plural = FALSE;' . EOL;
+		$model_code .= '    ' . 'protected $_table_name = \'' . $this->table_name . '\';' . EOL;
 		if ( ! isset($this->columns['id'])) {
-			$model_code .= TAB . '// protected $_primary_key = \'' . 'id' . '\'; // default: id' . EOL;
+			$model_code .= '    ' . '// protected $_primary_key = \'' . 'id' . '\'; // default: id' . EOL;
 		}
 		if ( ! isset($this->columns['name'])) {
-			$model_code .= TAB . '// protected $_primary_val = \'' . 'name' . '\'; // default: name (column used as primary value)' . EOL;
+			$model_code .= '    ' . '// protected $_primary_val = \'' . 'name' . '\'; // default: name (column used as primary value)' . EOL;
 		}
-		$model_code .= TAB . 'public $_table_name_display = \'' . CL4::underscores_to_words($this->table_name) . '\'; // cl4 specific' . EOL;
+		$model_code .= '    ' . 'public $_table_name_display = \'' . CL4::underscores_to_words($this->table_name) . '\'; // cl4 specific' . EOL;
 
 		return $model_code;
 	}
 
 	protected function build_sorting() {
 		$model_code = EOL;
-		$model_code .= TAB . '// default sorting'. EOL;
-		$model_code .= TAB . (isset($this->columns['display_order']) || isset($this->columns['name']) ? '' : '// ') . 'protected $_sorting = array(';
+		$model_code .= '    ' . '// default sorting'. EOL;
+		$model_code .= '    ' . (isset($this->columns['display_order']) || isset($this->columns['name']) ? '' : '// ') . 'protected $_sorting = array(';
 		if (isset($this->columns['display_order'])) {
-			$model_code .= EOL . TAB . TAB . '\'display_order\' => \'ASC\',';
+			$model_code .= EOL . '    ' . '    ' . '\'display_order\' => \'ASC\',';
 		}
 		if (isset($this->columns['name'])) {
-			$model_code .= EOL . TAB . TAB . '\'name\' => \'ASC\',';
+			$model_code .= EOL . '    ' . '    ' . '\'name\' => \'ASC\',';
 		}
 		if (isset($this->columns['display_order']) || isset($this->columns['name'])) {
-			$model_code .= EOL . TAB;
+			$model_code .= EOL . '    ';
 		}
 		$model_code .= ');' . EOL;
 
@@ -353,11 +353,11 @@ class CL4_Model_Create {
 
 	protected function build_col_code($column_name, $meta_data, $default_meta_data, $loop_through_field_attributes) {
 		// add the cl4 meta data
-		$model_code = TAB . TAB . '\'' . $column_name . '\' => array(' . EOL;
+		$model_code = '    ' . '    ' . '\'' . $column_name . '\' => array(' . EOL;
 		foreach ($meta_data as $key => $data) {
 			// only add the fields that don't exist in the default, are not the default, are field type or field attributes (and we have to loop through field attributes, probably for maxlength)
 			if ( ! array_key_exists($key, $default_meta_data) || $data !== $default_meta_data[$key] || $key == 'field_type' || ($key == 'field_attributes' && $loop_through_field_attributes)) {
-				$model_code .= TAB . TAB . TAB . "'" . $key . "' => ";
+				$model_code .= '    ' . '    ' . '    ' . "'" . $key . "' => ";
 
 				if (is_array($data)) {
 					$model_code .= 'array(' . EOL;
@@ -365,7 +365,7 @@ class CL4_Model_Create {
 						if ( ! array_key_exists($sub_key, $default_meta_data[$key]) || $sub_data !== $default_meta_data[$key][$sub_key]
 							// special case: add the maxlength attribute because it's important when generating fields
 							|| ($key == 'field_attributes' && $sub_key == 'maxlength')) {
-							$model_code .= TAB . TAB . TAB . TAB . "'" . $sub_key . "' => ";
+							$model_code .= '    ' . '    ' . '    ' . '    ' . "'" . $sub_key . "' => ";
 							if (is_array($sub_data)) {
 
 								$model_code .= 'array(' . EOL;
@@ -373,10 +373,10 @@ class CL4_Model_Create {
 									if ( ! isset($default_meta_data[$key][$sub_key]) || ! array_key_exists($_sub_key, $default_meta_data[$key][$sub_key]) || $_sub_data !== $default_meta_data[$key][$sub_key][$_sub_key]
 										// special case: add the source key to the source array so it's obvious what's being used
 										|| ($key == 'field_options' && $sub_key == 'source' && $_sub_key == 'source')) {
-										$model_code .= TAB . TAB . TAB . TAB . TAB . "'" . $_sub_key . "' => " . $this->return_code_value($_sub_data) . ',' . EOL;
+										$model_code .= '    ' . '    ' . '    ' . '    ' . '    ' . "'" . $_sub_key . "' => " . $this->return_code_value($_sub_data) . ',' . EOL;
 									}
 								} // foreach
-								$model_code .= TAB . TAB . TAB . TAB . ')';
+								$model_code .= '    ' . '    ' . '    ' . '    ' . ')';
 
 							} else {
 								$model_code .= $this->return_code_value($sub_data);
@@ -384,7 +384,7 @@ class CL4_Model_Create {
 							$model_code .= ',' . EOL;
 						} // if
 					} // foreach
-					$model_code .= TAB . TAB . TAB . ')';
+					$model_code .= '    ' . '    ' . '    ' . ')';
 
 				} else {
 					$model_code .= $this->return_code_value($data);
@@ -393,7 +393,7 @@ class CL4_Model_Create {
 			} // if
 		} // foreach
 
-		$model_code .= TAB . TAB . '),' . EOL;
+		$model_code .= '    ' . '    ' . '),' . EOL;
 
 		return $model_code;
 	}
@@ -410,10 +410,10 @@ class CL4_Model_Create {
 			$tables = $this->_db->list_tables($column_name_wo_id);
 			if (count($tables) > 0) {
 				$belongs_to_code .= EOL;
-				$belongs_to_code .= TAB . TAB . '\'' . $column_name_wo_id . '\' => array(' . EOL;
-				$belongs_to_code .= TAB . TAB . TAB . '\'model\' => \'' . $this->make_class_name($column_name_wo_id) . '\',' . EOL;
-				$belongs_to_code .= TAB . TAB . TAB . '\'foreign_key\' => \'' . $column_name . '\',' . EOL;
-				$belongs_to_code .= TAB . TAB . '),';
+				$belongs_to_code .= '    ' . '    ' . '\'' . $column_name_wo_id . '\' => array(' . EOL;
+				$belongs_to_code .= '    ' . '    ' . '    ' . '\'model\' => \'' . $this->make_class_name($column_name_wo_id) . '\',' . EOL;
+				$belongs_to_code .= '    ' . '    ' . '    ' . '\'foreign_key\' => \'' . $column_name . '\',' . EOL;
+				$belongs_to_code .= '    ' . '    ' . '),';
 			}
 		} // if
 
@@ -434,10 +434,10 @@ class CL4_Model_Create {
 					$has_has_many = TRUE;
 
 					$has_many_code .= EOL;
-					$has_many_code .= TAB . TAB . '\'' . $table_name . '\' => array(' . EOL;
-					$has_many_code .= TAB . TAB . TAB . '\'model\' => \'' . $this->make_class_name($table_name) . '\',' . EOL;
-					$has_many_code .= TAB . TAB . TAB . '\'foreign_key\' => \'' . $column_name . '\',' . EOL;
-					$has_many_code .= TAB . TAB . '),';
+					$has_many_code .= '    ' . '    ' . '\'' . $table_name . '\' => array(' . EOL;
+					$has_many_code .= '    ' . '    ' . '    ' . '\'model\' => \'' . $this->make_class_name($table_name) . '\',' . EOL;
+					$has_many_code .= '    ' . '    ' . '    ' . '\'foreign_key\' => \'' . $column_name . '\',' . EOL;
+					$has_many_code .= '    ' . '    ' . '),';
 				}
 			}
 
@@ -460,12 +460,12 @@ class CL4_Model_Create {
 					$column_name_wo_id = substr($column_name, 0, strrpos($column_name, '_'));
 
 					$has_many_code .= EOL;
-					$has_many_code .= TAB . TAB . '\'' . $column_name_wo_id . '\' => array(' . EOL;
-					$has_many_code .= TAB . TAB . TAB . '\'model\' => \'' . $this->make_class_name($column_name_wo_id) . '\',' . EOL;
-					$has_many_code .= TAB . TAB . TAB . '\'through\' => \'' . $table_name . '\',' . EOL;
-					$has_many_code .= TAB . TAB . TAB . '\'foreign_key\' => \'' . $this->table_name . '_id\',' . EOL;
-					$has_many_code .= TAB . TAB . TAB . '\'far_key\' => \'' . $column_name . '\',' . EOL;
-					$has_many_code .= TAB . TAB . '),';
+					$has_many_code .= '    ' . '    ' . '\'' . $column_name_wo_id . '\' => array(' . EOL;
+					$has_many_code .= '    ' . '    ' . '    ' . '\'model\' => \'' . $this->make_class_name($column_name_wo_id) . '\',' . EOL;
+					$has_many_code .= '    ' . '    ' . '    ' . '\'through\' => \'' . $table_name . '\',' . EOL;
+					$has_many_code .= '    ' . '    ' . '    ' . '\'foreign_key\' => \'' . $this->table_name . '_id\',' . EOL;
+					$has_many_code .= '    ' . '    ' . '    ' . '\'far_key\' => \'' . $column_name . '\',' . EOL;
+					$has_many_code .= '    ' . '    ' . '),';
 				}
 			}
 		}
@@ -475,101 +475,101 @@ class CL4_Model_Create {
 
 	protected function build_date_columns() {
 		$model_code = EOL;
-		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * @var  array  $_created_column  The date and time this row was created.' . EOL;
-		$model_code .= TAB . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
-		$model_code .= TAB . ' */' . EOL;
-		$model_code .= TAB . ( ! isset($this->columns['date_created']) ? '// ' : '') . 'protected $_created_column = array(\'column\' => \'date_created\', \'format\' => \'Y-m-j H:i:s\');'. EOL;
+		$model_code .= '    ' . '/**' . EOL;
+		$model_code .= '    ' . ' * @var  array  $_created_column  The date and time this row was created.' . EOL;
+		$model_code .= '    ' . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
+		$model_code .= '    ' . ' */' . EOL;
+		$model_code .= '    ' . ( ! isset($this->columns['date_created']) ? '// ' : '') . 'protected $_created_column = array(\'column\' => \'date_created\', \'format\' => \'Y-m-j H:i:s\');'. EOL;
 		$model_code .= EOL;
-		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * @var  array  $_updated_column  The date and time this row was updated.' . EOL;
-		$model_code .= TAB . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
-		$model_code .= TAB . ' */' . EOL;
-		$model_code .= TAB . ( ! isset($this->columns['date_modified']) ? '// ' : '') . 'protected $_updated_column = array(\'column\' => \'date_modified\', \'format\' => TRUE);' . EOL;
+		$model_code .= '    ' . '/**' . EOL;
+		$model_code .= '    ' . ' * @var  array  $_updated_column  The date and time this row was updated.' . EOL;
+		$model_code .= '    ' . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
+		$model_code .= '    ' . ' */' . EOL;
+		$model_code .= '    ' . ( ! isset($this->columns['date_modified']) ? '// ' : '') . 'protected $_updated_column = array(\'column\' => \'date_modified\', \'format\' => TRUE);' . EOL;
 		$model_code .= EOL;
 
 		return $model_code;
 	}
 
 	protected function build_expiry_column() {
-		$model_code = TAB . '/**' . EOL;
-		$model_code .= TAB . ' * @var  array  $_expires_column  The time this row expires and is no longer returned in standard searches.' . EOL;
-		$model_code .= TAB . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
-		$model_code .= TAB . ' */' . EOL;
-		$model_code .= TAB . ( ! isset($this->columns['expiry_date']) ? '/*' : '') . 'protected $_expires_column = array(' . EOL;
-		$model_code .= TAB . TAB . '\'column\' 	=> \'expiry_date\',' . EOL;
-		$model_code .= TAB . TAB . '\'default\'	=> 0,' . EOL;
-		$model_code .= TAB . ');' . ( ! isset($this->columns['expiry_date']) ? '*/' : '') . EOL;
+		$model_code = '    ' . '/**' . EOL;
+		$model_code .= '    ' . ' * @var  array  $_expires_column  The time this row expires and is no longer returned in standard searches.' . EOL;
+		$model_code .= '    ' . ' * Use format => \'Y-m-j H:i:s\' for DATETIMEs and format => TRUE for TIMESTAMPs.' . EOL;
+		$model_code .= '    ' . ' */' . EOL;
+		$model_code .= '    ' . ( ! isset($this->columns['expiry_date']) ? '/*' : '') . 'protected $_expires_column = array(' . EOL;
+		$model_code .= '    ' . '    ' . '\'column\' 	=> \'expiry_date\',' . EOL;
+		$model_code .= '    ' . '    ' . '\'default\'	=> 0,' . EOL;
+		$model_code .= '    ' . ');' . ( ! isset($this->columns['expiry_date']) ? '*/' : '') . EOL;
 
 		return $model_code;
 	}
 
 	protected function build_display_order() {
 		$model_code = EOL;
-		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * @var  array  $_display_order  The order to display columns in, if different from as listed in $_table_columns.' . EOL;
-		$model_code .= TAB . ' * Columns not listed here will be added beneath these columns, in the order they are listed in $_table_columns.' . EOL;
-		$model_code .= TAB . ' */' . EOL;
-		$model_code .= TAB . '/*protected $_display_order = array(' . EOL;
+		$model_code .= '    ' . '/**' . EOL;
+		$model_code .= '    ' . ' * @var  array  $_display_order  The order to display columns in, if different from as listed in $_table_columns.' . EOL;
+		$model_code .= '    ' . ' * Columns not listed here will be added beneath these columns, in the order they are listed in $_table_columns.' . EOL;
+		$model_code .= '    ' . ' */' . EOL;
+		$model_code .= '    ' . '/*protected $_display_order = array(' . EOL;
 		foreach ($this->columns as $column_name => $column_data) {
-			$model_code .= TAB . TAB . "'{$column_name}'," . EOL;
+			$model_code .= '    ' . '    ' . "'{$column_name}'," . EOL;
 		}
-		$model_code .= TAB . ');*/' . EOL;
+		$model_code .= '    ' . ');*/' . EOL;
 
 		return $model_code;
 	}
 
 	protected function build_labels() {
 		$model_code = EOL;
-		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * Labels for columns.' . EOL;
-		$model_code .= TAB . ' *' . EOL;
-		$model_code .= TAB . ' * @return  array' . EOL;
-		$model_code .= TAB . ' */' . EOL;
-		$model_code .= TAB . 'public function labels() {' . EOL;
-		$model_code .= TAB . TAB . 'return array(' . EOL;
+		$model_code .= '    ' . '/**' . EOL;
+		$model_code .= '    ' . ' * Labels for columns.' . EOL;
+		$model_code .= '    ' . ' *' . EOL;
+		$model_code .= '    ' . ' * @return  array' . EOL;
+		$model_code .= '    ' . ' */' . EOL;
+		$model_code .= '    ' . 'public function labels() {' . EOL;
+		$model_code .= '    ' . '    ' . 'return array(' . EOL;
 		foreach ($this->columns as $column_name => $column_data) {
 			$label = (isset($this->options['special_labels'][$column_name]) ? $this->options['special_labels'][$column_name] : $this->make_column_label($column_name));
-			$model_code .= TAB . TAB . TAB . '\'' . $column_name . '\' => \'' . $label . '\',' . EOL;
+			$model_code .= '    ' . '    ' . '    ' . '\'' . $column_name . '\' => \'' . $label . '\',' . EOL;
 		} // foreach
-		$model_code .= TAB . TAB . ');' . EOL;
-		$model_code .= TAB . '}' . EOL;
+		$model_code .= '    ' . '    ' . ');' . EOL;
+		$model_code .= '    ' . '}' . EOL;
 
 		return $model_code;
 	}
 
 	protected function build_rules() {
 		$model_code = EOL;
-		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * Rule definitions for validation.' . EOL;
-		$model_code .= TAB . ' *' . EOL;
-		$model_code .= TAB . ' * @return  array' . EOL;
-		$model_code .= TAB . ' */' . EOL;
-		$model_code .= TAB . '/*public function rules() {' . EOL;
-		$model_code .= TAB . TAB . 'return array(' . EOL;
-		$model_code .= TAB . TAB . TAB . '\'' . $this->first_text_column_name . '\' => array(' . EOL;
-		$model_code .= TAB . TAB . TAB . TAB . 'array(\'not_empty\'),' . EOL;
-		$model_code .= TAB . TAB . TAB . '),' . EOL;
-		$model_code .= TAB . TAB . ');' . EOL;
-		$model_code .= TAB . '}*/' . EOL;
+		$model_code .= '    ' . '/**' . EOL;
+		$model_code .= '    ' . ' * Rule definitions for validation.' . EOL;
+		$model_code .= '    ' . ' *' . EOL;
+		$model_code .= '    ' . ' * @return  array' . EOL;
+		$model_code .= '    ' . ' */' . EOL;
+		$model_code .= '    ' . '/*public function rules() {' . EOL;
+		$model_code .= '    ' . '    ' . 'return array(' . EOL;
+		$model_code .= '    ' . '    ' . '    ' . '\'' . $this->first_text_column_name . '\' => array(' . EOL;
+		$model_code .= '    ' . '    ' . '    ' . '    ' . 'array(\'not_empty\'),' . EOL;
+		$model_code .= '    ' . '    ' . '    ' . '),' . EOL;
+		$model_code .= '    ' . '    ' . ');' . EOL;
+		$model_code .= '    ' . '}*/' . EOL;
 
 		return $model_code;
 	}
 
 	protected function build_filters() {
 		$model_code = EOL;
-		$model_code .= TAB . '/**' . EOL;
-		$model_code .= TAB . ' * Filter definitions, run everytime a field is set.' . EOL;
-		$model_code .= TAB . ' *' . EOL;
-		$model_code .= TAB . ' * @return  array' . EOL;
-		$model_code .= TAB . ' */' . EOL;
-		$model_code .= TAB . '/*public function filters() {' . EOL;
-		$model_code .= TAB . TAB . 'return array(' . EOL;
-		$model_code .= TAB . TAB . TAB . ( ! empty($this->first_text_column_name) ? '\'' . $this->first_text_column_name . '\'' : 'TRUE') . ' => array(' . EOL;
-		$model_code .= TAB . TAB . TAB . TAB . 'array(\'trim\'),' . EOL;
-		$model_code .= TAB . TAB . TAB . '),' . EOL;
-		$model_code .= TAB . TAB . ');' . EOL;
-		$model_code .= TAB . '}*/' . EOL;
+		$model_code .= '    ' . '/**' . EOL;
+		$model_code .= '    ' . ' * Filter definitions, run everytime a field is set.' . EOL;
+		$model_code .= '    ' . ' *' . EOL;
+		$model_code .= '    ' . ' * @return  array' . EOL;
+		$model_code .= '    ' . ' */' . EOL;
+		$model_code .= '    ' . '/*public function filters() {' . EOL;
+		$model_code .= '    ' . '    ' . 'return array(' . EOL;
+		$model_code .= '    ' . '    ' . '    ' . ( ! empty($this->first_text_column_name) ? '\'' . $this->first_text_column_name . '\'' : 'TRUE') . ' => array(' . EOL;
+		$model_code .= '    ' . '    ' . '    ' . '    ' . 'array(\'trim\'),' . EOL;
+		$model_code .= '    ' . '    ' . '    ' . '),' . EOL;
+		$model_code .= '    ' . '    ' . ');' . EOL;
+		$model_code .= '    ' . '}*/' . EOL;
 
 		return $model_code;
 	}
