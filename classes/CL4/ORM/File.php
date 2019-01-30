@@ -146,7 +146,8 @@ class CL4_ORM_File extends ORM_FieldType {
 
 		// if there is an existing file, determine the name of the file based on the original_filename column
 		if ( ! empty($value) && ! empty($file_options['original_filename_column'])) {
-			$file_name = $orm_model->$file_options['original_filename_column'];
+            $original_filename_column = $file_options['original_filename_column'];
+			$file_name = $orm_model->$original_filename_column;
 		} else {
 			$file_name = $value;
 		} // if

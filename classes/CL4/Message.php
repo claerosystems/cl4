@@ -31,49 +31,53 @@ class CL4_Message {
 	* @return  array  The current array of messages in the session
 	*/
 	public static function add($message, $level = NULL, $data = NULL) {
-		if ($level === NULL) {
-			$level = Message::$default_level;
-		}
+	    if ( ! empty($message)) {
+            if ($level === NULL) {
+                $level = Message::$default_level;
+            }
 
-		// we are in dev/debug so we don't want to add the message because it's a debug only message
-		if ( ! CL4::is_dev() && $level == Message::$debug) {
-			// get session messages, but don't delete them
-			return Message::get(NULL, FALSE);
-		}
+            // we are in dev/debug so we don't want to add the message because it's a debug only message
+            if ( ! CL4::is_dev() && $level == Message::$debug) {
+                // get session messages, but don't delete them
+                return Message::get(NULL, FALSE);
+            }
 
-		// get session messages
-		$messages = Message::get();
+            // get session messages
+            $messages = Message::get();
 
-		// initialize if necessary
-		if( ! is_array($messages)) {
-			$messages = array();
-		}
+            // initialize if necessary
+            if( ! is_array($messages)) {
+                $messages = array();
+            }
 
-		// append to messages
-		if (is_array($message)) {
-			foreach ($message as $level => $_message) {
-				if (is_array($data)) {
-					$_message = strtr($_message, $data);
-				}
+            // append to messages
+            if (is_array($message)) {
+                foreach ($message as $level => $_message) {
+                    if (is_array($data)) {
+                        $_message = strtr($_message, $data);
+                    }
 
-				$messages[] = array(
-					'level' => $level,
-					'message' => $_message, // translate the message
-				);
-			}
-		} else {
-			if (is_array($data)) {
-				$message = strtr($message, $data);
-			}
+                    $messages[] = array(
+                        'level' => $level,
+                        'message' => $_message, // translate the message
+                    );
+                }
+            } else {
+                if (is_array($data)) {
+                    $message = strtr($message, $data);
+                }
 
-			$messages[] = array(
-				'level' => $level,
-				'message' => $message,
-			);
-		}
+                $messages[] = array(
+                    'level' => $level,
+                    'message' => $message,
+                );
+            }
 
-		// set messages
-		Message::set($messages);
+            // set messages
+            Message::set($messages);
+        } else {
+            return Message::get(NULL, FALSE);
+        }
 
 		return $messages;
 	} // function

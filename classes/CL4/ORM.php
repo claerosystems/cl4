@@ -725,7 +725,8 @@ class CL4_ORM extends Kohana_ORM {
 	 */
 	public function prepare_form($process_column_name = NULL, $override_attributes = array()) {
 		// add the extra hidden fields from options, if there is any
-		if (count($this->_options['hidden_fields'] > 0)) {
+
+		if ( ! empty($this->_options['hidden_fields']) && is_array($this->_options['hidden_fields'])) {
 			foreach ($this->_options['hidden_fields'] as $hidden_field) {
 				$this->_form_fields_hidden[] = $hidden_field;
 			} // foreach
@@ -1555,7 +1556,7 @@ class CL4_ORM extends Kohana_ORM {
 		// prepare csv file
 		$csv = new ClaeroCsv('write');
 		if (!$csv->GetStatus()) {
-			trigger_error('File System Error: Failed to prepare for writing of CSV file', E_USER_ERROR);
+			Message::add('File System Error: Failed to prepare for writing of CSV file', Message::$error);
 			return false;
 		}
 
@@ -1572,7 +1573,7 @@ class CL4_ORM extends Kohana_ORM {
 		} // foreach
 		$csv->AddRow($headings);
 		if (!$csv->GetStatus()) {
-			trigger_error('CSV Error: Failed to add header row', E_USER_ERROR);
+			Message::add('CSV Error: Failed to add header row', Message::$error);
 			return false;
 		}
 
@@ -1626,19 +1627,19 @@ class CL4_ORM extends Kohana_ORM {
 
 			$csv->AddRow($row);
 			if (!$csv->GetStatus()) {
-				trigger_error('CSV Error: Failed to add row to csv file', E_USER_ERROR);
+				Message::add('CSV Error: Failed to add row to csv file', Message::$error);
 			}
 		} // foreach
 
 		$csv->CloseCsv();
 		if (!$csv->GetStatus()) {
-			trigger_error('CSV Error: Failed to close CSV', E_USER_ERROR);
+			Message::add('CSV Error: Failed to close CSV', Message::$error);
 			return false;
 		}
 
 		$csv->GetCsv($this->formName . '-' . time() . '.csv');
 		if (!$csv->GetStatus()) {
-			trigger_error('CSV Error: Failed to retrieve CSV', E_USER_ERROR);
+			Message::add('CSV Error: Failed to retrieve CSV', Message::$error);
 			return false;
 		}
 
