@@ -762,7 +762,8 @@ class CL4_Form extends Kohana_Form {
 				}
 				// add the square brackets around the end of the name; warn the user if they aren't there
 				if (substr($name, -2, 2) != '[]') {
-					throw new Kohana_Exception('Input Error: The field name (:name) for a multiple select was missing the square brackets required for a multiple select', array(':name' => $name));
+                    $name = $name . '[]';
+					//throw new Kohana_Exception('Input Error: The field name (:name) for a multiple select was missing the square brackets required for a multiple select', array(':name' => $name));
 				}
 			}
 
