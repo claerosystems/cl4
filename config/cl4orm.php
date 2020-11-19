@@ -391,7 +391,7 @@ return array(
 		// these fields will be added to the hidden fields array when generating the form and will not be included in the _field_html array and therefore will not get a row in an edit form
 		'field_types_treated_as_hidden' => array('Hidden'),
 		// these fields will be treated as textareas, such that the will limited based on editable_list_options.textarea_word_limit
-		'field_types_treaded_as_textarea' => array('textarea'),
+		'field_types_treated_as_textarea' => array('textarea'),
 		'record_changes' => TRUE, // if set to TRUE, Model_Change_Log will be used to record changes; set this to FALSE to disable the change_log logging for all models; use _log and _log_next_query in ORM to affect only the model or save
 		'add_field_help' => FALSE, // enabling this will display the field help as found in ORM::_field_help
 		'field_help_view' => 'cl4/field_help', // the view used to generate the help for the field
