@@ -51,6 +51,14 @@ class CL4_ORM_FieldType {
 		if ($value !== NULL || $options['is_nullable']) {
 			$orm_model->$column_name = $value;
 		}
+
+        if ($column_name === 'account_expiry_date' && $value === '') {
+            $orm_model->$column_name = '0000-00-00 00:00:00';
+        }
+
+        if ($column_name === 'date_modified') {
+            $orm_model->$column_name = date('Y-m-d H:i:s');
+        }
 	} // function save
 
 	/**
