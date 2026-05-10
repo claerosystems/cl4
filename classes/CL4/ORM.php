@@ -1935,8 +1935,8 @@ class CL4_ORM extends Kohana_ORM {
 	 *
 	 * @param  string  $alias    Alias of the has_many "through" relationship
 	 * @param  mixed   $far_keys Related model, primary key, or an array of primary keys
-	 * @return ORM
-	 */
+	 * @return CL4_ORM
+     */
 	public function add($alias, $far_keys) {
 		$far_keys = ($far_keys instanceof ORM ? $far_keys->pk() : $far_keys);
 
@@ -1959,22 +1959,23 @@ class CL4_ORM extends Kohana_ORM {
 		return $this;
 	} // function add
 
-	/**
-	 * Removes a relationship between this model and another.
-	 *
-	 *     // Remove a role using a model instance
-	 *     $model->remove('roles', ORM::factory('role', array('name' => 'login')));
-	 *     // Remove the role knowing the primary key
-	 *     $model->remove('roles', 5);
-	 *     // Remove multiple roles (for example, from checkboxes on a form)
-	 *     $model->remove('roles', array(1, 2, 3, 4));
-	 *     // Remove all related roles
-	 *     $model->remove('roles');
-	 *
-	 * @param  string $alias    Alias of the has_many "through" relationship
-	 * @param  mixed  $far_keys Related model, primary key, or an array of primary keys
-	 * @return ORM
-	 */
+    /**
+     * Removes a relationship between this model and another.
+     *
+     *     // Remove a role using a model instance
+     *     $model->remove('roles', ORM::factory('role', array('name' => 'login')));
+     *     // Remove the role knowing the primary key
+     *     $model->remove('roles', 5);
+     *     // Remove multiple roles (for example, from checkboxes on a form)
+     *     $model->remove('roles', array(1, 2, 3, 4));
+     *     // Remove all related roles
+     *     $model->remove('roles');
+     *
+     * @param string $alias Alias of the has_many "through" relationship
+     * @param mixed $far_keys Related model, primary key, or an array of primary keys
+     * @return ORM
+     * @throws Kohana_Exception
+     */
 	public function remove($alias, $far_keys = NULL) {
 		$far_keys = ($far_keys instanceof ORM) ? $far_keys->pk() : $far_keys;
 
